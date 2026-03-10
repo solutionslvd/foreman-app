@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[YOUR BUSINESS NAME] - AI Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hard-hat"></i>
+                    <span>[YOUR BUSINESS NAME]</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-section="chat">
+                    <i class="fas fa-comments"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="#" class="nav-item" data-section="financial">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Financial</span>
+                </a>
+                <a href="#" class="nav-item" data-section="projects">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Projects</span>
+                </a>
+                <a href="#" class="nav-item" data-section="compliance">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Compliance</span>
+                </a>
+                <a href="#" class="nav-item" data-section="documents">
+                    <i class="fas fa-folder"></i>
+                    <span>Documents</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">[YOUR NAME]</div>
+                        <div class="user-trade">[YOUR TRADE]</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <button class="btn btn-primary" id="voiceBtn">
+                        <i class="fas fa-microphone"></i>
+                        <span>Voice Command</span>
+                    </button>
+                    <button class="btn btn-secondary" id="notificationBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">0</span>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Dashboard Section -->
+            <section class="content-section active" id="dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon income">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-label">Monthly Income</div>
+                            <div class="stat-value">$0.00</div>
+                            <div class="stat-change neutral">No data yet</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon expenses">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-label">Monthly Expenses</div>
+                            <div class="stat-value">$0.00</div>
+                            <div class="stat-change neutral">No data yet</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon projects">
+                            <i class="fas fa-hard-hat"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-label">Active Projects</div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-change neutral">Add your first project</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon compliance">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-label">Compliance Score</div>
+                            <div class="stat-value">--</div>
+                            <div class="stat-change neutral">Setup compliance tracking</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>AI Suggestions</h3>
+                            <button class="btn-icon"><i class="fas fa-ellipsis-h"></i></button>
+                        </div>
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <i class="fas fa-lightbulb"></i>
+                                <p>No suggestions yet</p>
+                                <small>Start using the AI assistant to get personalized suggestions</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Recent Activity</h3>
+                            <button class="btn-icon"><i class="fas fa-ellipsis-h"></i></button>
+                        </div>
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <i class="fas fa-history"></i>
+                                <p>No recent activity</p>
+                                <small>Your activity will appear here</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Upcoming Deadlines</h3>
+                            <button class="btn-icon"><i class="fas fa-ellipsis-h"></i></button>
+                        </div>
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-alt"></i>
+                                <p>No upcoming deadlines</p>
+                                <small>Deadlines will appear here</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- AI Chat Section -->
+            <section class="content-section" id="chat">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="chat-title">
+                            <i class="fas fa-robot"></i>
+                            <span>[YOUR AI NAME]</span>
+                        </div>
+                        <div class="chat-actions">
+                            <button class="btn-icon" title="Clear Chat">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="btn-icon" title="Export Chat">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai-message">
+                            <div class="message-avatar ai">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <p>Hello! I'm your [YOUR AI NAME]. I can help you with:</p>
+                                <ul>
+                                    <li>📊 Financial management and invoicing</li>
+                                    <li>📋 Compliance (WCB, OHS, permits)</li>
+                                    <li>💰 Tax guidance and accounting</li>
+                                    <li>🏗️ Project management and scheduling</li>
+                                    <li>📝 Administrative tasks and paperwork</li>
+                                </ul>
+                                <p>I specialize in [YOUR TRADE] and Alberta construction regulations. What would you like help with today?</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <div class="quick-actions">
+                            <button class="quick-action" data-action="create_invoice">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                                Create Invoice
+                            </button>
+                            <button class="quick-action" data-action="check_compliance">
+                                <i class="fas fa-shield-alt"></i>
+                                Check Compliance
+                            </button>
+                            <button class="quick-action" data-action="tax_help">
+                                <i class="fas fa-calculator"></i>
+                                Tax Help
+                            </button>
+                            <button class="quick-action" data-action="catch_up">
+                                <i class="fas fa-clock"></i>
+                                Catch Up
+                            </button>
+                        </div>
+                        
+                        <div class="chat-input-wrapper">
+                            <button class="btn-icon voice-btn" id="chatVoiceBtn">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <textarea 
+                                id="chatInput" 
+                                placeholder="Type your message or use voice command..."
+                                rows="1"
+                            ></textarea>
+                            <button class="btn-primary send-btn" id="sendBtn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Financial Section -->
+            <section class="content-section" id="financial">
+                <div class="financial-header">
+                    <div class="financial-summary">
+                        <div class="summary-card">
+                            <div class="summary-label">Total Income</div>
+                            <div class="summary-value income">$0.00</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Total Expenses</div>
+                            <div class="summary-value expense">$0.00</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Net Profit</div>
+                            <div class="summary-value profit">$0.00</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Pending Invoices</div>
+                            <div class="summary-value pending">$0.00</div>
+                        </div>
+                    </div>
+                    
+                    <div class="financial-actions">
+                        <button class="btn btn-primary" id="createInvoiceBtn">
+                            <i class="fas fa-plus"></i>
+                            Create Invoice
+                        </button>
+                        <button class="btn btn-secondary" id="addExpenseBtn">
+                            <i class="fas fa-receipt"></i>
+                            Add Expense
+                        </button>
+                        <button class="btn btn-secondary" id="processPayrollBtn">
+                            <i class="fas fa-users"></i>
+                            Process Payroll
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="financial-tabs">
+                    <button class="tab-btn active" data-tab="transactions">Transactions</button>
+                    <button class="tab-btn" data-tab="invoices">Invoices</button>
+                    <button class="tab-btn" data-tab="expenses">Expenses</button>
+                    <button class="tab-btn" data-tab="payroll">Payroll</button>
+                    <button class="tab-btn" data-tab="tax">Tax Summary</button>
+                </div>
+                
+                <div class="financial-content">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" class="empty-row">
+                                        <div class="empty-state">
+                                            <i class="fas fa-table"></i>
+                                            <p>No transactions yet</p>
+                                            <small>Add your first transaction to get started</small>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Projects Section -->
+            <section class="content-section" id="projects">
+                <div class="projects-header">
+                    <h2>Active Projects</h2>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        New Project
+                    </button>
+                </div>
+                
+                <div class="projects-grid">
+                    <div class="empty-state large">
+                        <i class="fas fa-project-diagram"></i>
+                        <p>No projects yet</p>
+                        <small>Click "New Project" to add your first project</small>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Compliance Section -->
+            <section class="content-section" id="compliance">
+                <div class="compliance-overview">
+                    <div class="compliance-score">
+                        <div class="score-circle">
+                            <svg viewBox="0 0 36 36">
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    fill="none" stroke="#e0e0e0" stroke-width="3"
+                                />
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    fill="none" stroke="#9e9e9e" stroke-width="3"
+                                    stroke-dasharray="0, 100"
+                                />
+                            </svg>
+                            <div class="score-value">--</div>
+                        </div>
+                        <div class="score-label">Overall Compliance</div>
+                    </div>
+                    
+                    <div class="compliance-items">
+                        <div class="compliance-item neutral">
+                            <div class="compliance-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="compliance-info">
+                                <div class="compliance-title">WCB Coverage</div>
+                                <div class="compliance-status">Setup required</div>
+                            </div>
+                        </div>
+                        
+                        <div class="compliance-item neutral">
+                            <div class="compliance-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="compliance-info">
+                                <div class="compliance-title">Safety Inspections</div>
+                                <div class="compliance-status">Setup required</div>
+                            </div>
+                        </div>
+                        
+                        <div class="compliance-item neutral">
+                            <div class="compliance-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="compliance-info">
+                                <div class="compliance-title">Building Permits</div>
+                                <div class="compliance-status">Setup required</div>
+                            </div>
+                        </div>
+                        
+                        <div class="compliance-item neutral">
+                            <div class="compliance-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="compliance-info">
+                                <div class="compliance-title">Training Records</div>
+                                <div class="compliance-status">Setup required</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="compliance-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-clipboard-check"></i>
+                        Start Safety Inspection
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-file-alt"></i>
+                        View Compliance Report
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-plus"></i>
+                        Add Training Record
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Documents Section -->
+            <section class="content-section" id="documents">
+                <div class="documents-header">
+                    <h2>Documents</h2>
+                    <div class="document-actions">
+                        <input type="text" placeholder="Search documents..." class="search-input">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-upload"></i>
+                            Upload
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="documents-grid">
+                    <div class="empty-state large">
+                        <i class="fas fa-folder-open"></i>
+                        <p>No documents yet</p>
+                        <small>Upload your first document to get started</small>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal Container -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

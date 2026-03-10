@@ -1,0 +1,21 @@
+grep: Unmatched [, [^, [:, [., or [=
+261:          <button class="btn-secondary btn-sm" onclick="refreshDashboard()">↻ Refresh</button>
+373:          <button class="btn-secondary btn-sm" onclick="clearChat()">Clear Chat</button>
+374:          <button class="btn-secondary btn-sm" onclick="showAIContext()">📊 Context</button>
+445:          <button class="btn-secondary btn-sm" onclick="openEstimateModal()">📋 New Estimate</button>
+498:          <button class="btn-secondary btn-sm" onclick="showExpenseTab('receipts',this)">📷 Receipts</button>
+533:          <button class="btn-secondary btn-sm" onclick="exportExpensesCSV()">⬇️ Export CSV</button>
+562:            <button class="btn-secondary" onclick="document.getElementById('receipt-camera-input').click()">📷 Take Photo (Mobile)</button>
+564:            <button class="btn-secondary" onclick="openModal('new-expense-modal')">✏️ Manual Entry</button>
+623:          <button class="btn-secondary btn-sm" onclick="showPayrollTab('chart',this)">📊 Chart of Accounts</button>
+624:          <button class="btn-secondary btn-sm" onclick="showPayrollTab('bank',this)">🏦 Bank Feed</button>
+625:          <button class="btn-secondary btn-sm" onclick="showPayrollTab('tax',this)">🇨🇦 CRA Tax</button>
+808:              <button class="btn-secondary" onclick="printPayStub()">🖨️ Print Pay Stub</button>
+826:              <button class="btn-secondary btn-sm" onclick="exportPayrollCSV()">⬇️ Export CSV</button>
+847:              <button class="btn-secondary btn-sm" onclick="exportCOACSV()">⬇️ Export CSV</button>
+975:              <button class="btn-secondary btn-sm" onclick="exportTransactionsCSV()">⬇️ Export</button>
+992:              <button class="btn-secondary btn-sm" onclick="exportTaxReport()">⬇️ Export PDF</button>
+1067:          <button class="btn-secondary btn-sm" onclick="exportAcctReport()">⬇️ Export</button>
+1174:            <button class="btn-secondary" onclick="exportReconciliation()">⬇️ Export CSV</button>
+1191:              <button class="btn-secondary btn-sm" onclick="exportTrialBalance()">⬇️ Export</button>
+1206:              <button class="btn-secondary btn-sm" onclick="exportBalanceSheetAcct()">⬇️ Export</button>

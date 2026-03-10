@@ -1,0 +1,139 @@
+================================================================================
+LANDING PAGE - NAVIGATION ELEMENT ANALYSIS
+================================================================================
+
+Total LINKS FOUND: 35
+--------------------------------------------------------------------------------
+
+[INTERNAL LINKS] (starting with /):
+  [OK] /admin                              -> 200 (Admin)
+  [OK] /admin                              -> 200 (Admin)
+  [OK] /app                                -> 200 (Dashboard)
+  [OK] /admin                              -> 200 (Admin Panel)
+  [OK] /privacy                            -> 200 (Privacy Policy)
+  [OK] /terms                              -> 200 (Terms of Service)
+  [OK] /privacy#cookies                    -> 200 (Cookie Policy)
+  [FAIL] mailto:legal@foremanapp.ca          -> ? (Legal Inquiries)
+  [FAIL] mailto:support@foremanapp.ca        -> ? (Contact Support)
+  [OK] /api/docs                           -> 200 (API Docs)
+  [FAIL] mailto:hello@foremanapp.ca          -> ? (Get in Touch)
+  [OK] /app                                -> 200 (Launch App)
+  [OK] /privacy                            -> 200 (Privacy)
+  [OK] /terms                              -> 200 (Terms)
+
+[EXTERNAL LINKS]:
+
+[HASH LINKS] (same-page anchors):
+  [OK] #features            -> #features             (Features) TARGET FOUND
+  [OK] #email-ai            -> #email-ai             (Email AI) TARGET FOUND
+  [OK] #pricing             -> #pricing              (Pricing) TARGET FOUND
+  [OK] #how-it-works        -> #how-it-works         (How It Works) TARGET FOUND
+  [OK] #testimonials        -> #testimonials         (Reviews) TARGET FOUND
+  [OK] #features            -> #features             (Features) TARGET FOUND
+  [OK] #email-ai            -> #email-ai             (Email AI) TARGET FOUND
+  [OK] #pricing             -> #pricing              (Pricing) TARGET FOUND
+  [OK] #how-it-works        -> #how-it-works         (How It Works) TARGET FOUND
+  [OK] #testimonials        -> #testimonials         (Reviews) TARGET FOUND
+  [OK] #features            -> #features             (See How It Works) TARGET FOUND
+  [OK] #features            -> #features             (Features) TARGET FOUND
+  [OK] #pricing             -> #pricing              (Pricing) TARGET FOUND
+  [OK] #how-it-works        -> #how-it-works         (How It Works) TARGET FOUND
+
+[JAVASCRIPT/ACTION LINKS]:
+  [JS] ForemanAI for Construction     onclick=''
+  [JS] Sign In                        onclick='openLogin()'
+  [JS] Start Free Trial               onclick='openSignup()'
+  [JS] Sign In                        onclick='closeMobileMenu();openLogin()'
+  [JS] Start Free Trial               onclick='closeMobileMenu();openSignup()'
+  [JS] Start Free 14-Day Trial        onclick='openSignup()'
+  [JS] Start Your Free 14-Day Trial   onclick='openSignup()'
+
+
+BUTTONS FOUND: 10
+--------------------------------------------------------------------------------
+  [BTN] [no text]                      onclick='toggleMobileMenu()'
+  [BTN] Get Started                    onclick='openSignup('starter')'
+  [BTN] Start Free Trial               onclick='openSignup('professional')'
+  [BTN] Contact Sales                  onclick='openSignup('business')'
+  [BTN] ×                              onclick='closeModal('signupModal')'
+  [BTN] Create Free Account            onclick=''
+  [BTN] Sign In Instead                onclick='closeModal('signupModal');openLogin()'
+  [BTN] ×                              onclick='closeModal('loginModal')'
+  [BTN] Sign In                        onclick=''
+  [BTN] Create Free Account            onclick='closeModal('loginModal');openSignup()'
+
+================================================================================
+APP PAGE - NAVIGATION ELEMENT ANALYSIS
+================================================================================
+
+NAV ITEMS (sidebar navigation): 19
+--------------------------------------------------------------------------------
+  [NAV] data-page='dashboard' onclick='navigateTo('dashboard')' (📊Dashboard)
+  [NAV] data-page='ai-chat' onclick='navigateTo('ai-chat')' (🤖AI Assistant)
+  [NAV] data-page='projects' onclick='navigateTo('projects')' (🏗️Projects)
+  [NAV] data-page='invoices' onclick='navigateTo('invoices')' (📄Invoices)
+  [NAV] data-page='expenses' onclick='navigateTo('expenses')' (💳Expenses)
+  [NAV] data-page='reports' onclick='navigateTo('reports')' (📈Reports)
+  [NAV] data-page='payroll' onclick='navigateTo('payroll')' (👷Payroll)
+  [NAV] data-page='accounting' onclick='navigateTo('accounting')' (📒Accounting)
+  [NAV] data-page='compliance' onclick='navigateTo('compliance')' (✅Compliance)
+  [NAV] data-page='documents' onclick='navigateTo('documents')' (📁Documents)
+  [NAV] data-page='time-tracking' onclick='navigateTo('time-tracking')' (⏱️Time Tracking)
+  [NAV] data-page='admin-settings' onclick='navigateTo('admin-settings')' (⚙️Settings)
+  [NAV] data-page='user-management' onclick='navigateTo('user-management')' (👥Users)
+  [NAV] data-page='billing' onclick='navigateTo('billing')' (💰Billing)
+  [NAV] data-page='dashboard' onclick='navigateTo('dashboard')' (📊Home)
+  [NAV] data-page='ai-chat' onclick='navigateTo('ai-chat')' (🤖AI)
+  [NAV] data-page='invoices' onclick='navigateTo('invoices')' (📄Invoices)
+  [NAV] data-page='projects' onclick='navigateTo('projects')' (🏗️Projects)
+  [NAV] data-page='compliance' onclick='navigateTo('compliance')' (✅Safety)
+
+PAGE CONTAINERS (divs with id='page-XXX'):
+--------------------------------------------------------------------------------
+  [OK] page-accounting                EXISTS
+  [OK] page-admin-settings            EXISTS
+  [OK] page-ai-chat                   EXISTS
+  [OK] page-billing                   EXISTS
+  [OK] page-compliance                EXISTS
+  [OK] page-dashboard                 EXISTS
+  [OK] page-documents                 EXISTS
+  [OK] page-expenses                  EXISTS
+  [OK] page-invoices                  EXISTS
+  [OK] page-payroll                   EXISTS
+  [OK] page-projects                  EXISTS
+  [OK] page-reports                   EXISTS
+  [OK] page-time-tracking             EXISTS
+  [OK] page-user-management           EXISTS
+
+NAVIGATETO CALLS:
+--------------------------------------------------------------------------------
+  [CALL] 👤 My Profile                   -> navigateTo('profile'); toggleUserMenu()
+  [CALL] ⚙️ Preferences                 -> navigateTo('profile'); toggleUserMenu()
+  [CALL] ❓ Help & Support               -> navigateTo('help'); toggleUserMenu()
+  [CALL] 📊Dashboard                     -> navigateTo('dashboard')
+  [CALL] 🤖AI Assistant                  -> navigateTo('ai-chat')
+  [CALL] 🏗️Projects                     -> navigateTo('projects')
+  [CALL] 📄Invoices                      -> navigateTo('invoices')
+  [CALL] 💳Expenses                      -> navigateTo('expenses')
+  [CALL] 📈Reports                       -> navigateTo('reports')
+  [CALL] 👷Payroll                       -> navigateTo('payroll')
+  [CALL] 📒Accounting                    -> navigateTo('accounting')
+  [CALL] ✅Compliance                    -> navigateTo('compliance')
+  [CALL] 📁Documents                     -> navigateTo('documents')
+  [CALL] ⏱️Time Tracking                -> navigateTo('time-tracking')
+  [CALL] ⚙️Settings                     -> navigateTo('admin-settings')
+  [CALL] 👥Users                         -> navigateTo('user-management')
+  [CALL] 💰Billing                       -> navigateTo('billing')
+  [CALL] 🤖Ask AI                        -> navigateTo('ai-chat')
+  [CALL] ✅Compliance                    -> navigateTo('compliance')
+  [CALL] ⏱️Log Time                     -> navigateTo('time-tracking')
+  [CALL] 📄Creating InvoicesLearn how to -> sendQuickPrompt('How do I create an invoice?'); navigateTo('
+  [CALL] ✅WCB ComplianceUnderstanding W -> sendQuickPrompt('How do I track WCB compliance?'); navigateT
+  [CALL] 🧾GST FilingAlberta GST filing  -> sendQuickPrompt('How do I file GST in Alberta?'); navigateTo
+  [CALL] 📋Building PermitsAlberta permi -> sendQuickPrompt('What permits do I need for construction in 
+  [CALL] 📊Home                          -> navigateTo('dashboard')
+  [CALL] 🤖AI                            -> navigateTo('ai-chat')
+  [CALL] 📄Invoices                      -> navigateTo('invoices')
+  [CALL] 🏗️Projects                     -> navigateTo('projects')
+  [CALL] ✅Safety                        -> navigateTo('compliance')
+  [CALL] 🤖                              -> navigateTo('ai-chat')

@@ -1,0 +1,6 @@
+305:          <button class="quick-btn" onclick="openInvoiceModal()">
+309:          <button class="quick-btn" onclick="openModal('new-expense-modal')">
+313:          <button class="quick-btn" onclick="navigateTo('ai-chat')">
+317:          <button class="quick-btn" onclick="openModal('new-project-modal')">
+321:          <button class="quick-btn" onclick="navigateTo('compliance')">
+325:          <button class="quick-btn" onclick="navigateTo('time-tracking')">

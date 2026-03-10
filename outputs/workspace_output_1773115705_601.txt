@@ -1,0 +1,31 @@
+@router.post("/incidents")
+async def record_incident(
+    incident: SafetyIncident,
+    authorization: Optional[str] = Header(None)
+):
+    """Record a workplace safety incident for the authenticated user."""
+    try:
+        engine = _get_engine(authorization)
+        result = engine.record_safety_incident(
+            incident_date=incident.incident_date,
+            incident_type=incident.incident_type,
+            description=incident.description,
+            location=incident.location,
+            severity=incident.severity,
+            injuries=incident.injuries,
+            witnesses=incident.witnesses,
+            immediate_actions_taken=incident.immediate_actions_taken
+        )
+        return {"status": "success", "incident": result}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error recording incident: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/training")
+async def add_training(
+    training: TrainingRecord,
+    authorization: Optional[str] = Header(None)
+):

@@ -1,0 +1,25 @@
+=== NEW BUGS IDENTIFIED ===
+
+BUG-NEW-A: /api/billing/payments requires admin but frontend calls with user token
+BUG-NEW-B: /api/financial/payroll GET returns 405 - wrong HTTP method in frontend
+BUG-NEW-C: /api/billing/subscription GET returns 405 - needs GET handler
+BUG-NEW-D: Ledger reports (P&L, AR, GST, cashflow, balance) blocked for starter plan users
+BUG-NEW-E: Compliance singleton shared across all users - pollutes scores
+BUG-NEW-F: User role field missing from /api/users/me response
+
+94:@router.get("/subscription/{user_email}")
+95:async def get_subscription(user_email: str):
+102:@router.post("/subscription")
+103:async def create_subscription(request: CreateSubscriptionRequest):
+138:@router.put("/subscription/{user_email}")
+139:async def update_subscription(user_email: str, request: UpdateSubscriptionRequest):
+158:@router.delete("/subscription/{user_email}")
+159:async def cancel_subscription(user_email: str):
+240:@router.get("/admin/subscriptions")
+241:async def get_all_subscriptions(authorization: Optional[str] = Header(None)):
+246:@router.put("/admin/subscription/{user_email}/override")
+247:async def admin_override_subscription(
+---
+92:@router.post("/payroll")
+93:async def process_payroll(payroll: PayrollCreate):
+---

@@ -1,0 +1,33 @@
+=== RUNNING PROCESSES ===
+root         630  0.0  0.7  37208 31316 ?        Ss   22:03   0:00 /usr/bin/python3 /usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf
+root         653  0.2  1.4 145948 59396 ?        Sl   22:03   0:01 python /app/browser_api.py
+root         658  0.2  1.0  50132 43724 ?        S    22:03   0:02 python /app/server.py
+root         740  0.0  0.2  15612 11760 ?        S    22:03   0:00 /usr/local/bin/python -c from multiprocessing.resource_tracker import main;main(4)
+root         741  0.1  1.0  51268 44252 ?        S    22:03   0:01 /usr/local/bin/python -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=5, pipe_handle=7) --multiprocessing-fork
+root         765  0.3  2.4 1473460 99956 ?       Sl   22:03   0:03 /usr/local/lib/python3.11/site-packages/playwright/driver/node /usr/local/lib/python3.11/site-packages/playwright/driver/package/cli.js run-driver
+root         918  0.0  0.5  28028 21708 ?        S    22:03   0:00 python3 -m websockify --web /opt/novnc 0.0.0.0:6080 localhost:5901
+root        2480  0.0  0.0   4352  3256 ?        S    22:15   0:00 bash -lc  cd /workspace && python -m uvicorn app.main:app --host 0.0.0.0 --port 8050 > /workspace/server.log 2>&1 
+root        2487  0.6  1.7 249944 70008 ?        Sl   22:15   0:01 python -m uvicorn app.main:app --host 0.0.0.0 --port 8050
+root        2658  0.0  0.0   4352  3244 ?        S    22:17   0:00 bash -lc  cd /workspace && python3 scheduler.py > /workspace/scheduler.log 2>&1 
+root        2665  0.0  0.4  24924 19388 ?        S    22:17   0:00 python3 scheduler.py
+
+=== REPORTS DIRECTORY ===
+total 16
+drwxr-xr-x 2 root root 4096 Mar  8 22:17 .
+drwxr-xr-x 8 user user 4096 Mar  8 22:17 ..
+-rw-r--r-- 1 root root 1292 Mar  8 22:17 DAILY_REPORT_2026-03-08.md
+-rw-r--r-- 1 root root 1698 Mar  8 22:17 diagnostic_2026-03-08.json
+
+=== KEY FILES CREATED/MODIFIED ===
+-rw-r--r-- 1 root root  6907 Mar  8 22:12 /workspace/app/persistence.py
+-rw-r--r-- 1 root root 17848 Mar  8 22:17 /workspace/daily_report.py
+-rw-r--r-- 1 root root  4022 Mar  8 22:17 /workspace/scheduler.py
+
+=== FINAL HEALTH CHECK ===
+{
+    "status": "healthy",
+    "service": "BuildAI Alberta",
+    "version": "2.0.0",
+    "timestamp": 1773008333,
+    "uptime": "active"
+}

@@ -1,0 +1,2 @@
+Fixed HTML entities in line 1291
+Done.

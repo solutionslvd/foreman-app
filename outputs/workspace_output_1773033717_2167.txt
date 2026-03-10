@@ -1,0 +1,61 @@
+4932 /workspace/web/app.js
+42:function loadUnifiedStore() {
+57:      migrateLegacyStorage();
+59:  } catch(e) { console.warn('loadUnifiedStore error:', e); }
+63:function migrateLegacyStorage() {
+70:    'receiptStore':            (v) => { store.receipts = v; },
+94:  loadUnifiedStore();
+600:  msgs.innerHTML += `<div style="text-align:right;margin-bottom:6px;color:var(--text-secondary)">${escapeHtml(msg)}</div>`;
+609:    msgs.innerHTML += `<div style="margin-bottom:6px;color:var(--text-primary)">${escapeHtml(data.response || 'Got it!')}</div>`;
+1212:        ${escapeHtml(p.address ? `<div style="font-size:12px;color:var(--text-muted);margin-top:.3rem">📍 ${p.address || '')}</div>` : ''}
+1260:// BUG-013 FIX: payrollStore now lives inside unified store.payroll
+1262:const payrollStore = store.payroll; // alias for backward compatibility
+1267:  syncStore().catch(() => {});
+1342:  payrollStore.employees.forEach(function(e, i) {
+1345:  payrollStore.contractors.forEach(function(c, i) {
+1356:  var worker = type === 'emp' ? payrollStore.employees[idx] : payrollStore.contractors[idx];
+1536:  payrollStore.history.push(entry);
+1539:  payrollStore.transactions.push({
+1584:  payrollStore.employees.push(emp);
+1594:  if (!payrollStore.employees.length) {
+1598:  container.innerHTML = payrollStore.employees.map(function(e, i) {
+1617:  payrollStore.employees.splice(i, 1);
+1624:  var worker = type === 'emp' ? payrollStore.employees[idx] : payrollStore.contractors[idx];
+1653:  payrollStore.contractors.push(con);
+1663:  if (!payrollStore.contractors.length) {
+1667:  container.innerHTML = payrollStore.contractors.map(function(c, i) {
+1686:  payrollStore.contractors.splice(i, 1);
+1701:  payrollStore.history.forEach(function(h) {
+1714:  payrollStore.history.forEach(function(h) { if (workers.indexOf(h.name) < 0) workers.push(h.name); });
+1726:  var filtered = payrollStore.history.filter(function(h) {
+1779:  payrollStore.history.forEach(function(h) {
+1790:    h = payrollStore.history[idx];
+1876:  payrollStore.history.forEach(function(h) {
+1885:  payrollStore.transactions.forEach(function(t) {
+1959:    payrollStore.transactions.filter(function(tx){return tx.account===acct.num;}).forEach(function(tx) {
+1974:  if (!payrollStore.transactions.length) {
+1979:  var sorted = payrollStore.transactions.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+2003:  var txn = payrollStore.transactions.find(function(t){return t.id===id;});
+2021:  payrollStore.transactions.push({
+2063:      payrollStore.transactions.push({
+2116:  payrollStore.transactions.forEach(function(t) {
+2137:  var totalSales = payrollStore.transactions.filter(function(t){return t.account==='100';}).reduce(function(s,t){return s+t.amount;},0);
+2139:  var itcAmount = payrollStore.transactions.filter(function(t){return t.gst==='itc'||t.gst==='included';}).reduce(function(s,t){return s+(t.amount/1.05*0.05);},0);
+2147:  var empHistory = payrollStore.history.filter(function(h){return !h.isContractor;});
+2192:  payrollStore.history.filter(function(h){return h.isContractor;}).forEach(function(h){
+2217:  var totalIncome = payrollStore.transactions.filter(function(t){return t.account==='100'||t.account==='101';}).reduce(function(s,t){return s+t.amount;},0);
+2218:  var totalExpenses = payrollStore.transactions.filter(function(t){return parseInt(t.account)>=200&&parseInt(t.account)<=214;}).reduce(function(s,t){return s+t.amount;},0);
+2232:  var empHistory = payrollStore.history.filter(function(h){return !h.isContractor;});
+2233:  var conHistory = payrollStore.history.filter(function(h){return h.isContractor;});
+2248:    ['Line 103 - Total Sales', payrollStore.transactions.filter(function(t){return t.account==='100';}).reduce(function(s,t){return s+t.amount;},0).toFixed(2)],
+2275:    var data = payrollStore.backdateData[year] || {};
+2335:  payrollStore.backdateData[year] = {
+2348:  if (!payrollStore.backdateData[year]) payrollStore.backdateData[year] = {};
+2349:  payrollStore.backdateData[year].completed = !payrollStore.backdateData[year].completed;
+2355:  var d = payrollStore.backdateData[year] || {};
+2572:      projSel.innerHTML += `<option value="${p.id}">${escapeHtml(p.name || '')}</option>`;
+2606:      <span>${escapeHtml(data.name)}</span>
+2668:      syncStore();
+3054:    if (res.status === 401) { handleSessionExpired(); return null; }
+3067:    if (res.status === 401) { handleSessionExpired(); return null; }
+3081:    if (res.status === 401) { handleSessionExpired(); return null; }

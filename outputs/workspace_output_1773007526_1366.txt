@@ -1,0 +1,182 @@
+=== PROJECT SCHEMA ===
+"""
+Project Management API
+Full project lifecycle with start/end dates, trades, line items
+"""
+from fastapi import APIRouter, HTTPException, Header
+from pydantic import BaseModel
+from typing import Optional, Dict, List, Any
+from datetime import datetime, date
+import logging
+import uuid
+
+logger = logging.getLogger(__name__)
+router = APIRouter()
+
+# ─── In-Memory Store ──────────────────────────────────────────────────────────
+projects_db: List[Dict] = []
+estimates_db: List[Dict] = []
+
+# ─── Models ───────────────────────────────────────────────────────────────────
+
+class InvoiceLineItem(BaseModel):
+    description: str
+    quantity: float = 1.0
+    unit: str = "ls"
+    rate: float = 0.0
+    price: Optional[float] = None   # auto-calculated if None
+    gst_exempt: bool = False
+    notes: Optional[str] = None
+
+class CreateProjectRequest(BaseModel):
+    name: str
+    client_name: str
+    client_email: Optional[str] = None
+    client_phone: Optional[str] = None
+    client_address: Optional[str] = None
+    project_address: str
+    project_type: str
+    description: Optional[str] = None
+    start_date: Optional[str] = None
+    scheduled_finish_date: Optional[str] = None
+    contract_value: Optional[float] = None
+    status: str = "pending"
+    notes: Optional[str] = None
+
+class UpdateProjectRequest(BaseModel):
+    name: Optional[str] = None
+    client_name: Optional[str] = None
+    client_email: Optional[str] = None
+    client_phone: Optional[str] = None
+    client_address: Optional[str] = None
+    project_address: Optional[str] = None
+    project_type: Optional[str] = None
+    description: Optional[str] = None
+    start_date: Optional[str] = None
+    scheduled_finish_date: Optional[str] = None
+    actual_finish_date: Optional[str] = None
+    contract_value: Optional[float] = None
+    status: Optional[str] = None
+    notes: Optional[str] = None
+
+class CreateInvoiceRequest(BaseModel):
+    project_id: Optional[str] = None
+    client_name: str
+    client_email: Optional[str] = None
+    client_address: Optional[str] = None
+    invoice_number: Optional[str] = None
+    invoice_date: Optional[str] = None
+    due_date: Optional[str] = None
+    payment_terms: str = "net_30"
+    line_items: List[InvoiceLineItem] = []
+    notes: Optional[str] = None
+    footer_text: Optional[str] = None
+    discount_percent: float = 0.0
+    deposit_paid: float = 0.0
+    is_estimate: bool = False
+
+class CreateEstimateRequest(BaseModel):
+    project_id: Optional[str] = None
+    client_name: str
+    client_email: Optional[str] = None
+    client_address: Optional[str] = None
+    estimate_number: Optional[str] = None
+    estimate_date: Optional[str] = None
+    valid_until: Optional[str] = None
+    project_type: str = "general_contracting"
+    line_items: List[InvoiceLineItem] = []
+    notes: Optional[str] = None
+    include_gst: bool = True
+
+# ─── Helpers ──────────────────────────────────────────────────────────────────
+
+def calculate_line_items(items: List[Dict], gst_rate: float = 0.05):
+    """Calculate totals for line items"""
+    processed = []
+    subtotal = 0.0
+    gst_total = 0.0
+
+    for item in items:
+        qty = float(item.get("quantity", 1))
+        rate = float(item.get("rate", 0))
+        price = qty * rate
+        gst_exempt = item.get("gst_exempt", False)
+        gst = 0.0 if gst_exempt else round(price * gst_rate, 2)
+
+        processed.append({
+            **item,
+            "price": round(price, 2),
+            "gst": gst,
+            "line_total": round(price + gst, 2),
+        })
+        subtotal += price
+        gst_total += gst
+
+    return processed, round(subtotal, 2), round(gst_total, 2)
+
+def next_invoice_number():
+    from app.config import config
+    prefix = getattr(config, "INVOICE_PREFIX", "INV")
+    count = len([i for i in projects_db if not i.get("is_estimate")]) + 1
+    return f"{prefix}-{datetime.now().year}-{count:04d}"
+
+def next_estimate_number():
+    count = len(estimates_db) + 1
+    return f"EST-{datetime.now().year}-{count:04d}"
+
+# ─── Project Endpoints ────────────────────────────────────────────────────────
+
+@router.get("/")
+async def list_projects(status: Optional[str] = None, project_type: Optional[str] = None):
+    """List all projects"""
+=== CHAT SCHEMA ===
+"""
+Chat API endpoints for AI Assistant - Full context-aware implementation
+"""
+
+from fastapi import APIRouter, HTTPException, Header
+from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
+from datetime import datetime
+import logging
+
+from ..ai_engine import ai_engine
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter()
+
+
+class ChatMessage(BaseModel):
+    message: str
+    context: Optional[str] = None          # current page
+    user_context: Optional[Dict[str, Any]] = {}
+    trade_specialization: Optional[str] = None
+    app_data: Optional[Dict[str, Any]] = None   # full store data from frontend
+
+
+class ChatResponse(BaseModel):
+    response: str
+    suggestions: List[str]
+    actions: List[Dict[str, str]]
+    confidence: float
+    timestamp: datetime
+
+
+@router.post("/message", response_model=ChatResponse)
+async def send_message(
+    chat_message: ChatMessage,
+    authorization: Optional[str] = Header(None)
+):
+    """
+    Send a message to the AI assistant and get a context-aware response.
+    The frontend sends the full app store data so the AI can reference real data.
+    """
+    try:
+        logger.info(f"Processing message: {chat_message.message[:100]}...")
+
+        # Get user info from auth token if available
+        user_context = chat_message.user_context or {}
+        if authorization and authorization.startswith("Bearer "):
+            try:
+                from ..user_system import users_db

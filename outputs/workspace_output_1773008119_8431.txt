@@ -1,0 +1,21 @@
+=== DEBUG: Store sync ===
+*   Trying 127.0.0.1:8050...
+* Connected to localhost (127.0.0.1) port 8050 (#0)
+> PUT /api/users/store HTTP/1.1
+> Host: localhost:8050
+> User-Agent: curl/7.88.1
+> Accept: */*
+> Authorization: Bearer LUQEYasHUMgYMz2_86Lh5Kf7lSmcvpC43my4uBxMuihF_qMDdlzfhwS7DiESMh_G-vDLJpN3HbENc4cJGaPwng
+> Content-Type: application/json
+> Content-Length: 47
+> 
+} [47 bytes data]
+< HTTP/1.1 500 Internal Server Error
+< date: Sun, 08 Mar 2026 22:15:19 GMT
+< server: uvicorn
+< content-length: 21
+< content-type: text/plain; charset=utf-8
+< 
+{ [21 bytes data]
+* Connection #0 to host localhost left intact
+Internal Server Error

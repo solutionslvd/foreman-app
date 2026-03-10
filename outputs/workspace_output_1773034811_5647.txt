@@ -1,0 +1,55 @@
+TOTAL: 51 | PASS: 41 | AUTH_FAIL: 1 | OTHER_FAIL: 9
+
+Endpoint                   Code     ms  Notes
+----------------------------------------------------------------------
+✅ Users/me                  200     2ms  status=active
+✅ Users/store               200     1ms  
+✅ Users/NDA                 200     0ms  
+✅ Projects/list             200     1ms  total=0
+✅ Projects/invoices         200     0ms  total=0
+✅ Projects/estimates        200     0ms  total=0
+✅ Projects/overview         200     0ms  
+✅ Financial/summary         200     0ms  
+✅ Financial/invoices        200     0ms  total=0
+✅ Financial/txns            200     0ms  total=0
+✅ Financial/tax2025         200     0ms  
+✅ Ledger/accounts           200     1ms  
+✅ Ledger/txns               200     0ms  total=0
+✅ Ledger/dashboard          200     1ms  
+✅ Compliance/status         200     0ms  overall_status=warning
+✅ Compliance/WCB            200     0ms  status=not_registered
+✅ Compliance/permits        200     0ms  total=0
+✅ Compliance/training       200     0ms  total=0
+✅ Compliance/incidents      200     0ms  total=0
+✅ Compliance/checklist      200     0ms  
+✅ Compliance/summary        200     0ms  
+✅ Billing/plans             200     0ms  
+✅ Billing/stripe            200     0ms  
+✅ Settings/public           200     0ms  
+✅ Settings/prefs            200     0ms  
+✅ Email/inbox               200     0ms  total=0
+✅ Email/stats               200     0ms  
+✅ Email/templates           200     0ms  
+✅ Email/followups           200     0ms  total=0
+✅ Chat/suggestions          200     0ms  
+✅ Dropdowns                 200     1ms  
+✅ Admin/dashboard           200     0ms  
+✅ Admin/users               200     0ms  
+✅ Admin/sys-status          200     0ms  status=running
+✅ Admin/logs                200     0ms  
+✅ Admin/data-fin            200     0ms  
+✅ Settings/admin-all        200     0ms  
+✅ Settings/business         200     0ms  
+✅ Settings/financial        200     0ms  
+✅ Settings/AI               200     0ms  
+✅ Billing/admin-subs        200     0ms  count=0
+🔒 Billing/payments          401     0ms  Invalid or expired admin token
+⚠️  Email/permissions         403     0ms  Please accept the NDA first
+⚠️  GDrive/permissions        403     0ms  Please accept the NDA first
+⚠️  Ledger/PnL                403     0ms  Manager or admin access required
+⚠️  Ledger/AR-aging           403     0ms  Manager or admin access required
+⚠️  Ledger/GST                403     0ms  Manager or admin access required
+⚠️  Ledger/cashflow           403     0ms  Manager or admin access required
+⚠️  Ledger/balance            403     0ms  Manager or admin access required
+⚠️  Financial/payroll         405     0ms  Method Not Allowed
+⚠️  Billing/sub               405     0ms  Method Not Allowed

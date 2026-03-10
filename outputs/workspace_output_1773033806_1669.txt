@@ -1,0 +1,51 @@
+        "accent_color": "#4CAF50",
+        "font_family": "Inter",
+        "dark_mode_default": True,
+    },
+
+    # --- BUSINESS INFO (Admin only) ---
+    "business": {
+        "business_name": "The Foreman",
+        "business_type": "general_contracting",
+        "trade_specialization": "framing",
+        "address": "",
+        "city": "Edmonton",
+        "province": "Alberta",
+        "postal_code": "",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "business_number": "",
+        "wcb_account": "",
+        "gst_number": "",
+        "logo_url": "",
+    },
+
+    # --- AI ASSISTANT (Admin only) ---
+    "ai": {
+        "assistant_name": "Foreman AI",
+        "personality": "professional",  # professional, friendly, concise
+        "trade_focus": "framing",
+        "language": "en",
+        "voice_enabled": True,
+        "proactive_suggestions": True,
+        "greeting_message": "Hi! I'm your construction AI assistant. How can I help you today?",
+        "specializations": ["framing", "carpentry", "general_contracting"],
+        "knowledge_level": "expert",  # basic, intermediate, expert
+    },
+
+    # --- FINANCIAL (Admin only) ---
+    "financial": {
+        "gst_rate": 0.05,
+        "invoice_prefix": "INV",
+        "invoice_next_number": 1001,
+        "payment_terms": "Net 30",
+        "late_fee_percentage": 2.0,
+        "currency": "CAD",
+        "fiscal_year_start": "01-01",  # MM-DD
+        "wcb_rate_framing": 3.20,
+        "wcb_rate_carpentry": 2.80,
+        "wcb_rate_general": 2.50,
+        "cpp_rate": 0.0595,
+        "ei_rate": 0.0163,
+        "default_labour_rate": 65.00,

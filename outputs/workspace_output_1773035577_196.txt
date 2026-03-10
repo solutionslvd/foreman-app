@@ -1,0 +1,18 @@
+
+🔍 FULL BUG FIX REGRESSION REPORT
+============================================================
+✅ BUG-NEW-A: Billing status (user)              HTTP 200
+✅ BUG-NEW-A: Billing payments (user)            HTTP 200
+✅ BUG-NEW-D: Ledger P&L (user)                  HTTP 200
+✅ BUG-NEW-E: Compliance not_configured          nc=True, score=0
+✅ BUG-NEW-F: Login returns role (user.role)     role=user
+❌ BUG-NEW-F: /me returns role                   role=None
+✅ BUG-018: Admin bcrypt login                   token=yes
+✅ BUG-015: Compliance score=0                   score=0
+✅ SECURITY: Unauth blocked                      HTTP 401
+✅ BUG-019: /me has business_name                business_name=Test Construction Ltd.
+✅ Admin dashboard (admin token)                 HTTP 200
+============================================================
+
+❌ SOME FIXES NEED ATTENTION
+Result: 10/11 passing

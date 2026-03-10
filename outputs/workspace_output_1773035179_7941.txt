@@ -1,0 +1,48 @@
+@router.get("/payments")
+async def get_all_payments(authorization: Optional[str] = Header(None)):
+    """Get payments — admin gets all, user gets their own."""
+    from app.admin_auth import verify_admin_token
+    from app.user_system import verify_user_token, users_db
+
+    token = (authorization or "").replace("Bearer ", "").strip()
+
+    # Try admin first
+    admin_session = verify_admin_token(token)
+    if admin_session:
+        total = sum(p["amount"] for p in payments_db if p["status"] == "succeeded")
+        return {"payments": payments_db, "total": total, "count": len(payments_db)}
+
+    # Try user token
+    payload = verify_user_token(token)
+    if payload:
+        email = payload.get("email")
+        user_payments = [p for p in payments_db if p.get("user_email") == email]
+        total = sum(p["amount"] for p in user_payments if p["status"] == "succeeded")
+        return {"payments": user_payments, "total": total, "count": len(user_payments)}
+
+    raise HTTPException(status_code=401, detail="Authentication required")
+
+
+@router.get("/payments/{user_email}")
+async def get_user_payments(user_email: str, authorization: Optional[str] = Header(None)):
+    """Get payments for a specific user (admin only or own account)."""
+    from app.admin_auth import verify_admin_token
+    from app.user_system import verify_user_token
+
+    token = (authorization or "").replace("Bearer ", "").strip()
+    admin_session = verify_admin_token(token)
+    if not admin_session:
+        payload = verify_user_token(token)
+        if not payload or payload.get("email") != user_email:
+            raise HTTPException(status_code=403, detail="Access denied")
+
+    user_payments = [p for p in payments_db if p["user_email"] == user_email]
+    return {"payments": user_payments, "count": len(user_payments)}
+
+# ─── Admin Billing Management ─────────────────────────────────────────────────
+
+@router.get("/admin/overview")
+async def billing_overview(authorization: Optional[str] = Header(None)):
+    """Get billing overview for admin"""
+    require_admin(authorization)
+

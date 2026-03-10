@@ -1,0 +1,4 @@
+  File "<stdin>", line 11
+    "`<div style="font-size:12px;color:var(--text-muted);margin-top:.3rem">"
+                             ^
+SyntaxError: invalid decimal literal

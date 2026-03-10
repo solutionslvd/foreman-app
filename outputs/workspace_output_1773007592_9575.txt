@@ -1,0 +1,113 @@
+=== CHAT SUGGESTIONS ===
+{
+    "suggestions": [
+        "\ud83d\udcb3 Payroll deductions due by the 15th"
+    ],
+    "timestamp": "2026-03-08T22:06:32.544349"
+}
+=== NDA CONTENT ===
+{
+    "nda_text": "\nNON-DISCLOSURE AND SERVICE AGREEMENT\n\nEffective Date: March 08, 2026\n\nPARTIES:\n\nService Provider: [YOUR BUSINESS NAME]\nAddress: [YOUR ADDRESS]\nContact: [YOUR NAME]\nEmail: [YOUR EMAIL]\nPhone: [YOUR PHONE]\n\nClient (User): Test Construction Ltd.\nContact: Test User\nEmail: test@foreman.ca\n\nRECITALS\n\nWHEREAS, the Service Provider operates an AI-powered construction business management \nplatform (\"the Platform\") that provides financial management, compliance tracking, \nproject management, and AI-assisted communication services;\n\nWHEREAS, the Client wishes to use the Platform and may share confidential business \ninformation including financial records, client data, project details, and communications;\n\nNOW, THEREFORE, in consideration of the mutual covenants contained herein, the parties \nagree as follows:\n\n1. DEFINITIONS\n\n1.1 \"Confidential Information\" means any and all information disclosed by either party \nto the other, including but not limited to: business plans, financial data, client lists, \nproject details, trade secrets, email communications, documents, and any other proprietary \ninformation.\n\n1.2 \"Platform Services\" means the AI assistant, financial management, compliance tracking, \nemail management, and Google Drive integration services provided through the Platform.\n\n2. CONFIDENTIALITY OBLIGATIONS\n\n2.1 The Service Provider agrees to:\n   (a) Keep all Client Confidential Information strictly confidential\n   (b) Not disclose Client information to any third party without written consent\n   (c) Use Client information only to provide the Platform Services\n   (d) Implement reasonable security measures to protect Client data\n   (e) Notify Client promptly of any unauthorized disclosure\n\n2.2 The Client agrees to:\n   (a) Keep all Service Provider proprietary information confidential\n   (b) Not reverse engineer, copy, or redistribute the Platform\n   (c) Use the Platform only for lawful business purposes\n   (d) Maintain the security of their login credentials\n\n3. DATA ACCESS AND PERMISSIONS\n\n3.1 Email Access: By granting email access permission, the Client authorizes the Platform to:\n   (a) Read incoming emails to categorize and prioritize them\n   (b) Generate and send automated replies on behalf of the Client\n   (c) Schedule and send follow-up emails\n   (d) Extract and save email attachments to Google Drive\n   (e) Analyze email content to improve AI responses\n\n3.2 Google Drive Access: By granting Google Drive access permission, the Client authorizes \nthe Platform to:\n   (a) Create organized folder structures for business documents\n   (b) Upload and save email attachments automatically\n   (c) Read existing files to provide context to the AI assistant\n   (d) Organize documents by category (Financial, Compliance, Projects, etc.)\n\n3.3 The Client may revoke any permission at any time through the Platform settings.\n\n4. DATA SECURITY AND PRIVACY\n\n4.1 The Service Provider will:\n   (a) Encrypt all data in transit and at rest\n   (b) Never sell or share Client data with third parties\n   (c) Comply with applicable Canadian privacy laws (PIPEDA)\n   (d) Retain data only as long as necessary for service provision\n   (e) Delete all Client data within 30 days of account termination\n\n4.2 The Client acknowledges that:\n   (a) No system is 100% secure\n   (b) They are responsible for maintaining secure login credentials\n   (c) They should not share sensitive information beyond what is necessary\n\n5. INTELLECTUAL PROPERTY\n\n5.1 The Platform and all its components remain the exclusive property of the Service Provider.\n5.2 Client data remains the exclusive property of the Client.\n5.3 AI-generated content created using Client data is owned by the Client.\n\n6. LIMITATION OF LIABILITY\n\n6.1 The Service Provider's liability is limited to the amount paid for Platform services \nin the preceding 3 months.\n6.2 The Service Provider is not liable for indirect, consequential, or incidental damages.\n6.3 The Client is responsible for verifying AI-generated content before use.\n\n7. TERM AND TERMINATION\n\n7.1 This Agreement is effective upon acceptance and continues until terminated.\n7.2 Either party may terminate with 30 days written notice.\n7.3 Upon termination, all Confidential Information must be returned or destroyed.\n\n8. GOVERNING LAW\n\nThis Agreement is governed by the laws of the Province of Alberta, Canada.\n\n9. ENTIRE AGREEMENT\n\nThis Agreement constitutes the entire agreement between the parties regarding \nconfidentiality and supersedes all prior agreements.\n\n10. ACCEPTANCE\n\nBy clicking \"I Accept\" or using the Platform Services, the Client acknowledges that \nthey have read, understood, and agree to be bound by this Agreement.\n\n---\n\nService Provider: [YOUR BUSINESS NAME]\nDate: March 08, 2026\n\nClient Signature: ________________________________\nClient Name: Test User\nBusiness: Test Construction Ltd.\nDate: ________________________________\n\n\u00a9 2026 [YOUR BUSINESS NAME]. All rights reserved.\n",
+    "already_accepted": false,
+    "accepted_at": null
+}
+=== EMAIL INBOX ===
+{
+    "emails": [],
+    "total": 0
+}
+=== EMAIL TEMPLATES ===
+{
+    "auto_reply_templates": {
+        "new_lead": {
+            "subject": "Re: {original_subject} - Thank you for reaching out!",
+            "body_preview": "Hi {sender_name},\n\nThank you for reaching out to {business_name}! We're excited to hear about your project.\n\nI've received your message and will personally review the details. Here's what happens next..."
+        },
+        "quote_request": {
+            "subject": "Re: {original_subject} - Quote Request Received",
+            "body_preview": "Hi {sender_name},\n\nThank you for requesting a quote from {business_name}!\n\nI've received your request and am preparing a detailed estimate for you.\n\n**To provide you with the most accurate quote, I ne..."
+        },
+        "project_update": {
+            "subject": "Re: {original_subject} - Project Update",
+            "body_preview": "Hi {sender_name},\n\nThank you for your message regarding your project.\n\nI'll review the current status and get back to you with a detailed update within a few hours.\n\nIn the meantime, here's a quick ov..."
+        },
+        "invoice_payment": {
+            "subject": "Re: {original_subject} - Payment Confirmation",
+            "body_preview": "Hi {sender_name},\n\nThank you for your message regarding payment.\n\nOur accounting team will review and confirm receipt within 1 business day.\n\n**Payment Methods We Accept:**\n\ud83d\udcb3 E-Transfer to: {business_..."
+        },
+        "complaint": {
+            "subject": "Re: {original_subject} - We're Here to Help",
+            "body_preview": "Hi {sender_name},\n\nThank you for bringing this to our attention. We take all feedback very seriously and want to make this right.\n\nI've flagged your message as a priority and will personally review th..."
+        },
+        "general": {
+            "subject": "Re: {original_subject} - Message Received",
+            "body_preview": "Hi {sender_name},\n\nThank you for contacting {business_name}!\n\nI've received your message and will respond personally within 24 hours.\n\nIf your matter is urgent, please call us at {business_phone}.\n\nBe..."
+        }
+    },
+    "follow_up_templates": {
+        "lead_day1": {
+            "subject": "Following up - {business_name} Quote",
+=== COMPLIANCE SAFETY CHECKLIST ===
+{
+    "personal_protective_equipment": [
+        "Hard hats available and worn",
+        "Safety glasses/goggles available",
+        "High-visibility vests worn",
+        "Safety boots worn",
+        "Gloves available for appropriate tasks",
+        "Hearing protection available for noisy areas"
+    ],
+    "site_conditions": [
+        "Walkways clear of debris",
+        "Proper lighting in work areas",
+        "Adequate ventilation",
+        "Weather protection in place",
+        "Signage posted (danger, caution, etc.)",
+        "First aid kit accessible and stocked"
+    ],
+    "equipment_safety": [
+        "Power tools in good condition",
+        "Extension cords inspected",
+=== FINANCIAL SUMMARY ===
+{
+    "total_income": 0.0,
+    "total_expenses": 0.0,
+    "net_profit": 0.0,
+    "total_deductible_expenses": 0.0,
+    "pending_invoices": 0.0,
+    "gst_remittance": 0.0,
+    "total_transactions": 0,
+    "pending_invoices_count": 0,
+    "payroll_records": 0
+}
+=== ADMIN USERS LIST ===
+{
+    "users": [
+        {
+            "id": "c6136ae38c34fe19",
+            "email": "test@foreman.ca",
+            "business_name": "Test Construction Ltd.",
+            "trade": "Framing",
+            "contact_name": "Test User",
+            "phone": "780-555-1234",
+            "plan": "pro",
+            "status": "active",
+            "created_at": "2026-03-08T22:04:10.731102",
+            "last_login": "2026-03-08T22:04:43.223235",
+            "nda_accepted": false,
+            "nda_accepted_at": null,
+            "email_access_granted": false,
+            "gdrive_access_granted": false,
+            "email_settings": {
+                "connected_email": "",
+                "auto_reply_enabled": false,
+                "follow_up_enabled": false,
+                "priority_filter": true,
+                "gdrive_folder_id": ""
+            },
+            "permissions": {
+                "email_read": false,
+                "email_send": false,
+                "gdrive_read": false,
+                "gdrive_write": false
+            },

@@ -1,0 +1,59 @@
+<div id="add-ap-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📤 Add Accounts Payable Entry</h3>
+      <button class="modal-close" onclick="closeModal('add-ap-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" id="ap-date">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="ap-status">
+            <option value="outstanding">Outstanding</option>
+            <option value="partial">Partial Payment</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+            <option value="disputed">Disputed</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Vendor / Supplier *</label>
+        <input type="text" id="ap-vendor" placeholder="Vendor name">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="ap-description" placeholder="e.g. Lumber delivery — Site A">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Amount ($) *</label>
+          <input type="number" id="ap-amount" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="ap-due-date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Bill / PO Reference #</label>
+        <input type="text" id="ap-bill-ref" placeholder="BILL-001 or PO-001">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('add-ap-modal')">Cancel</button>
+      <button class="btn-primary" onclick="saveAPEntry()">✅ Save AP Entry</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+
+<!-- Edit Project Modal -->
+<div id="modal-edit-project" class="modal-overlay hidden">
+  <div class="modal" style="max-width:800px;width:95vw">
+    <div class="modal-header">

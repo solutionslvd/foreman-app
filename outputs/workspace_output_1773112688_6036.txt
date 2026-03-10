@@ -1,0 +1,3 @@
+921:function openInvoiceModal() {
+3085:function openModal(id) {
+3282:function openEstimateModal() {

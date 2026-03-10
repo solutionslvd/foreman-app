@@ -1,0 +1,60 @@
+"""
+In-App Settings Manager
+All customizable settings accessible from within the app
+Admin-only settings vs client-allowed settings clearly separated
+"""
+
+import os
+import json
+import hashlib
+from datetime import datetime
+from typing import Dict, Any, Optional, List
+from decimal import Decimal
+import logging
+
+logger = logging.getLogger(__name__)
+
+# ============================================================
+# LIVE SETTINGS STORE (persisted to settings.json)
+# ============================================================
+SETTINGS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "settings.json")
+
+DEFAULT_SETTINGS = {
+    # --- BRANDING (Admin only) ---
+    "branding": {
+        "app_name": "BuildAI Alberta",
+        "tagline": "Your AI-Powered Construction Assistant",
+        "logo_url": "",
+        "primary_color": "#FF6B35",
+        "secondary_color": "#1a1a2e",
+        "accent_color": "#4CAF50",
+        "font_family": "Inter",
+        "dark_mode_default": True,
+    },
+
+    # --- BUSINESS INFO (Admin only) ---
+    "business": {
+        "business_name": "Your Construction Business",
+        "business_type": "general_contracting",
+        "trade_specialization": "framing",
+        "address": "",
+        "city": "Edmonton",
+        "province": "Alberta",
+        "postal_code": "",
+        "phone": "",
+        "email": "",
+        "website": "",
+        "business_number": "",
+        "wcb_account": "",
+        "gst_number": "",
+        "logo_url": "",
+    },
+
+    # --- AI ASSISTANT (Admin only) ---
+    "ai": {
+        "assistant_name": "BuildAI",
+        "personality": "professional",  # professional, friendly, concise
+        "trade_focus": "framing",
+        "language": "en",
+        "voice_enabled": True,
+        "proactive_suggestions": True,

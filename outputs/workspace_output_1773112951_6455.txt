@@ -1,0 +1,17 @@
+=== Pages referenced in navigateTo ===
+dashboard
+reports
+user-management
+admin-settings
+invoices
+expenses
+payroll
+accounting
+profile
+documents
+projects
+time-tracking
+ai-chat
+
+=== Pages in sidebar navigation ===
+grep: missing terminating ] for character class

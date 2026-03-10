@@ -1,0 +1,6 @@
+1243:function renderProjects(filter = 'all') {
+2472:function initPayroll() {
+2645:function initTimeTracking() {
+3420:function loadProfile() {
+3722:function initAccounting() {
+4656:function initDocuments() {

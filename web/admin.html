@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foreman Admin — Platform Control Center</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1a237e; --accent: #ff6f00; --accent-light: #ffa000;
+            --success: #2e7d32; --warning: #f57f17; --danger: #c62828;
+            --bg: #0d1117; --bg2: #161b22; --bg3: #21262d;
+            --border: #30363d; --text: #e6edf3; --text-muted: #8b949e;
+            --card-bg: #161b22; --sidebar-w: 260px;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        #loginScreen { display:flex; align-items:center; justify-content:center; min-height:100vh; background:linear-gradient(135deg,#0d1117 0%,#1a237e 100%); }
+        .login-box { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:3rem; width:100%; max-width:420px; }
+        .login-box h1 { font-size:1.6rem; margin-bottom:.5rem; color:var(--accent); }
+        .login-box p { color:var(--text-muted); margin-bottom:2rem; font-size:.9rem; }
+        .form-group { margin-bottom:1.2rem; }
+        .form-group label { display:block; font-size:.85rem; color:var(--text-muted); margin-bottom:.4rem; }
+        .form-group input, .form-group select, .form-group textarea { width:100%; padding:.75rem 1rem; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:.95rem; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline:none; border-color:var(--accent); }
+        .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.65rem 1.4rem; border-radius:8px; border:none; cursor:pointer; font-size:.9rem; font-weight:600; transition:all .2s; }
+        .btn-primary { background:var(--accent); color:#fff; }
+        .btn-primary:hover { background:var(--accent-light); }
+        .btn-secondary { background:var(--bg3); color:var(--text); border:1px solid var(--border); }
+        .btn-success { background:var(--success); color:#fff; }
+        .btn-danger { background:var(--danger); color:#fff; }
+        .btn-warning { background:var(--warning); color:#fff; }
+        .btn-sm { padding:.4rem .9rem; font-size:.8rem; }
+        .btn-full { width:100%; justify-content:center; }
+        #loginError { color:#ff6b6b; font-size:.85rem; margin-top:.5rem; display:none; }
+        #adminApp { display:none; height:100vh; overflow:hidden; }
+        .layout { display:flex; height:100vh; }
+        .sidebar { width:var(--sidebar-w); background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow-y:auto; flex-shrink:0; }
+        .sidebar-header { padding:1.2rem 1.5rem; border-bottom:1px solid var(--border); }
+        .sidebar-header .logo { font-size:1.3rem; font-weight:700; color:var(--accent); }
+        .sidebar-header .sub { font-size:.75rem; color:var(--text-muted); }
+        .nav-section { padding:.8rem 1.5rem .3rem; font-size:.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; }
+        .nav-link { display:flex; align-items:center; gap:.75rem; padding:.65rem 1.5rem; color:var(--text-muted); background:none; border:none; width:100%; text-align:left; cursor:pointer; font-size:.88rem; transition:all .15s; border-left:3px solid transparent; }
+        .nav-link:hover { background:var(--bg3); color:var(--text); }
+        .nav-link.active { background:rgba(255,111,0,.1); color:var(--accent); border-left-color:var(--accent); }
+        .nav-link i { width:18px; text-align:center; }
+        .sidebar-footer { margin-top:auto; padding:1rem 1.5rem; border-top:1px solid var(--border); }
+        .main-area { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+        .topbar { background:var(--bg2); border-bottom:1px solid var(--border); padding:.9rem 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+        .topbar-title { font-size:1.1rem; font-weight:600; }
+        .topbar-actions { display:flex; align-items:center; gap:.75rem; }
+        .badge { display:inline-block; padding:.2rem .6rem; border-radius:20px; font-size:.75rem; font-weight:600; }
+        .badge-success { background:rgba(46,125,50,.2); color:#66bb6a; }
+        .badge-warning { background:rgba(245,127,23,.2); color:#ffa726; }
+        .badge-danger { background:rgba(198,40,40,.2); color:#ef5350; }
+        .badge-info { background:rgba(26,35,126,.3); color:#7986cb; }
+        .content { flex:1; overflow-y:auto; padding:1.5rem; }
+        .admin-section { display:none; }
+        .admin-section.active { display:block; }
+        .card { background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+        .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.2rem; }
+        .card-title { font-size:1rem; font-weight:600; }
+        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+        .stat-card { background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:1.2rem; }
+        .stat-label { font-size:.8rem; color:var(--text-muted); margin-bottom:.4rem; }
+        .stat-value { font-size:1.8rem; font-weight:700; }
+        .stat-sub { font-size:.75rem; color:var(--text-muted); margin-top:.3rem; }
+        .stat-card.accent { border-color:var(--accent); }
+        .stat-card.success { border-color:var(--success); }
+        .stat-card.warning { border-color:var(--warning); }
+        .table-wrap { overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; font-size:.88rem; }
+        th { background:var(--bg3); padding:.75rem 1rem; text-align:left; font-size:.78rem; color:var(--text-muted); text-transform:uppercase; border-bottom:1px solid var(--border); }
+        td { padding:.75rem 1rem; border-bottom:1px solid var(--border); vertical-align:middle; }
+        tr:last-child td { border-bottom:none; }
+        tr:hover td { background:rgba(255,255,255,.02); }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
+        .flex-between { display:flex; align-items:center; justify-content:space-between; }
+        .flex-gap { display:flex; gap:.75rem; flex-wrap:wrap; }
+        .mt1 { margin-top:.5rem; } .mt2 { margin-top:1rem; } .mt3 { margin-top:1.5rem; }
+        .mb1 { margin-bottom:.5rem; } .mb2 { margin-bottom:1rem; }
+        #toastContainer { position:fixed; top:1rem; right:1rem; z-index:9999; display:flex; flex-direction:column; gap:.5rem; }
+        .toast { padding:.75rem 1.2rem; border-radius:8px; font-size:.88rem; font-weight:500; animation:slideIn .3s ease; max-width:320px; }
+        .toast-success { background:#1b5e20; color:#a5d6a7; border:1px solid #2e7d32; }
+        .toast-error { background:#b71c1c; color:#ffcdd2; border:1px solid #c62828; }
+        .toast-info { background:#1a237e; color:#c5cae9; border:1px solid #283593; }
+        @keyframes slideIn { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:1000; align-items:center; justify-content:center; }
+        .modal-overlay.open { display:flex; }
+        .modal { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:2rem; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; }
+        .modal h3 { font-size:1.1rem; margin-bottom:1.2rem; color:var(--accent); }
+        .modal-footer { display:flex; gap:.75rem; justify-content:flex-end; margin-top:1.5rem; }
+        .dropdown-list { list-style:none; }
+        .dropdown-list li { display:flex; align-items:center; justify-content:space-between; padding:.5rem .75rem; background:var(--bg3); border-radius:6px; margin-bottom:.4rem; font-size:.88rem; }
+        .color-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:.75rem; }
+        .color-swatch { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:.75rem; }
+        .color-swatch label { font-size:.78rem; color:var(--text-muted); display:block; margin-bottom:.4rem; }
+        .color-swatch input[type=color] { width:100%; height:36px; border:none; border-radius:4px; cursor:pointer; }
+        .perm-table th, .perm-table td { text-align:center; }
+        .perm-table td:first-child { text-align:left; }
+        .perm-check { width:18px; height:18px; cursor:pointer; accent-color:var(--accent); }
+        .plan-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
+        .plan-card { background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:1.2rem; }
+        .plan-card.featured { border-color:var(--accent); }
+        .plan-name { font-size:1rem; font-weight:700; }
+        .plan-price { font-size:1.8rem; font-weight:700; color:var(--accent); margin:.4rem 0; }
+        .plan-price span { font-size:.9rem; color:var(--text-muted); }
+        .plan-features { list-style:none; margin:.75rem 0; }
+        .plan-features li { font-size:.82rem; color:var(--text-muted); padding:.25rem 0; }
+        .plan-features li::before { content:"✓ "; color:var(--success); }
+        .setup-step { display:flex; gap:1rem; margin-bottom:1.2rem; }
+        .step-num { width:32px; height:32px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; }
+        .step-content h4 { font-size:.95rem; margin-bottom:.3rem; }
+        .step-content p { font-size:.83rem; color:var(--text-muted); line-height:1.5; }
+        .code-block { background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:.75rem 1rem; font-family:monospace; font-size:.82rem; color:#79c0ff; margin-top:.5rem; overflow-x:auto; }
+        .search-bar { display:flex; gap:.75rem; margin-bottom:1rem; flex-wrap:wrap; }
+        .search-bar input { flex:1; min-width:200px; padding:.6rem 1rem; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:.88rem; }
+        .alert { padding:.75rem 1rem; border-radius:8px; font-size:.85rem; margin-bottom:1rem; }
+        .alert-info { background:rgba(26,35,126,.3); border:1px solid #283593; color:#c5cae9; }
+        .alert-success { background:rgba(46,125,50,.2); border:1px solid #2e7d32; color:#a5d6a7; }
+        .alert-warning { background:rgba(245,127,23,.2); border:1px solid #f57f17; color:#ffcc02; }
+        .alert-danger { background:rgba(198,40,40,.2); border:1px solid #c62828; color:#ef9a9a; }
+        .toggle-wrap { display:flex; align-items:center; gap:.75rem; margin-top:.5rem; }
+        .toggle { position:relative; width:44px; height:24px; }
+        .toggle input { opacity:0; width:0; height:0; }
+        .toggle-slider { position:absolute; inset:0; background:var(--bg3); border-radius:24px; cursor:pointer; transition:.3s; border:1px solid var(--border); }
+        .toggle-slider::before { content:""; position:absolute; width:18px; height:18px; left:2px; top:2px; background:var(--text-muted); border-radius:50%; transition:.3s; }
+        .toggle input:checked + .toggle-slider { background:var(--accent); border-color:var(--accent); }
+        .toggle input:checked + .toggle-slider::before { transform:translateX(20px); background:#fff; }
+        @media(max-width:768px) {
+            .sidebar { width:60px; }
+            .sidebar-header .sub, .nav-section, .nav-link span { display:none; }
+            .nav-link { justify-content:center; padding:.65rem; }
+            .grid-2, .grid-3 { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+<div id="toastContainer"></div>
+
+<div id="loginScreen">
+    <div class="login-box">
+        <h1><i class="fas fa-shield-alt"></i> Foreman Admin</h1>
+        <p>Platform Control Center — Authorized Personnel Only</p>
+        <div class="form-group"><label>Admin Username</label><input type="text" id="loginUser" placeholder="admin"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+        <div id="loginError">Invalid credentials.</div>
+        <button class="btn btn-primary btn-full mt2" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+    </div>
+</div>
+
+<div id="adminApp">
+<div class="layout">
+<nav class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo"><i class="fas fa-hard-hat"></i> Foreman</div>
+        <div class="sub">Admin Control Center</div>
+    </div>
+    <div class="nav-section">Overview</div>
+    <button class="nav-link active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></button>
+    <button class="nav-link" data-section="activity"><i class="fas fa-stream"></i><span>Activity Log</span></button>
+    <div class="nav-section">Revenue</div>
+    <button class="nav-link" data-section="billing"><i class="fas fa-dollar-sign"></i><span>Billing Overview</span></button>
+    <button class="nav-link" data-section="subscriptions"><i class="fas fa-credit-card"></i><span>Subscriptions</span></button>
+    <button class="nav-link" data-section="plans"><i class="fas fa-layer-group"></i><span>Plans & Pricing</span></button>
+    <button class="nav-link" data-section="payments"><i class="fas fa-receipt"></i><span>Payment History</span></button>
+    <button class="nav-link" data-section="stripe-setup"><i class="fab fa-stripe-s"></i><span>Stripe Setup</span></button>
+    <div class="nav-section">Users</div>
+    <button class="nav-link" data-section="users"><i class="fas fa-users"></i><span>User Management</span></button>
+    <button class="nav-link" data-section="roles"><i class="fas fa-user-shield"></i><span>Roles & Permissions</span></button>
+    <button class="nav-link" data-section="platform-stats"><i class="fas fa-chart-bar"></i><span>Platform Stats</span></button>
+    <div class="nav-section">Data</div>
+    <button class="nav-link" data-section="projects-data"><i class="fas fa-project-diagram"></i><span>Projects</span></button>
+    <button class="nav-link" data-section="invoices-data"><i class="fas fa-file-invoice-dollar"></i><span>Invoices</span></button>
+    <button class="nav-link" data-section="transactions"><i class="fas fa-exchange-alt"></i><span>Transactions</span></button>
+    <button class="nav-link" data-section="compliance-data"><i class="fas fa-clipboard-check"></i><span>Compliance</span></button>
+    <div class="nav-section">Customize</div>
+    <button class="nav-link" data-section="dropdowns"><i class="fas fa-list-ul"></i><span>Dropdown Lists</span></button>
+    <button class="nav-link" data-section="branding"><i class="fas fa-palette"></i><span>Branding & Colors</span></button>
+    <button class="nav-link" data-section="layout-editor"><i class="fas fa-th-large"></i><span>Layout Editor</span></button>
+    <div class="nav-section">Settings</div>
+    <button class="nav-link" data-section="business"><i class="fas fa-building"></i><span>Business Info</span></button>
+    <button class="nav-link" data-section="ai-settings"><i class="fas fa-robot"></i><span>AI Settings</span></button>
+    <button class="nav-link" data-section="financial-settings"><i class="fas fa-coins"></i><span>Financial</span></button>
+    <button class="nav-link" data-section="compliance-settings"><i class="fas fa-hard-hat"></i><span>Compliance</span></button>
+    <div class="nav-section">Marketing</div>
+    <a href="/marketing" class="nav-link" style="text-decoration:none"><i class="fas fa-bullhorn"></i><span>Marketing Hub</span></a>
+    <div class="nav-section">System</div>
+    <button class="nav-link" data-section="security"><i class="fas fa-lock"></i><span>Security</span></button>
+    <button class="nav-link" data-section="system"><i class="fas fa-server"></i><span>System Status</span></button>
+    <div class="sidebar-footer">
+        <button class="btn btn-secondary btn-sm btn-full" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+    </div>
+</nav>
+
+<div class="main-area">
+    <div class="topbar">
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-actions">
+            <span class="badge badge-success"><i class="fas fa-circle" style="font-size:.5rem"></i> Live</span>
+            <span id="adminBadge" class="badge badge-info">Admin</span>
+            <button class="btn btn-secondary btn-sm" onclick="refreshCurrentSection()"><i class="fas fa-sync-alt"></i></button>
+        </div>
+    </div>
+    <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="admin-section active" id="section-dashboard">
+        <div class="stats-grid">
+            <div class="stat-card accent"><div class="stat-label">Monthly Recurring Revenue</div><div class="stat-value" id="dMRR">—</div></div>
+            <div class="stat-card success"><div class="stat-label">Annual Recurring Revenue</div><div class="stat-value" id="dARR">—</div></div>
+            <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="dUsers">—</div></div>
+            <div class="stat-card warning"><div class="stat-label">Active Subscriptions</div><div class="stat-value" id="dSubs">—</div></div>
+            <div class="stat-card"><div class="stat-label">Total Projects</div><div class="stat-value" id="dProjects">—</div></div>
+            <div class="stat-card"><div class="stat-label">Total Invoiced</div><div class="stat-value" id="dInvoiced">—</div></div>
+        </div>
+        <div class="grid-2">
+            <div class="card"><div class="card-header"><div class="card-title">Recent Users</div><button class="btn btn-secondary btn-sm" onclick="navigateTo('users')">View All</button></div><div id="dashRecentUsers">Loading…</div></div>
+            <div class="card"><div class="card-header"><div class="card-title">Recent Subscriptions</div><button class="btn btn-secondary btn-sm" onclick="navigateTo('subscriptions')">View All</button></div><div id="dashRecentPayments">Loading…</div></div>
+        </div>
+        <div class="card"><div class="card-header"><div class="card-title">System Health</div></div><div id="dashHealth">Loading…</div></div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div class="admin-section" id="section-activity">
+        <div class="card"><div class="card-header"><div class="card-title">Activity Log</div><button class="btn btn-secondary btn-sm" onclick="loadActivity()"><i class="fas fa-sync-alt"></i></button></div><div id="activityList">Loading…</div></div>
+    </div>
+
+    <!-- BILLING -->
+    <div class="admin-section" id="section-billing">
+        <div class="stats-grid">
+            <div class="stat-card accent"><div class="stat-label">MRR</div><div class="stat-value" id="bMRR">—</div></div>
+            <div class="stat-card success"><div class="stat-label">ARR</div><div class="stat-value" id="bARR">—</div></div>
+            <div class="stat-card"><div class="stat-label">Active Subs</div><div class="stat-value" id="bActiveSubs">—</div></div>
+            <div class="stat-card warning"><div class="stat-label">Churned</div><div class="stat-value" id="bChurned">—</div></div>
+        </div>
+        <div class="card"><div class="card-header"><div class="card-title">Revenue by Plan</div></div><div id="billingByPlan" class="table-wrap"></div></div>
+        <div class="card">
+            <div class="card-header"><div class="card-title">Billing Settings</div><button class="btn btn-primary btn-sm" onclick="saveBillingSettings()"><i class="fas fa-save"></i> Save</button></div>
+            <div class="grid-2">
+                <div class="form-group"><label>Trial Period (days)</label><input type="number" id="bsTrial" value="14"></div>
+                <div class="form-group"><label>Grace Period (days)</label><input type="number" id="bsGrace" value="3"></div>
+                <div class="form-group"><label>Currency</label><select id="bsCurrency"><option value="CAD">CAD</option><option value="USD">USD</option></select></div>
+                <div class="form-group"><label>Tax Rate (%)</label><input type="number" id="bsTax" value="5" step="0.01"></div>
+            </div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="bsAutoRenew" checked><span class="toggle-slider"></span></label><span>Auto-renew subscriptions</span></div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="bsTrialEnabled" checked><span class="toggle-slider"></span></label><span>Enable free trial</span></div>
+        </div>
+    </div>
+
+    <!-- SUBSCRIPTIONS -->
+    <div class="admin-section" id="section-subscriptions">
+        <div class="card">
+            <div class="card-header"><div class="card-title">All Subscriptions</div><button class="btn btn-secondary btn-sm" onclick="loadSubscriptions()"><i class="fas fa-sync-alt"></i></button></div>
+            <div class="search-bar"><input type="text" id="subSearch" placeholder="Search by email…" oninput="filterSubs()"></div>
+            <div class="table-wrap"><table><thead><tr><th>User</th><th>Plan</th><th>Status</th><th>Started</th><th>Next Bill</th><th>Actions</th></tr></thead><tbody id="subsTbody"><tr><td colspan="6">Loading…</td></tr></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- PLANS -->
+    <div class="admin-section" id="section-plans">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Subscription Plans</div><button class="btn btn-primary btn-sm" onclick="openPlanModal()"><i class="fas fa-plus"></i> New Plan</button></div>
+            <div class="plan-cards" id="planCards">Loading…</div>
+        </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="admin-section" id="section-payments">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Payment History</div><button class="btn btn-primary btn-sm" onclick="openModal('paymentModal')"><i class="fas fa-plus"></i> Record Payment</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Date</th><th>User</th><th>Amount</th><th>Plan</th><th>Method</th><th>Status</th><th>Ref</th></tr></thead><tbody id="paymentsTbody"><tr><td colspan="7">Loading…</td></tr></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- STRIPE SETUP -->
+    <div class="admin-section" id="section-stripe-setup">
+        <div class="card">
+            <div class="card-header"><div class="card-title"><i class="fab fa-stripe-s"></i> Stripe Payment Setup</div></div>
+            <div class="alert alert-info mb2">Complete these steps to start accepting payments from your customers.</div>
+            <div class="setup-step"><div class="step-num">1</div><div class="step-content"><h4>Create a Stripe Account</h4><p>Go to <strong>stripe.com</strong> and sign up. Complete identity verification. Canadian businesses select Canada as country.</p></div></div>
+            <div class="setup-step"><div class="step-num">2</div><div class="step-content"><h4>Get Your API Keys</h4><p>Stripe Dashboard → Developers → API Keys. Copy your Publishable Key (pk_live_…) and Secret Key (sk_live_…).</p></div></div>
+            <div class="setup-step"><div class="step-num">3</div><div class="step-content"><h4>Add Keys to Render Environment</h4><p>Render dashboard → foreman-app → Environment → Add variables:</p><div class="code-block">STRIPE_PUBLISHABLE_KEY=pk_live_your_key_here<br>STRIPE_SECRET_KEY=sk_live_your_key_here</div></div></div>
+            <div class="setup-step"><div class="step-num">4</div><div class="step-content"><h4>Set Up Webhooks</h4><p>Stripe Dashboard → Developers → Webhooks → Add endpoint:</p><div class="code-block">https://foreman-app.onrender.com/api/billing/webhook</div><p>Events: payment_intent.succeeded, customer.subscription.updated, customer.subscription.deleted, invoice.payment_failed</p></div></div>
+            <div class="setup-step"><div class="step-num">5</div><div class="step-content"><h4>Create Products in Stripe</h4><p>Stripe Dashboard → Products → Add Product for each plan. Copy Price IDs:</p><div class="code-block">STRIPE_PRICE_STARTER=price_xxx<br>STRIPE_PRICE_PROFESSIONAL=price_xxx<br>STRIPE_PRICE_BUSINESS=price_xxx<br>STRIPE_PRICE_ENTERPRISE=price_xxx</div></div></div>
+            <div class="setup-step"><div class="step-num">6</div><div class="step-content"><h4>Configure Bank Account</h4><p>Stripe Dashboard → Settings → Payouts → Add your Canadian bank account. Stripe deposits every 2 business days.</p></div></div>
+            <div class="setup-step"><div class="step-num">7</div><div class="step-content"><h4>Enter Keys & Save</h4>
+                <div class="grid-2 mt2">
+                    <div class="form-group"><label>Publishable Key</label><input type="text" id="stripePubKey" placeholder="pk_live_…"></div>
+                    <div class="form-group"><label>Secret Key</label><input type="password" id="stripeSecKey" placeholder="sk_live_…"></div>
+                </div>
+                <button class="btn btn-primary mt2" onclick="saveStripeKeys()"><i class="fas fa-save"></i> Save Stripe Keys</button>
+            </div></div>
+        </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="admin-section" id="section-users">
+        <div class="card">
+            <div class="card-header"><div class="card-title">User Management</div><button class="btn btn-primary btn-sm" onclick="openModal('addUserModal')"><i class="fas fa-user-plus"></i> Add User</button></div>
+            <div class="search-bar">
+                <input type="text" id="userSearch" placeholder="Search users…" oninput="filterUsers()">
+                <select id="userStatusFilter" onchange="filterUsers()" style="padding:.6rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text)">
+                    <option value="">All Status</option><option value="active">Active</option><option value="suspended">Suspended</option>
+                </select>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Plan</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersTbody"><tr><td colspan="7">Loading…</td></tr></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- ROLES -->
+    <div class="admin-section" id="section-roles">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Roles & Permissions Matrix</div><button class="btn btn-primary btn-sm" onclick="savePermissions()"><i class="fas fa-save"></i> Save</button></div>
+            <div class="table-wrap"><table class="perm-table"><thead><tr><th>Permission</th><th>Owner</th><th>Manager</th><th>Foreman</th><th>Worker</th><th>Viewer</th></tr></thead><tbody id="permMatrix"></tbody></table></div>
+        </div>
+        <div class="card mt2">
+            <div class="card-header"><div class="card-title">Role Descriptions</div></div>
+            <div class="grid-2">
+                <div><strong>Owner</strong><p style="font-size:.83rem;color:var(--text-muted);margin-top:.3rem">Full access to all features, billing, and settings.</p></div>
+                <div><strong>Manager</strong><p style="font-size:.83rem;color:var(--text-muted);margin-top:.3rem">Can manage projects, workers, invoices, and reports.</p></div>
+                <div class="mt2"><strong>Foreman</strong><p style="font-size:.83rem;color:var(--text-muted);margin-top:.3rem">Can manage assigned projects, timesheets, and safety checklists.</p></div>
+                <div class="mt2"><strong>Worker</strong><p style="font-size:.83rem;color:var(--text-muted);margin-top:.3rem">Can view assigned tasks, submit timesheets, and complete safety forms.</p></div>
+                <div class="mt2"><strong>Viewer</strong><p style="font-size:.83rem;color:var(--text-muted);margin-top:.3rem">Read-only access to reports and project status.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLATFORM STATS -->
+    <div class="admin-section" id="section-platform-stats">
+        <div class="stats-grid" id="platformStatsGrid">Loading…</div>
+        <div class="grid-2">
+            <div class="card"><div class="card-header"><div class="card-title">Users by Plan</div></div><div id="statsByPlan"></div></div>
+            <div class="card"><div class="card-header"><div class="card-title">Feature Usage</div></div><div id="statsFeatureUsage"></div></div>
+        </div>
+    </div>
+
+    <!-- PROJECTS DATA -->
+    <div class="admin-section" id="section-projects-data">
+        <div class="card">
+            <div class="card-header"><div class="card-title">All Projects (Platform-Wide)</div><button class="btn btn-secondary btn-sm" onclick="loadProjectsData()"><i class="fas fa-sync-alt"></i></button></div>
+            <div class="table-wrap"><table><thead><tr><th>Project</th><th>Client</th><th>Type</th><th>Status</th><th>Start</th><th>Finish</th><th>Contract Value</th><th>User</th></tr></thead><tbody id="projectsTbody"><tr><td colspan="8">Loading…</td></tr></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- INVOICES DATA -->
+    <div class="admin-section" id="section-invoices-data">
+        <div class="card">
+            <div class="card-header"><div class="card-title">All Invoices (Platform-Wide)</div><button class="btn btn-secondary btn-sm" onclick="loadInvoicesData()"><i class="fas fa-sync-alt"></i></button></div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-label">Total Invoiced</div><div class="stat-value" id="iTotal">—</div></div>
+                <div class="stat-card success"><div class="stat-label">Paid</div><div class="stat-value" id="iPaid">—</div></div>
+                <div class="stat-card warning"><div class="stat-label">Outstanding</div><div class="stat-value" id="iOutstanding">—</div></div>
+                <div class="stat-card"><div class="stat-label">Overdue</div><div class="stat-value" id="iOverdue">—</div></div>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th>#</th><th>Client</th><th>Project</th><th>Subtotal</th><th>GST</th><th>Total</th><th>Status</th><th>Due Date</th></tr></thead><tbody id="invoicesTbody"><tr><td colspan="8">Loading…</td></tr></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div class="admin-section" id="section-transactions">
+        <div class="card">
+            <div class="card-header"><div class="card-title">All Financial Transactions</div></div>
+            <div class="table-wrap"><table><thead><tr><th>Date</th><th>User</th><th>Type</th><th>Description</th><th>Amount</th><th>Category</th></tr></thead><tbody id="transactionsTbody"><tr><td colspan="6">Loading…</td></tr></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- COMPLIANCE DATA -->
+    <div class="admin-section" id="section-compliance-data">
+        <div class="card"><div class="card-header"><div class="card-title">Compliance Overview</div></div><div id="complianceDataContent">Loading…</div></div>
+    </div>
+
+    <!-- DROPDOWN MANAGER -->
+    <div class="admin-section" id="section-dropdowns">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Dropdown List Manager</div><button class="btn btn-primary btn-sm" onclick="openModal('createDropdownModal')"><i class="fas fa-plus"></i> New List</button></div>
+            <div class="alert alert-info mb2">Edit any dropdown list used throughout the app. Changes take effect immediately for all users.</div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Select Dropdown List</label>
+                        <select id="ddSelector" onchange="loadDropdownItems()" style="width:100%;padding:.75rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text)">
+                            <option value="">— Choose a list —</option>
+                        </select>
+                    </div>
+                    <div id="ddListPanel" style="display:none">
+                        <strong id="ddListTitle" style="font-size:.9rem;display:block;margin-bottom:.5rem"></strong>
+                        <ul class="dropdown-list" id="ddItemsList"></ul>
+                        <div class="flex-gap mt2">
+                            <input type="text" id="ddNewItem" placeholder="New item…" style="flex:1;padding:.6rem .9rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text)">
+                            <button class="btn btn-primary btn-sm" onclick="addDropdownItem()"><i class="fas fa-plus"></i> Add</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="background:var(--bg3)">
+                    <div class="card-title mb1" style="font-size:.9rem">Available Lists</div>
+                    <div id="ddAllLists" style="font-size:.82rem;color:var(--text-muted);line-height:2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BRANDING -->
+    <div class="admin-section" id="section-branding">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Branding & Colors</div><button class="btn btn-primary btn-sm" onclick="saveBranding()"><i class="fas fa-save"></i> Save & Apply</button></div>
+            <div class="alert alert-info mb2">Customize the app's color scheme and branding.</div>
+            <div class="color-grid">
+                <div class="color-swatch"><label>Primary Color</label><input type="color" id="c-primary" value="#1a237e"></div>
+                <div class="color-swatch"><label>Accent / CTA</label><input type="color" id="c-accent" value="#ff6f00"></div>
+                <div class="color-swatch"><label>Success</label><input type="color" id="c-success" value="#2e7d32"></div>
+                <div class="color-swatch"><label>Warning</label><input type="color" id="c-warning" value="#f57f17"></div>
+                <div class="color-swatch"><label>Danger</label><input type="color" id="c-danger" value="#c62828"></div>
+                <div class="color-swatch"><label>Background</label><input type="color" id="c-bg" value="#0d1117"></div>
+                <div class="color-swatch"><label>Card Background</label><input type="color" id="c-card" value="#161b22"></div>
+                <div class="color-swatch"><label>Border Color</label><input type="color" id="c-border" value="#30363d"></div>
+            </div>
+            <div class="grid-2 mt3">
+                <div class="form-group"><label>App Name</label><input type="text" id="brandAppName" value="Foreman"></div>
+                <div class="form-group"><label>Tagline</label><input type="text" id="brandTagline" value="Alberta Construction AI"></div>
+                <div class="form-group"><label>Logo URL</label><input type="text" id="brandLogoUrl" placeholder="https://…"></div>
+                <div class="form-group"><label>Favicon URL</label><input type="text" id="brandFaviconUrl" placeholder="https://…"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LAYOUT EDITOR -->
+    <div class="admin-section" id="section-layout-editor">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Layout & Feature Toggles</div><button class="btn btn-primary btn-sm" onclick="saveLayoutSettings()"><i class="fas fa-save"></i> Save</button></div>
+            <div class="alert alert-info mb2">Enable or disable features for all users.</div>
+            <div class="grid-2" id="featureToggles"></div>
+        </div>
+    </div>
+
+    <!-- BUSINESS SETTINGS -->
+    <div class="admin-section" id="section-business">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Business Information</div><button class="btn btn-primary btn-sm" onclick="saveBusinessSettings()"><i class="fas fa-save"></i> Save</button></div>
+            <div class="grid-2">
+                <div class="form-group"><label>Company Name</label><input type="text" id="bizName" placeholder="Your Company Name"></div>
+                <div class="form-group"><label>GST/HST Number</label><input type="text" id="bizGST" placeholder="123456789 RT0001"></div>
+                <div class="form-group"><label>WCB Account Number</label><input type="text" id="bizWCB" placeholder="WCB-XXXXXXX"></div>
+                <div class="form-group"><label>Province</label><select id="bizProvince"><option value="AB">Alberta</option><option value="BC">British Columbia</option><option value="SK">Saskatchewan</option><option value="MB">Manitoba</option><option value="ON">Ontario</option></select></div>
+                <div class="form-group"><label>Business Phone</label><input type="text" id="bizPhone" placeholder="(780) 555-0100"></div>
+                <div class="form-group"><label>Business Email</label><input type="text" id="bizEmail" placeholder="info@company.com"></div>
+                <div class="form-group"><label>Website</label><input type="text" id="bizWebsite" placeholder="https://company.com"></div>
+                <div class="form-group"><label>Address</label><input type="text" id="bizAddress" placeholder="123 Main St, Edmonton, AB"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI SETTINGS -->
+    <div class="admin-section" id="section-ai-settings">
+        <div class="card">
+            <div class="card-header"><div class="card-title">AI Engine Settings</div><button class="btn btn-primary btn-sm" onclick="saveAISettings()"><i class="fas fa-save"></i> Save</button></div>
+            <div class="grid-2">
+                <div class="form-group"><label>AI Model</label><select id="aiModel"><option value="gpt-4o">GPT-4o (Recommended)</option><option value="gpt-4-turbo">GPT-4 Turbo</option><option value="gpt-3.5-turbo">GPT-3.5 Turbo</option></select></div>
+                <div class="form-group"><label>Max Tokens</label><input type="number" id="aiMaxTokens" value="2000"></div>
+                <div class="form-group"><label>Temperature (0-1)</label><input type="number" id="aiTemp" value="0.7" step="0.1" min="0" max="1"></div>
+                <div class="form-group"><label>Context Window</label><input type="number" id="aiContext" value="10"></div>
+            </div>
+            <div class="form-group mt2"><label>System Prompt</label><textarea id="aiSystemPrompt" rows="5" style="width:100%;padding:.75rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);resize:vertical">You are Foreman, an expert AI assistant for Alberta construction businesses. You specialize in WCB compliance, GST/HST, payroll, permits, safety regulations, and project management.</textarea></div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="aiEnabled" checked><span class="toggle-slider"></span></label><span>AI Chat Enabled</span></div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="aiEmailEnabled" checked><span class="toggle-slider"></span></label><span>AI Email Generation Enabled</span></div>
+        </div>
+    </div>
+
+    <!-- FINANCIAL SETTINGS -->
+    <div class="admin-section" id="section-financial-settings">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Financial Settings</div><button class="btn btn-primary btn-sm" onclick="saveFinancialSettings()"><i class="fas fa-save"></i> Save</button></div>
+            <div class="grid-2">
+                <div class="form-group"><label>GST Rate (%)</label><input type="number" id="finGST" value="5" step="0.01"></div>
+                <div class="form-group"><label>Default Payment Terms (days)</label><input type="number" id="finPayTerms" value="30"></div>
+                <div class="form-group"><label>Fiscal Year Start</label><select id="finFiscalYear"><option value="1">January</option><option value="4">April</option><option value="7">July</option><option value="10">October</option></select></div>
+                <div class="form-group"><label>Currency</label><select id="finCurrency"><option value="CAD">CAD</option><option value="USD">USD</option></select></div>
+                <div class="form-group"><label>Invoice Prefix</label><input type="text" id="finInvPrefix" value="INV-"></div>
+                <div class="form-group"><label>Estimate Prefix</label><input type="text" id="finEstPrefix" value="EST-"></div>
+                <div class="form-group"><label>Late Fee (%)</label><input type="number" id="finLateFee" value="1.5" step="0.1"></div>
+                <div class="form-group"><label>Overtime Multiplier</label><input type="number" id="finOT" value="1.5" step="0.1"></div>
+            </div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="finGSTEnabled" checked><span class="toggle-slider"></span></label><span>GST Enabled by Default</span></div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="finAutoInvoice"><span class="toggle-slider"></span></label><span>Auto-generate invoices on project completion</span></div>
+        </div>
+    </div>
+
+    <!-- COMPLIANCE SETTINGS -->
+    <div class="admin-section" id="section-compliance-settings">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Compliance Settings</div><button class="btn btn-primary btn-sm" onclick="saveComplianceSettings()"><i class="fas fa-save"></i> Save</button></div>
+            <div class="grid-2">
+                <div class="form-group"><label>WCB Rate (%)</label><input type="number" id="compWCB" value="1.5" step="0.01"></div>
+                <div class="form-group"><label>CPP Rate (%)</label><input type="number" id="compCPP" value="5.95" step="0.01"></div>
+                <div class="form-group"><label>EI Rate (%)</label><input type="number" id="compEI" value="1.66" step="0.01"></div>
+                <div class="form-group"><label>Safety Meeting Frequency</label><select id="compSafetyFreq"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="biweekly">Bi-Weekly</option></select></div>
+            </div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="compWCBEnabled" checked><span class="toggle-slider"></span></label><span>WCB Tracking Enabled</span></div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="compSafetyEnabled" checked><span class="toggle-slider"></span></label><span>Safety Checklists Required</span></div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="compPermitEnabled" checked><span class="toggle-slider"></span></label><span>Permit Tracking Enabled</span></div>
+        </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div class="admin-section" id="section-security">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Change Admin Password</div></div>
+            <div class="grid-2">
+                <div class="form-group"><label>Current Password</label><input type="password" id="secCurrent"></div>
+                <div></div>
+                <div class="form-group"><label>New Password (min 12 chars)</label><input type="password" id="secNew"></div>
+                <div class="form-group"><label>Confirm New Password</label><input type="password" id="secConfirm"></div>
+            </div>
+            <button class="btn btn-primary mt2" onclick="changePassword()"><i class="fas fa-key"></i> Change Password</button>
+            <div id="secAlert" class="mt2"></div>
+        </div>
+        <div class="card mt2">
+            <div class="card-header"><div class="card-title">Session Management</div></div>
+            <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem">Active sessions: <strong id="sessionCount">—</strong></p>
+            <button class="btn btn-warning" onclick="cleanupSessions()"><i class="fas fa-sign-out-alt"></i> Invalidate All Sessions</button>
+        </div>
+        <div class="card mt2">
+            <div class="card-header"><div class="card-title" style="color:var(--danger)">Danger Zone</div></div>
+            <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem">These actions are irreversible.</p>
+            <button class="btn btn-danger" onclick="confirmReset()"><i class="fas fa-exclamation-triangle"></i> Reset All User Data</button>
+        </div>
+    </div>
+
+    <!-- SYSTEM STATUS -->
+    <div class="admin-section" id="section-system">
+        <div class="card"><div class="card-header"><div class="card-title">System Status</div><button class="btn btn-secondary btn-sm" onclick="loadSystemStatus()"><i class="fas fa-sync-alt"></i></button></div><div id="systemStatusContent">Loading…</div></div>
+        <div class="card mt2">
+            <div class="card-header"><div class="card-title">API Endpoints Health</div></div>
+            <div class="table-wrap"><table><thead><tr><th>Endpoint</th><th>Method</th><th>Status</th></tr></thead><tbody id="apiEndpointsTbody"></tbody></table></div>
+        </div>
+    </div>
+
+    </div><!-- /content -->
+</div><!-- /main-area -->
+</div><!-- /layout -->
+</div><!-- /adminApp -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="addUserModal">
+    <div class="modal">
+        <h3><i class="fas fa-user-plus"></i> Add New User</h3>
+        <div class="grid-2">
+            <div class="form-group"><label>First Name</label><input type="text" id="newUserFirst" placeholder="John"></div>
+            <div class="form-group"><label>Last Name</label><input type="text" id="newUserLast" placeholder="Smith"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="newUserEmail" placeholder="john@company.com"></div>
+            <div class="form-group"><label>Password</label><input type="password" id="newUserPass"></div>
+            <div class="form-group"><label>Company</label><input type="text" id="newUserCompany"></div>
+            <div class="form-group"><label>Plan</label><select id="newUserPlan"><option value="starter">Starter ($49/mo)</option><option value="professional">Professional ($99/mo)</option><option value="business">Business ($199/mo)</option><option value="enterprise">Enterprise ($499/mo)</option></select></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="addUser()"><i class="fas fa-user-plus"></i> Create User</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="editUserModal">
+    <div class="modal">
+        <h3><i class="fas fa-user-edit"></i> Edit User</h3>
+        <input type="hidden" id="editUserEmail">
+        <div class="grid-2">
+            <div class="form-group"><label>First Name</label><input type="text" id="editUserFirst"></div>
+            <div class="form-group"><label>Last Name</label><input type="text" id="editUserLast"></div>
+            <div class="form-group"><label>Company</label><input type="text" id="editUserCompany"></div>
+            <div class="form-group"><label>Plan Override</label><select id="editUserPlan"><option value="">No override</option><option value="starter">Starter</option><option value="professional">Professional</option><option value="business">Business</option><option value="enterprise">Enterprise</option></select></div>
+            <div class="form-group"><label>Status</label><select id="editUserStatus"><option value="active">Active</option><option value="suspended">Suspended</option></select></div>
+            <div class="form-group"><label>New Password (blank = keep)</label><input type="password" id="editUserNewPass"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('editUserModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveEditUser()"><i class="fas fa-save"></i> Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="planModal">
+    <div class="modal">
+        <h3 id="planModalTitle"><i class="fas fa-layer-group"></i> New Plan</h3>
+        <input type="hidden" id="planModalId">
+        <div class="grid-2">
+            <div class="form-group"><label>Plan ID (slug)</label><input type="text" id="planId" placeholder="professional"></div>
+            <div class="form-group"><label>Display Name</label><input type="text" id="planName" placeholder="Professional"></div>
+            <div class="form-group"><label>Monthly Price (CAD)</label><input type="number" id="planPrice" placeholder="99"></div>
+            <div class="form-group"><label>Max Users</label><input type="number" id="planMaxUsers" placeholder="5"></div>
+            <div class="form-group"><label>Max Projects</label><input type="number" id="planMaxProjects" placeholder="25"></div>
+            <div class="form-group"><label>Storage (GB)</label><input type="number" id="planStorage" placeholder="10"></div>
+        </div>
+        <div class="form-group"><label>Features (one per line)</label><textarea id="planFeatures" rows="4" style="width:100%;padding:.75rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);resize:vertical">AI Chat Assistant
+Invoice Builder
+Project Management
+WCB Compliance</textarea></div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('planModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="savePlan()"><i class="fas fa-save"></i> Save Plan</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="paymentModal">
+    <div class="modal">
+        <h3><i class="fas fa-receipt"></i> Record Payment</h3>
+        <div class="grid-2">
+            <div class="form-group"><label>User Email</label><input type="email" id="pmEmail"></div>
+            <div class="form-group"><label>Amount (CAD)</label><input type="number" id="pmAmount" step="0.01"></div>
+            <div class="form-group"><label>Plan</label><select id="pmPlan"><option value="starter">Starter</option><option value="professional">Professional</option><option value="business">Business</option><option value="enterprise">Enterprise</option></select></div>
+            <div class="form-group"><label>Method</label><select id="pmMethod"><option value="stripe">Stripe</option><option value="e-transfer">E-Transfer</option><option value="cheque">Cheque</option><option value="cash">Cash</option><option value="bank_transfer">Bank Transfer</option></select></div>
+            <div class="form-group"><label>Reference #</label><input type="text" id="pmRef"></div>
+            <div class="form-group"><label>Notes</label><input type="text" id="pmNotes"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('paymentModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="recordPayment()"><i class="fas fa-check"></i> Record Payment</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="createDropdownModal">
+    <div class="modal">
+        <h3><i class="fas fa-list-ul"></i> Create New Dropdown List</h3>
+        <div class="form-group"><label>List Key (no spaces)</label><input type="text" id="newDDKey" placeholder="my_custom_list"></div>
+        <div class="form-group"><label>Items (one per line)</label><textarea id="newDDItems" rows="6" style="width:100%;padding:.75rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);resize:vertical" placeholder="Item One&#10;Item Two&#10;Item Three"></textarea></div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('createDropdownModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="createDropdownList()"><i class="fas fa-plus"></i> Create List</button>
+        </div>
+    </div>
+</div>
+
+<script>
+var API='',adminToken='',currentSection='dashboard',allUsers=[],allSubs=[],allPlans=[];
+
+function showToast(msg,type){
+    type=type||'info';
+    var t=document.createElement('div');
+    t.className='toast toast-'+type;
+    t.textContent=msg;
+    document.getElementById('toastContainer').appendChild(t);
+    setTimeout(function(){t.remove();},4000);
+}
+function fmt(v){
+    if(v===null||v===undefined)return'—';
+    if(typeof v==='number')return v.toLocaleString('en-CA',{style:'currency',currency:'CAD'});
+    return v;
+}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-CA');}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+async function apiCall(ep,method,body){
+    method=method||'GET';
+    var opts={method:method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken}};
+    if(body)opts.body=JSON.stringify(body);
+    var res=await fetch(API+ep,opts);
+    var data=await res.json();
+    if(!res.ok)throw new Error(data.detail||data.message||'Request failed');
+    return data;
+}
+
+async function doLogin(){
+    var user=document.getElementById('loginUser').value.trim();
+    var pass=document.getElementById('loginPass').value;
+    document.getElementById('loginError').style.display='none';
+    try{
+        var res=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:user,password:pass})});
+        var data=await res.json();
+        if(!res.ok)throw new Error(data.detail||'Login failed');
+        adminToken=data.token;
+        localStorage.setItem('adminToken',adminToken);
+        document.getElementById('loginScreen').style.display='none';
+        document.getElementById('adminApp').style.display='block';
+        document.getElementById('adminBadge').textContent=data.username||'Admin';
+        loadDashboard();
+    }catch(e){
+        document.getElementById('loginError').textContent=e.message;
+        document.getElementById('loginError').style.display='block';
+    }
+}
+document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+
+function logout(){
+    localStorage.removeItem('adminToken');adminToken='';
+    document.getElementById('adminApp').style.display='none';
+    document.getElementById('loginScreen').style.display='flex';
+}
+
+async function tryAutoLogin(){
+    var saved=localStorage.getItem('adminToken');
+    if(!saved)return;
+    try{
+        var res=await fetch('/api/admin/dashboard',{headers:{'Authorization':'Bearer '+saved}});
+        if(res.ok){adminToken=saved;document.getElementById('loginScreen').style.display='none';document.getElementById('adminApp').style.display='block';loadDashboard();}
+        else localStorage.removeItem('adminToken');
+    }catch(e){localStorage.removeItem('adminToken');}
+}
+
+document.querySelectorAll('.nav-link[data-section]').forEach(function(l){
+    l.addEventListener('click',function(){navigateTo(l.dataset.section);});
+});
+
+function navigateTo(section){
+    document.querySelectorAll('.nav-link[data-section]').forEach(function(l){l.classList.remove('active');});
+    var nl=document.querySelector('.nav-link[data-section="'+section+'"]');
+    if(nl)nl.classList.add('active');
+    document.querySelectorAll('.admin-section').forEach(function(s){s.classList.remove('active');});
+    var sl=document.getElementById('section-'+section);
+    if(sl)sl.classList.add('active');
+    var titles={'dashboard':'Dashboard','activity':'Activity Log','billing':'Billing Overview','subscriptions':'Subscriptions','plans':'Plans & Pricing','payments':'Payment History','stripe-setup':'Stripe Setup','users':'User Management','roles':'Roles & Permissions','platform-stats':'Platform Stats','projects-data':'Projects Data','invoices-data':'Invoices Data','transactions':'Transactions','compliance-data':'Compliance Data','dropdowns':'Dropdown Manager','branding':'Branding & Colors','layout-editor':'Layout Editor','business':'Business Settings','ai-settings':'AI Settings','financial-settings':'Financial Settings','compliance-settings':'Compliance Settings','security':'Security','system':'System Status'};
+    document.getElementById('topbarTitle').textContent=titles[section]||section;
+    currentSection=section;
+    var loaders={'dashboard':loadDashboard,'activity':loadActivity,'billing':loadBilling,'subscriptions':loadSubscriptions,'plans':loadPlans,'payments':loadPayments,'users':loadUsers,'roles':loadRoles,'platform-stats':loadPlatformStats,'projects-data':loadProjectsData,'invoices-data':loadInvoicesData,'transactions':loadTransactions,'compliance-data':loadComplianceData,'dropdowns':loadDropdowns,'branding':loadBranding,'layout-editor':loadLayoutEditor,'business':loadBusinessSettings,'ai-settings':loadAISettings,'financial-settings':loadFinancialSettings,'compliance-settings':loadComplianceSettings,'security':loadSecurity,'system':loadSystemStatus};
+    if(loaders[section])loaders[section]();
+}
+function refreshCurrentSection(){navigateTo(currentSection);}
+
+async function loadDashboard(){
+    try{
+        var r=await Promise.allSettled([apiCall('/api/admin/dashboard'),apiCall('/api/billing/admin/overview'),apiCall('/api/admin/users')]);
+        if(r[1].status==='fulfilled'){var b=r[1].value;document.getElementById('dMRR').textContent=fmt(b.mrr||0);document.getElementById('dARR').textContent=fmt(b.arr||0);document.getElementById('dSubs').textContent=b.active_subscriptions||0;}
+        if(r[0].status==='fulfilled'){var d=r[0].value;document.getElementById('dUsers').textContent=d.total_users||0;document.getElementById('dProjects').textContent=d.total_projects||'—';document.getElementById('dInvoiced').textContent=fmt(d.total_invoiced||0);document.getElementById('dashHealth').innerHTML='<div class="grid-3"><div><strong>Uptime</strong><br><span style="color:#66bb6a">'+(d.uptime||'99.9%')+'</span></div><div><strong>API</strong><br><span style="color:#66bb6a">Operational</span></div><div><strong>DB</strong><br><span style="color:#66bb6a">Active</span></div></div>';}
+        if(r[2].status==='fulfilled'){var u=r[2].value;var rec=(u.users||[]).slice(-5).reverse();document.getElementById('dashRecentUsers').innerHTML=rec.length?'<table style="width:100%;font-size:.83rem">'+rec.map(function(u){return'<tr><td>'+(u.first_name||'')+' '+(u.last_name||'')+'</td><td style="color:var(--text-muted)">'+u.email+'</td><td><span class="badge badge-'+(u.status==='active'?'success':'danger')+'">'+u.status+'</span></td></tr>';}).join('')+'</table>':'<p style="color:var(--text-muted)">No users yet.</p>';}
+        try{var pay=await apiCall('/api/billing/admin/subscriptions');var rs=(pay.subscriptions||[]).slice(-5).reverse();document.getElementById('dashRecentPayments').innerHTML=rs.length?'<table style="width:100%;font-size:.83rem">'+rs.map(function(p){return'<tr><td>'+p.user_email+'</td><td style="color:var(--text-muted)">'+p.plan_id+'</td><td><span class="badge badge-'+(p.status==='active'?'success':'warning')+'">'+p.status+'</span></td></tr>';}).join('')+'</table>':'<p style="color:var(--text-muted)">No subscriptions yet.</p>';}catch(e){}
+    }catch(e){showToast('Dashboard error: '+e.message,'error');}
+}
+
+async function loadActivity(){
+    try{var data=await apiCall('/api/admin/logs');var logs=data.logs||data||[];document.getElementById('activityList').innerHTML=logs.length?'<table style="width:100%;font-size:.83rem"><thead><tr><th>Time</th><th>Event</th><th>User</th><th>Details</th></tr></thead><tbody>'+logs.map(function(l){return'<tr><td style="color:var(--text-muted)">'+fmtDate(l.timestamp||l.time)+'</td><td>'+(l.event||l.action||'—')+'</td><td>'+(l.user||l.email||'—')+'</td><td style="color:var(--text-muted)">'+(l.details||l.message||'—')+'</td></tr>';}).join('')+'</tbody></table>':'<p style="color:var(--text-muted)">No activity logged yet.</p>';}
+    catch(e){document.getElementById('activityList').innerHTML='<p style="color:var(--text-muted)">Activity log unavailable.</p>';}
+}
+
+async function loadBilling(){
+    try{
+        var data=await apiCall('/api/billing/admin/overview');
+        document.getElementById('bMRR').textContent=fmt(data.mrr||0);document.getElementById('bARR').textContent=fmt(data.arr||0);document.getElementById('bActiveSubs').textContent=data.active_subscriptions||0;document.getElementById('bChurned').textContent=data.churned||0;
+        var bp=data.by_plan||{};document.getElementById('billingByPlan').innerHTML='<table><thead><tr><th>Plan</th><th>Subscribers</th><th>MRR</th></tr></thead><tbody>'+Object.entries(bp).map(function(e){return'<tr><td>'+e[0]+'</td><td>'+(e[1].count||0)+'</td><td>'+fmt(e[1].mrr||0)+'</td></tr>';}).join('')+'</tbody></table>';
+        try{var s=await apiCall('/api/billing/admin/settings');if(s){document.getElementById('bsTrial').value=s.trial_days||14;document.getElementById('bsGrace').value=s.grace_period_days||3;document.getElementById('bsTax').value=s.tax_rate||5;document.getElementById('bsAutoRenew').checked=s.auto_renew!==false;document.getElementById('bsTrialEnabled').checked=s.trial_enabled!==false;}}catch(e){}
+    }catch(e){showToast('Billing error: '+e.message,'error');}
+}
+async function saveBillingSettings(){try{await apiCall('/api/billing/admin/settings','PUT',{trial_days:parseInt(document.getElementById('bsTrial').value),grace_period_days:parseInt(document.getElementById('bsGrace').value),tax_rate:parseFloat(document.getElementById('bsTax').value),auto_renew:document.getElementById('bsAutoRenew').checked,trial_enabled:document.getElementById('bsTrialEnabled').checked,currency:document.getElementById('bsCurrency').value});showToast('Billing settings saved!','success');}catch(e){showToast('Error: '+e.message,'error');}}
+
+async function loadSubscriptions(){try{var data=await apiCall('/api/billing/admin/subscriptions');allSubs=data.subscriptions||[];renderSubs(allSubs);}catch(e){document.getElementById('subsTbody').innerHTML='<tr><td colspan="6" style="color:var(--text-muted)">Error loading.</td></tr>';}}
+function renderSubs(subs){document.getElementById('subsTbody').innerHTML=subs.length?subs.map(function(s){return'<tr><td>'+s.user_email+'</td><td><span class="badge badge-info">'+s.plan_id+'</span></td><td><span class="badge badge-'+(s.status==='active'?'success':s.status==='trial'?'warning':'danger')+'">'+s.status+'</span></td><td>'+fmtDate(s.start_date)+'</td><td>'+fmtDate(s.next_billing_date)+'</td><td><button class="btn btn-secondary btn-sm" onclick="overrideSub(\''+s.user_email+'\')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="cancelSub(\''+s.user_email+'\')"><i class="fas fa-times"></i></button></td></tr>';}).join(''):'<tr><td colspan="6" style="color:var(--text-muted)">No subscriptions.</td></tr>';}
+function filterSubs(){var q=document.getElementById('subSearch').value.toLowerCase();renderSubs(allSubs.filter(function(s){return s.user_email.toLowerCase().includes(q);}));}
+async function overrideSub(email){var plan=prompt('Override plan for '+email+':\nOptions: starter, professional, business, enterprise');if(!plan)return;try{await apiCall('/api/billing/admin/subscription/'+encodeURIComponent(email)+'/override','PUT',{plan_id:plan,status:'active'});showToast('Updated!','success');loadSubscriptions();}catch(e){showToast('Error: '+e.message,'error');}}
+async function cancelSub(email){if(!confirm('Cancel subscription for '+email+'?'))return;try{await apiCall('/api/billing/subscription','DELETE',{user_email:email});showToast('Cancelled.','success');loadSubscriptions();}catch(e){showToast('Error: '+e.message,'error');}}
+
+async function loadPlans(){try{var data=await apiCall('/api/billing/plans');allPlans=data.plans||data||[];renderPlans(allPlans);}catch(e){document.getElementById('planCards').innerHTML='<p style="color:var(--text-muted)">Error loading plans.</p>';}}
+function renderPlans(plans){document.getElementById('planCards').innerHTML=plans.map(function(p){return'<div class="plan-card '+(p.id==='professional'?'featured':'')+'"><div class="plan-name">'+(p.name||p.id)+'</div><div class="plan-price">$'+(p.price||p.monthly_price||0)+'<span>/mo</span></div><ul class="plan-features">'+(p.features||[]).map(function(f){return'<li>'+f+'</li>';}).join('')+'</ul><div class="flex-gap mt2"><button class="btn btn-secondary btn-sm" onclick="editPlan(\''+p.id+'\')"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-danger btn-sm" onclick="deletePlan(\''+p.id+'\')"><i class="fas fa-trash"></i></button></div></div>';}).join('');}
+function openPlanModal(planId){document.getElementById('planModalTitle').innerHTML=planId?'<i class="fas fa-edit"></i> Edit Plan':'<i class="fas fa-plus"></i> New Plan';document.getElementById('planModalId').value=planId||'';if(!planId){['planId','planName','planPrice','planMaxUsers','planMaxProjects','planStorage'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('planFeatures').value='';}openModal('planModal');}
+function editPlan(id){var p=allPlans.find(function(p){return p.id===id;});if(!p)return;document.getElementById('planModalId').value=id;document.getElementById('planId').value=p.id;document.getElementById('planName').value=p.name||'';document.getElementById('planPrice').value=p.price||p.monthly_price||'';document.getElementById('planMaxUsers').value=p.max_users||'';document.getElementById('planMaxProjects').value=p.max_projects||'';document.getElementById('planStorage').value=p.storage_gb||'';document.getElementById('planFeatures').value=(p.features||[]).join('\n');openPlanModal(id);}
+async function savePlan(){var id=document.getElementById('planModalId').value;var body={id:document.getElementById('planId').value,name:document.getElementById('planName').value,price:parseFloat(document.getElementById('planPrice').value),monthly_price:parseFloat(document.getElementById('planPrice').value),max_users:parseInt(document.getElementById('planMaxUsers').value)||999,max_projects:parseInt(document.getElementById('planMaxProjects').value)||999,storage_gb:parseInt(document.getElementById('planStorage').value)||10,features:document.getElementById('planFeatures').value.split('\n').filter(function(f){return f.trim();})};try{if(id){await apiCall('/api/billing/admin/plans/'+id,'PUT',body);}else{await apiCall('/api/billing/admin/plans','POST',body);}showToast('Plan saved!','success');closeModal('planModal');loadPlans();}catch(e){showToast('Error: '+e.message,'error');}}
+async function deletePlan(id){if(!confirm('Delete plan "'+id+'"?'))return;try{await apiCall('/api/billing/admin/plans/'+id,'DELETE');showToast('Deleted.','success');loadPlans();}catch(e){showToast('Error: '+e.message,'error');}}
+
+async function loadPayments(){try{var data=await apiCall('/api/billing/payments');var payments=data.payments||data||[];document.getElementById('paymentsTbody').innerHTML=payments.length?payments.map(function(p){return'<tr><td>'+fmtDate(p.date||p.created_at)+'</td><td>'+p.user_email+'</td><td>'+fmt(p.amount)+'</td><td>'+(p.plan_id||'—')+'</td><td>'+(p.method||p.payment_method||'—')+'</td><td><span class="badge badge-'+(p.status==='completed'||p.status==='succeeded'?'success':'warning')+'">'+p.status+'</span></td><td style="color:var(--text-muted);font-size:.78rem">'+(p.reference||p.stripe_payment_id||'—')+'</td></tr>';}).join(''):'<tr><td colspan="7" style="color:var(--text-muted)">No payments.</td></tr>';}catch(e){document.getElementById('paymentsTbody').innerHTML='<tr><td colspan="7" style="color:var(--text-muted)">Error.</td></tr>';}}
+async function recordPayment(){try{await apiCall('/api/billing/payment','POST',{user_email:document.getElementById('pmEmail').value,amount:parseFloat(document.getElementById('pmAmount').value),plan_id:document.getElementById('pmPlan').value,payment_method:document.getElementById('pmMethod').value,reference:document.getElementById('pmRef').value,notes:document.getElementById('pmNotes').value});showToast('Payment recorded!','success');closeModal('paymentModal');loadPayments();}catch(e){showToast('Error: '+e.message,'error');}}
+async function saveStripeKeys(){var pub=document.getElementById('stripePubKey').value.trim();var sec=document.getElementById('stripeSecKey').value.trim();if(!pub||!sec){showToast('Enter both keys.','error');return;}try{await apiCall('/api/admin/settings','PUT',{stripe_publishable_key:pub,stripe_secret_key:sec});showToast('Stripe keys saved! Redeploy to activate.','success');}catch(e){showToast('Error: '+e.message,'error');}}
+
+async function loadUsers(){try{var data=await apiCall('/api/admin/users');allUsers=data.users||[];renderUsers(allUsers);}catch(e){document.getElementById('usersTbody').innerHTML='<tr><td colspan="7" style="color:var(--text-muted)">Error.</td></tr>';}}
+function renderUsers(users){document.getElementById('usersTbody').innerHTML=users.length?users.map(function(u){return'<tr><td>'+(u.first_name||'')+' '+(u.last_name||'')+'</td><td>'+u.email+'</td><td>'+(u.company_name||'—')+'</td><td><span class="badge badge-info">'+(u.plan||'starter')+'</span></td><td><span class="badge badge-'+(u.status==='active'?'success':'danger')+'">'+(u.status||'active')+'</span></td><td>'+fmtDate(u.created_at)+'</td><td><button class="btn btn-secondary btn-sm" onclick="openEditUser(\''+u.email+'\')"><i class="fas fa-edit"></i></button> <button class="btn btn-'+(u.status==='active'?'warning':'success')+' btn-sm" onclick="toggleUserStatus(\''+u.email+'\',\''+(u.status||'active')+'\')"><i class="fas fa-'+(u.status==='active'?'ban':'check')+'"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteUser(\''+u.email+'\')"><i class="fas fa-trash"></i></button></td></tr>';}).join(''):'<tr><td colspan="7" style="color:var(--text-muted)">No users.</td></tr>';}
+function filterUsers(){var q=document.getElementById('userSearch').value.toLowerCase();var st=document.getElementById('userStatusFilter').value;renderUsers(allUsers.filter(function(u){return(u.email.toLowerCase().includes(q)||(u.first_name||'').toLowerCase().includes(q)||(u.company_name||'').toLowerCase().includes(q))&&(!st||u.status===st);}));}
+async function addUser(){try{await apiCall('/api/users/register','POST',{email:document.getElementById('newUserEmail').value,password:document.getElementById('newUserPass').value,first_name:document.getElementById('newUserFirst').value,last_name:document.getElementById('newUserLast').value,company_name:document.getElementById('newUserCompany').value});showToast('User created!','success');closeModal('addUserModal');loadUsers();}catch(e){showToast('Error: '+e.message,'error');}}
+function openEditUser(email){var u=allUsers.find(function(u){return u.email===email;});if(!u)return;document.getElementById('editUserEmail').value=email;document.getElementById('editUserFirst').value=u.first_name||'';document.getElementById('editUserLast').value=u.last_name||'';document.getElementById('editUserCompany').value=u.company_name||'';document.getElementById('editUserStatus').value=u.status||'active';document.getElementById('editUserPlan').value='';document.getElementById('editUserNewPass').value='';openModal('editUserModal');}
+async function saveEditUser(){var email=document.getElementById('editUserEmail').value;try{await apiCall('/api/admin/users/'+encodeURIComponent(email),'PUT',{first_name:document.getElementById('editUserFirst').value,last_name:document.getElementById('editUserLast').value,company_name:document.getElementById('editUserCompany').value,status:document.getElementById('editUserStatus').value,new_password:document.getElementById('editUserNewPass').value||undefined});var plan=document.getElementById('editUserPlan').value;if(plan){await apiCall('/api/billing/admin/subscription/'+encodeURIComponent(email)+'/override','PUT',{plan_id:plan,status:'active'});}showToast('User updated!','success');closeModal('editUserModal');loadUsers();}catch(e){showToast('Error: '+e.message,'error');}}
+async function toggleUserStatus(email,cur){var ns=cur==='active'?'suspended':'active';try{await apiCall('/api/admin/users/'+encodeURIComponent(email)+'/suspend','POST',{status:ns});showToast('User '+ns+'!','success');loadUsers();}catch(e){showToast('Error: '+e.message,'error');}}
+async function deleteUser(email){if(!confirm('Delete user '+email+'?'))return;try{await apiCall('/api/admin/users/'+encodeURIComponent(email),'DELETE');showToast('Deleted.','success');loadUsers();}catch(e){showToast('Error: '+e.message,'error');}}
+
+var PERMISSIONS=['View Projects','Create Projects','Edit Projects','Delete Projects','View Invoices','Create Invoices','Send Invoices','Delete Invoices','View Estimates','Create Estimates','View Payroll','Run Payroll','View Reports','Export Reports','Manage Workers','View Compliance','Submit Safety Forms','Manage Permits','View AI Chat','Manage Settings'];
+var ROLES=['Owner','Manager','Foreman','Worker','Viewer'];
+var DEFAULT_PERMS={Owner:PERMISSIONS.map(function(){return true;}),Manager:[true,true,true,false,true,true,true,false,true,true,true,true,true,true,true,true,false,true,true,false],Foreman:[true,false,true,false,true,false,false,false,true,false,false,false,true,false,true,true,true,true,true,false],Worker:[true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,true,true,false,true,false],Viewer:[true,false,false,false,true,false,false,false,true,false,false,false,true,false,false,true,false,false,false,false]};
+function loadRoles(){var saved=JSON.parse(localStorage.getItem('permMatrix')||'null')||DEFAULT_PERMS;document.getElementById('permMatrix').innerHTML=PERMISSIONS.map(function(perm,pi){return'<tr><td style="text-align:left;font-size:.85rem">'+perm+'</td>'+ROLES.map(function(role){return'<td><input type="checkbox" class="perm-check" data-role="'+role+'" data-perm="'+pi+'" '+(role==='Owner'?'disabled checked':(saved[role]&&saved[role][pi]?'checked':''))+'></td>';}).join('')+'</tr>';}).join('');}
+function savePermissions(){var m={};ROLES.forEach(function(role){m[role]=PERMISSIONS.map(function(_,pi){if(role==='Owner')return true;var cb=document.querySelector('input[data-role="'+role+'"][data-perm="'+pi+'"]');return cb?cb.checked:false;});});localStorage.setItem('permMatrix',JSON.stringify(m));showToast('Permissions saved!','success');}
+
+async function loadPlatformStats(){try{var d=await apiCall('/api/admin/dashboard');document.getElementById('platformStatsGrid').innerHTML='<div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value">'+(d.total_users||0)+'</div></div><div class="stat-card accent"><div class="stat-label">Active Sessions</div><div class="stat-value">'+(d.active_sessions||0)+'</div></div><div class="stat-card success"><div class="stat-label">Total Projects</div><div class="stat-value">'+(d.total_projects||0)+'</div></div><div class="stat-card warning"><div class="stat-label">Total Invoices</div><div class="stat-value">'+(d.total_invoices||0)+'</div></div>';document.getElementById('statsByPlan').innerHTML='<table style="width:100%;font-size:.85rem"><thead><tr><th>Plan</th><th>Users</th></tr></thead><tbody><tr><td>Starter</td><td>'+(d.users_by_plan&&d.users_by_plan.starter||0)+'</td></tr><tr><td>Professional</td><td>'+(d.users_by_plan&&d.users_by_plan.professional||0)+'</td></tr><tr><td>Business</td><td>'+(d.users_by_plan&&d.users_by_plan.business||0)+'</td></tr><tr><td>Enterprise</td><td>'+(d.users_by_plan&&d.users_by_plan.enterprise||0)+'</td></tr></tbody></table>';document.getElementById('statsFeatureUsage').innerHTML='<table style="width:100%;font-size:.85rem"><thead><tr><th>Feature</th><th>Usage</th></tr></thead><tbody><tr><td>AI Chat</td><td>'+(d.ai_chats||0)+' messages</td></tr><tr><td>Invoices</td><td>'+(d.total_invoices||0)+' created</td></tr><tr><td>Projects</td><td>'+(d.total_projects||0)+' active</td></tr><tr><td>Safety Forms</td><td>'+(d.safety_forms||0)+' submitted</td></tr></tbody></table>';}catch(e){document.getElementById('platformStatsGrid').innerHTML='<p style="color:var(--text-muted)">Error.</p>';}}
+
+async function loadProjectsData(){try{var data=await apiCall('/api/projects/summary/overview');var projects=data.projects||[];document.getElementById('projectsTbody').innerHTML=projects.length?projects.map(function(p){return'<tr><td>'+p.name+'</td><td>'+(p.client_name||'—')+'</td><td><span class="badge badge-info">'+(p.project_type||'—')+'</span></td><td><span class="badge badge-'+(p.status==='active'?'success':p.status==='completed'?'info':'warning')+'">'+p.status+'</span></td><td>'+fmtDate(p.start_date)+'</td><td>'+fmtDate(p.scheduled_finish_date)+'</td><td>'+fmt(p.contract_value)+'</td><td style="color:var(--text-muted);font-size:.78rem">'+(p.user_email||'—')+'</td></tr>';}).join(''):'<tr><td colspan="8" style="color:var(--text-muted)">No projects.</td></tr>';}catch(e){document.getElementById('projectsTbody').innerHTML='<tr><td colspan="8" style="color:var(--text-muted)">Error.</td></tr>';}}
+
+async function loadInvoicesData(){try{var data=await apiCall('/api/projects/summary/overview');var invoices=data.invoices||[];var total=0,paid=0,outstanding=0,overdue=0;invoices.forEach(function(inv){total+=inv.total||0;if(inv.status==='paid')paid+=inv.total||0;else if(inv.status==='overdue')overdue+=inv.total||0;else outstanding+=inv.total||0;});document.getElementById('iTotal').textContent=fmt(total);document.getElementById('iPaid').textContent=fmt(paid);document.getElementById('iOutstanding').textContent=fmt(outstanding);document.getElementById('iOverdue').textContent=fmt(overdue);document.getElementById('invoicesTbody').innerHTML=invoices.length?invoices.map(function(inv){return'<tr><td style="font-size:.78rem;color:var(--text-muted)">'+(inv.invoice_number||inv.id||'—')+'</td><td>'+(inv.client_name||'—')+'</td><td>'+(inv.project_name||'—')+'</td><td>'+fmt(inv.subtotal)+'</td><td>'+fmt(inv.gst_total)+'</td><td><strong>'+fmt(inv.total)+'</strong></td><td><span class="badge badge-'+(inv.status==='paid'?'success':inv.status==='overdue'?'danger':'warning')+'">'+inv.status+'</span></td><td>'+fmtDate(inv.due_date)+'</td></tr>';}).join(''):'<tr><td colspan="8" style="color:var(--text-muted)">No invoices.</td></tr>';}catch(e){document.getElementById('invoicesTbody').innerHTML='<tr><td colspan="8" style="color:var(--text-muted)">Error.</td></tr>';}}
+
+async function loadTransactions(){try{var data=await apiCall('/api/financial/transactions');var txns=data.transactions||data||[];document.getElementById('transactionsTbody').innerHTML=txns.length?txns.map(function(t){return'<tr><td>'+fmtDate(t.date||t.created_at)+'</td><td>'+(t.user_email||'—')+'</td><td><span class="badge badge-'+(t.type==='income'?'success':'danger')+'">'+(t.type||'—')+'</span></td><td>'+(t.description||'—')+'</td><td>'+fmt(t.amount)+'</td><td>'+(t.category||'—')+'</td></tr>';}).join(''):'<tr><td colspan="6" style="color:var(--text-muted)">No transactions.</td></tr>';}catch(e){document.getElementById('transactionsTbody').innerHTML='<tr><td colspan="6" style="color:var(--text-muted)">Error.</td></tr>';}}
+
+async function loadComplianceData(){try{var data=await apiCall('/api/compliance/summary');document.getElementById('complianceDataContent').innerHTML='<div class="grid-3"><div class="stat-card"><div class="stat-label">Safety Forms</div><div class="stat-value">'+(data.safety_forms||0)+'</div></div><div class="stat-card"><div class="stat-label">Permits</div><div class="stat-value">'+(data.permits||0)+'</div></div><div class="stat-card"><div class="stat-label">Inspections</div><div class="stat-value">'+(data.inspections||0)+'</div></div></div>';}catch(e){document.getElementById('complianceDataContent').innerHTML='<p style="color:var(--text-muted)">Unavailable.</p>';}}
+
+async function loadDropdowns(){try{var data=await apiCall('/api/dropdowns');var keys=Object.keys(data);var sel=document.getElementById('ddSelector');sel.innerHTML='<option value="">— Choose a list —</option>'+keys.map(function(k){return'<option value="'+k+'">'+k.replace(/_/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();})+'</option>';}).join('');document.getElementById('ddAllLists').innerHTML=keys.map(function(k){return'<span style="cursor:pointer;color:var(--accent)" onclick="document.getElementById(\'ddSelector\').value=\''+k+'\';loadDropdownItems()">'+k+'</span><br>';}).join('');}catch(e){showToast('Error: '+e.message,'error');}}
+async function loadDropdownItems(){var key=document.getElementById('ddSelector').value;if(!key){document.getElementById('ddListPanel').style.display='none';return;}document.getElementById('ddListPanel').style.display='block';document.getElementById('ddListTitle').textContent=key.replace(/_/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});try{var data=await apiCall('/api/dropdowns/'+key);var items=data.items||data||[];document.getElementById('ddItemsList').innerHTML=items.map(function(item){var label=typeof item==='object'?(item.label||item.value||JSON.stringify(item)):item;var value=typeof item==='object'?item.value:item;return'<li><span class="item-label">'+label+'</span><button class="btn btn-danger btn-sm" onclick="removeDropdownItem(\''+key+'\',\''+value+'\')"><i class="fas fa-times"></i></button></li>';}).join('')||'<li style="color:var(--text-muted)">No items.</li>';}catch(e){showToast('Error: '+e.message,'error');}}
+async function addDropdownItem(){var key=document.getElementById('ddSelector').value;var val=document.getElementById('ddNewItem').value.trim();if(!key||!val)return;try{await apiCall('/api/dropdowns/'+key+'/item','POST',{value:val,label:val});document.getElementById('ddNewItem').value='';showToast('Item added!','success');loadDropdownItems();}catch(e){showToast('Error: '+e.message,'error');}}
+async function removeDropdownItem(key,value){if(!confirm('Remove "'+value+'"?'))return;try{await apiCall('/api/dropdowns/'+key+'/item/'+encodeURIComponent(value),'DELETE');showToast('Removed.','success');loadDropdownItems();}catch(e){showToast('Error: '+e.message,'error');}}
+async function createDropdownList(){var key=document.getElementById('newDDKey').value.trim().replace(/\s+/g,'_');var items=document.getElementById('newDDItems').value.split('\n').map(function(i){return i.trim();}).filter(Boolean);if(!key){showToast('Enter a key.','error');return;}try{await apiCall('/api/dropdowns','POST',{key:key,items:items});showToast('List created!','success');closeModal('createDropdownModal');loadDropdowns();}catch(e){showToast('Error: '+e.message,'error');}}
+
+function loadBranding(){var s=JSON.parse(localStorage.getItem('brandingSettings')||'{}');if(s.primary)document.getElementById('c-primary').value=s.primary;if(s.accent)document.getElementById('c-accent').value=s.accent;if(s.appName)document.getElementById('brandAppName').value=s.appName;if(s.tagline)document.getElementById('brandTagline').value=s.tagline;}
+async function saveBranding(){var s={primary:document.getElementById('c-primary').value,accent:document.getElementById('c-accent').value,success:document.getElementById('c-success').value,warning:document.getElementById('c-warning').value,danger:document.getElementById('c-danger').value,bg:document.getElementById('c-bg').value,card:document.getElementById('c-card').value,border:document.getElementById('c-border').value,appName:document.getElementById('brandAppName').value,tagline:document.getElementById('brandTagline').value,logoUrl:document.getElementById('brandLogoUrl').value,faviconUrl:document.getElementById('brandFaviconUrl').value};localStorage.setItem('brandingSettings',JSON.stringify(s));try{await apiCall('/api/admin/settings','PUT',{branding:s});}catch(e){}showToast('Branding saved!','success');}
+
+var FEATURES=[{key:'ai_chat',label:'AI Chat Assistant'},{key:'invoices',label:'Invoice Builder'},{key:'estimates',label:'Estimates / Quotes'},{key:'projects',label:'Project Management'},{key:'payroll',label:'Payroll Calculator'},{key:'wcb',label:'WCB Compliance'},{key:'permits',label:'Permit Tracking'},{key:'safety',label:'Safety Checklists'},{key:'inspections',label:'Inspections'},{key:'financial',label:'Financial Ledger'},{key:'email_ai',label:'AI Email Generator'},{key:'nda',label:'NDA Generator'},{key:'reports',label:'Reports & Analytics'}];
+function loadLayoutEditor(){var saved=JSON.parse(localStorage.getItem('featureToggles')||'{}');document.getElementById('featureToggles').innerHTML=FEATURES.map(function(f){return'<div class="toggle-wrap" style="padding:.5rem 0;border-bottom:1px solid var(--border)"><label class="toggle"><input type="checkbox" id="ft-'+f.key+'" '+(saved[f.key]!==false?'checked':'')+'><span class="toggle-slider"></span></label><span>'+f.label+'</span></div>';}).join('');}
+function saveLayoutSettings(){var t={};FEATURES.forEach(function(f){var el=document.getElementById('ft-'+f.key);t[f.key]=el?el.checked:true;});localStorage.setItem('featureToggles',JSON.stringify(t));showToast('Layout saved!','success');}
+
+async function loadBusinessSettings(){try{var data=await apiCall('/api/admin/settings');var s=data.settings||data;if(s.company_name)document.getElementById('bizName').value=s.company_name;if(s.gst_number)document.getElementById('bizGST').value=s.gst_number;if(s.wcb_account)document.getElementById('bizWCB').value=s.wcb_account;if(s.phone)document.getElementById('bizPhone').value=s.phone;if(s.email)document.getElementById('bizEmail').value=s.email;if(s.website)document.getElementById('bizWebsite').value=s.website;if(s.address)document.getElementById('bizAddress').value=s.address;}catch(e){}}
+async function saveBusinessSettings(){try{await apiCall('/api/admin/settings','PUT',{company_name:document.getElementById('bizName').value,gst_number:document.getElementById('bizGST').value,wcb_account:document.getElementById('bizWCB').value,province:document.getElementById('bizProvince').value,phone:document.getElementById('bizPhone').value,email:document.getElementById('bizEmail').value,website:document.getElementById('bizWebsite').value,address:document.getElementById('bizAddress').value});showToast('Business settings saved!','success');}catch(e){showToast('Error: '+e.message,'error');}}
+
+async function loadAISettings(){try{var data=await apiCall('/api/admin/settings');var s=data.settings||data;if(s.ai_model)document.getElementById('aiModel').value=s.ai_model;if(s.max_tokens)document.getElementById('aiMaxTokens').value=s.max_tokens;if(s.temperature)document.getElementById('aiTemp').value=s.temperature;if(s.system_prompt)document.getElementById('aiSystemPrompt').value=s.system_prompt;}catch(e){}}
+async function saveAISettings(){try{await apiCall('/api/admin/settings','PUT',{ai_model:document.getElementById('aiModel').value,max_tokens:parseInt(document.getElementById('aiMaxTokens').value),temperature:parseFloat(document.getElementById('aiTemp').value),system_prompt:document.getElementById('aiSystemPrompt').value,ai_enabled:document.getElementById('aiEnabled').checked,ai_email_enabled:document.getElementById('aiEmailEnabled').checked});showToast('AI settings saved!','success');}catch(e){showToast('Error: '+e.message,'error');}}
+
+async function loadFinancialSettings(){try{var data=await apiCall('/api/admin/settings');var s=data.settings||data;if(s.gst_rate)document.getElementById('finGST').value=s.gst_rate;if(s.payment_terms)document.getElementById('finPayTerms').value=s.payment_terms;if(s.invoice_prefix)document.getElementById('finInvPrefix').value=s.invoice_prefix;if(s.estimate_prefix)document.getElementById('finEstPrefix').value=s.estimate_prefix;}catch(e){}}
+async function saveFinancialSettings(){try{await apiCall('/api/admin/settings','PUT',{gst_rate:parseFloat(document.getElementById('finGST').value),payment_terms:parseInt(document.getElementById('finPayTerms').value),fiscal_year_start:parseInt(document.getElementById('finFiscalYear').value),currency:document.getElementById('finCurrency').value,invoice_prefix:document.getElementById('finInvPrefix').value,estimate_prefix:document.getElementById('finEstPrefix').value,late_fee_rate:parseFloat(document.getElementById('finLateFee').value),overtime_multiplier:parseFloat(document.getElementById('finOT').value),gst_enabled:document.getElementById('finGSTEnabled').checked,auto_invoice:document.getElementById('finAutoInvoice').checked});showToast('Financial settings saved!','success');}catch(e){showToast('Error: '+e.message,'error');}}
+
+async function loadComplianceSettings(){try{var data=await apiCall('/api/admin/settings');var s=data.settings||data;if(s.wcb_rate)document.getElementById('compWCB').value=s.wcb_rate;if(s.cpp_rate)document.getElementById('compCPP').value=s.cpp_rate;if(s.ei_rate)document.getElementById('compEI').value=s.ei_rate;}catch(e){}}
+async function saveComplianceSettings(){try{await apiCall('/api/admin/settings','PUT',{wcb_rate:parseFloat(document.getElementById('compWCB').value),cpp_rate:parseFloat(document.getElementById('compCPP').value),ei_rate:parseFloat(document.getElementById('compEI').value),safety_meeting_frequency:document.getElementById('compSafetyFreq').value,wcb_enabled:document.getElementById('compWCBEnabled').checked,safety_checklists_required:document.getElementById('compSafetyEnabled').checked,permit_tracking_enabled:document.getElementById('compPermitEnabled').checked});showToast('Compliance settings saved!','success');}catch(e){showToast('Error: '+e.message,'error');}}
+
+function loadSecurity(){apiCall('/api/admin/dashboard').then(function(d){document.getElementById('sessionCount').textContent=d.active_sessions||1;}).catch(function(){});}
+async function changePassword(){var cur=document.getElementById('secCurrent').value;var np=document.getElementById('secNew').value;var cf=document.getElementById('secConfirm').value;if(np!==cf){document.getElementById('secAlert').innerHTML='<div class="alert alert-danger">Passwords do not match.</div>';return;}if(np.length<12){document.getElementById('secAlert').innerHTML='<div class="alert alert-danger">Min 12 characters.</div>';return;}try{await apiCall('/api/admin/change-password','POST',{current_password:cur,new_password:np});document.getElementById('secAlert').innerHTML='<div class="alert alert-success">Password changed!</div>';document.getElementById('secCurrent').value='';document.getElementById('secNew').value='';document.getElementById('secConfirm').value='';}catch(e){document.getElementById('secAlert').innerHTML='<div class="alert alert-danger">Error: '+e.message+'</div>';}}
+async function cleanupSessions(){try{await apiCall('/api/admin/cleanup-sessions','POST');showToast('Sessions invalidated.','success');logout();}catch(e){showToast('Error: '+e.message,'error');}}
+async function confirmReset(){if(!confirm('WARNING: Delete ALL user data?'))return;if(prompt('Type "RESET ALL DATA" to confirm:')!=='RESET ALL DATA'){showToast('Cancelled.','info');return;}try{await apiCall('/api/admin/reset','POST');showToast('Data reset.','success');}catch(e){showToast('Error: '+e.message,'error');}}
+
+async function loadSystemStatus(){
+    try{
+        var data=await apiCall('/api/health');
+        document.getElementById('systemStatusContent').innerHTML='<div class="grid-3"><div class="stat-card success"><div class="stat-label">API Status</div><div class="stat-value" style="font-size:1.2rem">Operational</div></div><div class="stat-card"><div class="stat-label">Version</div><div class="stat-value" style="font-size:1.2rem">'+(data.version||'1.0.0')+'</div></div><div class="stat-card"><div class="stat-label">Environment</div><div class="stat-value" style="font-size:1.2rem">'+(data.environment||'production')+'</div></div></div>';
+        var eps=[{path:'/api/health',method:'GET'},{path:'/api/admin/dashboard',method:'GET'},{path:'/api/billing/plans',method:'GET'},{path:'/api/dropdowns',method:'GET'},{path:'/api/projects/summary/overview',method:'GET'}];
+        document.getElementById('apiEndpointsTbody').innerHTML=eps.map(function(ep){return'<tr><td style="font-family:monospace;font-size:.82rem">'+ep.path+'</td><td>'+ep.method+'</td><td><span class="badge badge-success">OK</span></td></tr>';}).join('');
+    }catch(e){document.getElementById('systemStatusContent').innerHTML='<p style="color:var(--text-muted)">Error loading status.</p>';}
+}
+
+tryAutoLogin();
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+{
+  "timestamp": "2026-03-08T22:17:36.383776",
+  "tests": [
+    {
+      "name": "Health Check",
+      "status": "PASS",
+      "detail": "Server healthy"
+    },
+    {
+      "name": "User Login",
+      "status": "PASS",
+      "detail": "Token obtained"
+    },
+    {
+      "name": "BUG-004: Projects Auth",
+      "status": "PASS",
+      "detail": "Unauthenticated blocked"
+    },
+    {
+      "name": "Projects List",
+      "status": "PASS",
+      "detail": "0 projects"
+    },
+    {
+      "name": "BUG-007: Invoice due_date",
+      "status": "PASS",
+      "detail": "due_date=2026-04-07"
+    },
+    {
+      "name": "BUG-001: Store Sync",
+      "status": "PASS",
+      "detail": "syncStore working"
+    },
+    {
+      "name": "Financial Summary",
+      "status": "PASS",
+      "detail": "OK"
+    },
+    {
+      "name": "Ledger Dashboard",
+      "status": "PASS",
+      "detail": "OK"
+    },
+    {
+      "name": "Compliance Status",
+      "status": "PASS",
+      "detail": "Score: 80.0%"
+    },
+    {
+      "name": "BUG-006: Pricing",
+      "status": "PASS",
+      "detail": "Pro=$149 Biz=$299"
+    },
+    {
+      "name": "Admin Login",
+      "status": "PASS",
+      "detail": "OK"
+    },
+    {
+      "name": "Admin Dashboard",
+      "status": "PASS",
+      "detail": "1 users"
+    },
+    {
+      "name": "BUG-005: Persistence",
+      "status": "PASS",
+      "detail": "2 data files on disk"
+    },
+    {
+      "name": "AI Chat",
+      "status": "WARN",
+      "detail": "No AI API key configured"
+    }
+  ],
+  "bugs_found": [
+    "AI: No OpenAI/Anthropic API key configured - AI features disabled"
+  ],
+  "server_status": "\ud83d\udfe2 ONLINE",
+  "total_pass": 13,
+  "total_fail": 0,
+  "total_warn": 1
+}

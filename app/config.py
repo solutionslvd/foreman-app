@@ -1,0 +1,150 @@
+"""
+Configuration File for Alberta Construction AI Assistant
+Customize all settings here for your business
+"""
+
+from typing import Dict, List, Optional
+from decimal import Decimal
+
+class AppConfig:
+    """Main application configuration"""
+    
+    # ============================================
+    # BUSINESS INFORMATION
+    # ============================================
+    BUSINESS_NAME = "[YOUR BUSINESS NAME]"  # e.g., "ABC Construction Ltd."
+    BUSINESS_TYPE = "[YOUR TRADE]"  # e.g., "framing", "carpentry", "general_contracting"
+    BUSINESS_ADDRESS = "[YOUR ADDRESS]"
+    BUSINESS_PHONE = "[YOUR PHONE]"
+    BUSINESS_EMAIL = "[YOUR EMAIL]"
+    
+    # ============================================
+    # CONTACT INFORMATION
+    # ============================================
+    CONTACT_PERSON = "[YOUR NAME]"
+    CONTACT_TITLE = "[YOUR TITLE]"
+    
+    # ============================================
+    # TAX & FINANCIAL SETTINGS
+    # ============================================
+    GST_RATE = Decimal("0.05")  # Alberta GST rate (5%)
+    BUSINESS_NUMBER = "[YOUR CRA BUSINESS NUMBER]"  # e.g., "123456789RT0001"
+    WCB_ACCOUNT_NUMBER = "[YOUR WCB ACCOUNT NUMBER]"
+    
+    # WCB Premium Rates (customize based on your trade)
+    WCB_RATES = {
+        "construction_general": Decimal("2.50"),  # Default rate - update in .env
+        "framing": Decimal("3.20"),  # Default rate - update in .env
+        "carpentry": Decimal("2.80"),  # Default rate - update in .env
+    }
+    
+    # Payroll Tax Rates (CRA rates - update if changed)
+    CPP_RATE = Decimal("0.0595")  # Employee CPP rate
+    EI_RATE = Decimal("0.0163")   # Employee EI rate
+    EI_EMPLOYER_MULTIPLIER = Decimal("1.4")  # Employer pays 1.4x EI rate
+    
+    # ============================================
+    # INVOICE SETTINGS
+    # ============================================
+    INVOICE_PREFIX = "INV"  # Prefix for invoice numbers
+    INVOICE_PAYMENT_TERMS = "Net 30"  # e.g., "Net 30", "Due on receipt"
+    INVOICE_LATE_FEE_PERCENTAGE = Decimal("2.0")  # e.g., "2.0"
+    
+    # ============================================
+    # PROJECT SETTINGS
+    # ============================================
+    DEFAULT_PROJECT_STATUS = "active"  # e.g., "pending", "active"
+    PROJECT_BUDGET_WARNING_THRESHOLD = Decimal("80.0")  # e.g., "80.0"
+    
+    # ============================================
+    # COMPLIANCE SETTINGS
+    # ============================================
+    SAFETY_INSPECTION_FREQUENCY = "weekly"  # e.g., "weekly", "bi-weekly"
+    SAFETY_TRAINING_REQUIRED = [
+        "WHMIS",  # e.g., "WHMIS"
+        "Fall Protection",  # e.g., "Fall Protection"
+        "First Aid",  # e.g., "First Aid"
+    ]
+    
+    # ============================================
+    # AI ASSISTANT SETTINGS
+    # ============================================
+    AI_NAME = "[YOUR AI NAME]"  # e.g., "BuildAI Alberta"
+    AI_TRADE_SPECIALIZATION = "[YOUR TRADE]"  # e.g., "framing", "carpentry"
+    
+    # Custom knowledge base for your trade
+    TRADE_KNOWLEDGE = {
+        "common_materials": [
+            "lumber",  # e.g., "lumber"
+            "plywood",  # e.g., "plywood"
+            "nails",  # e.g., "nails"
+        ],
+        "typical_costs": {
+            "2x4_lumber": Decimal("3.50"),  # e.g., "2x4_lumber": 3.50
+            "plywood_4x8": Decimal("45.00"),
+            "labour_hour": Decimal("65.00"),
+        },
+        "regulations": [
+            "Alberta Building Code requirements",
+            "WCB safety requirements",
+            "Fall protection regulations",
+        ]
+    }
+    
+    # ============================================
+    # EXPENSE CATEGORIES
+    # ============================================
+    EXPENSE_CATEGORIES = {
+        "materials": "[DESCRIPTION]",
+        "labor": "[DESCRIPTION]",
+        "equipment": "[DESCRIPTION]",
+        "vehicle": "[DESCRIPTION]",
+        "tools": "[DESCRIPTION]",
+        "insurance": "[DESCRIPTION]",
+        "licenses_permits": "[DESCRIPTION]",
+        "utilities": "[DESCRIPTION]",
+        "rent": "[DESCRIPTION]",
+        "marketing": "[DESCRIPTION]",
+        "professional_services": "[DESCRIPTION]",
+        "meals_entertainment": "[DESCRIPTION]",
+        "home_office": "[DESCRIPTION]",
+        "other": "[DESCRIPTION]"
+    }
+    
+    # ============================================
+    # NOTIFICATION SETTINGS
+    # ============================================
+    EMAIL_NOTIFICATIONS = True
+    SMS_NOTIFICATIONS = False
+    NOTIFICATION_EMAIL = "[YOUR NOTIFICATION EMAIL]"
+    
+    # ============================================
+    # DEADLINE REMINDERS
+    # ============================================
+    GST_REMINDER_DAYS_BEFORE = [7, 3, 1]  # Remind 7, 3, and 1 days before
+    PAYROLL_REMINDER_DAYS_BEFORE = [3, 1]
+    PERMIT_EXPIRY_REMINDER_DAYS = [30, 14, 7]
+    
+    # ============================================
+    # DATABASE SETTINGS (for future use)
+    # ============================================
+    DATABASE_URL = "[YOUR DATABASE URL]"  # e.g., "postgresql://user:pass@localhost/db"
+    
+    # ============================================
+    # API SETTINGS
+    # ============================================
+    API_HOST = "0.0.0.0"
+    API_PORT = 8000
+    DEBUG_MODE = False
+    
+    # ============================================
+    # CUSTOM BUSINESS RULES
+    # ============================================
+    # Add any custom business rules here
+    CUSTOM_RULES = {
+        "example_rule": "[YOUR RULE]"
+    }
+
+
+# Create global config instance
+config = AppConfig()

@@ -1,0 +1,12 @@
+INFO:     Will watch for changes in these directories: ['/workspace']
+INFO:     Uvicorn running on http://0.0.0.0:8050 (Press CTRL+C to quit)
+INFO:     Started reloader process [1058] using WatchFiles
+2026-03-08 22:04:10,579 - app.settings_manager - INFO - Settings loaded from file
+2026-03-08 22:04:10,592 - app.financial_ledger - INFO - Initialized 48 accounts in chart of accounts
+INFO:     Started server process [1060]
+INFO:     Waiting for application startup.
+2026-03-08 22:04:10,731 - app.main - INFO - 🚀 Starting BuildAI Alberta v2.0...
+2026-03-08 22:04:10,731 - app.user_system - INFO - New user registered: test@foreman.ca (Test Construction Ltd.)
+2026-03-08 22:04:10,731 - app.main - INFO - Default test user created: test@foreman.ca / Test1234!
+2026-03-08 22:04:10,731 - app.main - INFO - ✅ Application started successfully! Keep-alive task running.
+INFO:     Application startup complete.

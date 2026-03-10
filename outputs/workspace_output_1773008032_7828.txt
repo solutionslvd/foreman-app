@@ -1,0 +1,30 @@
+        settings["connected_email"] = request.connected_email
+    if request.auto_reply_enabled is not None:
+        settings["auto_reply_enabled"] = request.auto_reply_enabled
+    if request.follow_up_enabled is not None:
+        settings["follow_up_enabled"] = request.follow_up_enabled
+    if request.priority_filter is not None:
+        settings["priority_filter"] = request.priority_filter
+    users_db[user["email"]]["email_settings"] = settings
+    save_users(users_db)  # persist
+    return {"success": True, "settings": settings}
+
+
+# ─── Admin: All Users ─────────────────────────────────────────────────────────
+
+@router.get("/admin/all")
+async def admin_get_all_users(authorization: Optional[str] = Header(None)):
+    """Admin: Get all registered users"""
+    token = authorization.replace("Bearer ", "").strip() if authorization else ""
+    if not verify_admin_token(token):
+        raise HTTPException(status_code=401, detail="Admin access required")
+    return {"users": get_all_users(), "stats": get_platform_stats()}
+
+
+@router.get("/admin/stats")
+async def admin_get_stats(authorization: Optional[str] = Header(None)):
+    """Admin: Get platform statistics"""
+    token = authorization.replace("Bearer ", "").strip() if authorization else ""
+    if not verify_admin_token(token):
+        raise HTTPException(status_code=401, detail="Admin access required")
+    return get_platform_stats()

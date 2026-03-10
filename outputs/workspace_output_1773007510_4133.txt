@@ -1,0 +1,145 @@
+=== CORRECT ROUTE TESTS ===
+--- GET /api/users/me ---
+{
+    "id": "c6136ae38c34fe19",
+    "email": "test@foreman.ca",
+    "business_name": "Test Construction Ltd.",
+    "trade": "Framing",
+    "contact_name": "Test User",
+    "phone": "780-555-1234",
+    "plan": "pro",
+    "status": "active",
+    "created_at": "2026-03-08T22:04:10.731102",
+    "last_login": "2026-03-08T22:04:43.223235",
+    "nda_accepted": false,
+    "nda_accepted_at": null,
+    "email_access_granted": false,
+    "gdrive_access_granted": false,
+    "email_settings": {
+        "connected_email": "",
+        "auto_reply_enabled": false,
+        "follow_up_enabled": false,
+        "priority_filter": true,
+        "gdrive_folder_id": ""
+    },
+    "permissions": {
+        "email_read": false,
+        "email_send": false,
+        "gdrive_read": false,
+        "gdrive_write": false
+    },
+    "data": {
+        "transactions": [],
+        "invoices": [],
+        "projects": [],
+        "permits": [],
+        "training_records": [],
+        "emails": [],
+        "documents": []
+    },
+    "stats": {
+        "emails_processed": 0,
+        "files_saved": 0,
+        "auto_replies_sent": 0,
+        "leads_converted": 0
+    }
+}
+--- GET /api/settings/public ---
+{
+    "app_name": "BuildAI Alberta",
+    "tagline": "Your AI-Powered Construction Assistant",
+    "logo_url": "",
+    "primary_color": "#FF6B35",
+    "secondary_color": "#1a1a2e",
+    "accent_color": "#4CAF50",
+    "font_family": "Inter",
+    "assistant_name": "BuildAI",
+    "greeting_message": "Hi! I'm your construction AI assistant. How can I help you today?",
+    "voice_enabled": true,
+    "business_name": "Your Construction Business",
+    "business_type": "general_contracting",
+    "currency": "CAD",
+    "date_format": "YYYY-MM-DD",
+    "timezone": "America/Edmonton",
+    "allow_registration": true,
+    "require_nda": true
+}
+--- GET /api/ledger/accounts ---
+{
+    "accounts": [
+        {
+            "id": "2004b876-dd50-49d3-a152-944368b003a2",
+            "code": "1010",
+            "name": "Chequing Account",
+            "type": "bank",
+            "description": "Main business chequing account",
+            "is_active": true,
+            "balance": 0.0,
+            "is_balance_sheet": true
+        },
+        {
+            "id": "1cc1d7e2-9b45-4cc5-8a16-9f6e6d4f9035",
+            "code": "1020",
+            "name": "Savings Account",
+            "type": "bank",
+            "description": "Business savings account",
+            "is_active": true,
+            "balance": 0.0,
+            "is_balance_sheet": true
+        },
+        {
+            "id": "6f092666-bc4e-40a4-a4bd-de857571ea02",
+            "code": "1100",
+            "name": "Accounts Receivable",
+            "type": "accounts_receivable",
+            "description": "Money owed by customers",
+            "is_active": true,
+            "balance": 0.0,
+--- GET /api/ledger/reports/dashboard-summary ---
+{
+    "ytd": {
+        "revenue": 0,
+        "expenses": 0,
+        "net_income": 0,
+        "gross_margin": 0
+    },
+    "mtd": {
+        "revenue": 0,
+        "expenses": 0,
+        "net_income": 0
+    },
+    "ar_outstanding": 0.0,
+    "ar_overdue": 0.0,
+    "bank_balance": 0.0
+}
+--- GET /api/billing/plans ---
+{
+    "plans": {
+        "starter": {
+            "price": 49,
+            "name": "Starter",
+            "users": 1,
+            "features": [
+                "AI Chat",
+                "Invoicing",
+                "Basic Compliance"
+            ]
+        },
+        "professional": {
+            "price": 99,
+            "name": "Professional",
+            "users": 3,
+            "features": [
+                "All Starter",
+                "Email AI",
+                "Payroll",
+                "Advanced Reports"
+            ]
+        },
+        "business": {
+            "price": 199,
+            "name": "Business",
+            "users": -1,
+            "features": [
+                "All Professional",
+                "White Label",

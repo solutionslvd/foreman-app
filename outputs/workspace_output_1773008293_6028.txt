@@ -1,0 +1,8 @@
+2026-03-08 22:17:59,340 - ForemanScheduler - INFO - 🏗️ Foreman AI Scheduler initializing...
+2026-03-08 22:17:59,341 - ForemanScheduler - INFO - Current Mountain Time: 2026-03-08 15:17:59 MT
+2026-03-08 22:17:59,341 - ForemanScheduler - INFO - Next scheduled report: 2026-03-09 07:00:00 MT
+2026-03-08 22:17:59,341 - ForemanScheduler - INFO - Time until next report: 15.7 hours (942 minutes)
+2026-03-08 22:17:59,341 - ForemanScheduler - INFO - 🕐 Foreman AI Scheduler started
+2026-03-08 22:17:59,341 - ForemanScheduler - INFO - 📅 Reports scheduled daily at 07:00 AM Mountain Time
+2026-03-08 22:17:59,341 - ForemanScheduler - INFO - ⏰ Current MT: 2026-03-08 15:17:59
+2026-03-08 22:17:59,341 - ForemanScheduler - INFO - 📋 Next report: 2026-03-09 07:00:00 MT (15.7 hours)

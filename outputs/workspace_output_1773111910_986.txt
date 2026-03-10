@@ -1,0 +1,4 @@
+572:function sendQuickPrompt(prompt) {
+651:    `<button onclick="sendQuickPrompt(${JSON.stringify(s.prompt)})">${s.icon} ${s.label}</button>`
+4625:          `<button class="suggestion-chip" onclick="sendQuickPrompt('${s.replace(/'/g, "\'")}')">${s}</button>`
+5003:  navigateTo('ai-chat');

@@ -1,0 +1,72 @@
+=== CORRECTED ENDPOINT AUDIT ===
+User token: aD65VqHU8l3RPUG... Admin token: kST271s4TsxFEuw...
+
+--- USER ENDPOINTS ---
+✅ | Users/me | 200 | 8ms
+✅ | Users/store | 200 | 8ms
+✅ | Users/NDA | 200 | 7ms
+⚠️ | Users/permissions/email | 403 | 8ms
+⚠️ | Users/permissions/gdrive | 403 | 8ms
+
+--- PROJECT ENDPOINTS ---
+✅ | Projects/list | 200 | 9ms
+✅ | Projects/invoices | 200 | 9ms
+✅ | Projects/estimates | 200 | 9ms
+✅ | Projects/summary | 200 | 8ms
+
+--- FINANCIAL ENDPOINTS ---
+✅ | Financial/summary | 200 | 8ms
+✅ | Financial/invoices | 200 | 7ms
+✅ | Financial/transactions | 200 | 8ms
+⚠️ | Financial/payroll | 405 | 8ms
+✅ | Financial/tax/2025 | 200 | 8ms
+
+--- LEDGER ENDPOINTS ---
+✅ | Ledger/accounts | 200 | 9ms
+✅ | Ledger/transactions | 200 | 7ms
+✅ | Ledger/dashboard | 200 | 7ms
+⚠️ | Ledger/P&L | 403 | 7ms
+⚠️ | Ledger/AR-aging | 403 | 7ms
+⚠️ | Ledger/GST | 403 | 7ms
+⚠️ | Ledger/cash-flow | 403 | 7ms
+⚠️ | Ledger/balance-sheet | 403 | 8ms
+
+--- COMPLIANCE ENDPOINTS ---
+✅ | Compliance/status | 200 | 8ms
+✅ | Compliance/WCB | 200 | 8ms
+✅ | Compliance/permits | 200 | 7ms
+✅ | Compliance/training | 200 | 6ms
+✅ | Compliance/incidents | 200 | 6ms
+✅ | Compliance/checklist | 200 | 7ms
+✅ | Compliance/summary | 200 | 7ms
+
+--- BILLING ENDPOINTS ---
+✅ | Billing/plans | 200 | 7ms
+⚠️ | Billing/subscription | 405 | 7ms
+🔒 | Billing/payments | 401 | 7ms
+✅ | Billing/stripe-key | 200 | 7ms
+
+--- SETTINGS ENDPOINTS ---
+✅ | Settings/public | 200 | 7ms
+✅ | Settings/user-prefs | 200 | 7ms
+✅ | Settings/admin-all | 200 | 7ms
+✅ | Settings/business | 200 | 7ms
+✅ | Settings/financial | 200 | 7ms
+✅ | Settings/AI | 200 | 7ms
+
+--- EMAIL ENDPOINTS ---
+✅ | Email/inbox | 200 | 7ms
+✅ | Email/stats | 200 | 6ms
+✅ | Email/templates | 200 | 7ms
+✅ | Email/followups | 200 | 7ms
+
+--- ADMIN ENDPOINTS ---
+✅ | Admin/dashboard | 200 | 7ms
+✅ | Admin/users | 200 | 7ms
+✅ | Admin/system-status | 200 | 6ms
+✅ | Admin/logs | 200 | 7ms
+✅ | Admin/data/financial | 200 | 7ms
+
+--- MISC ENDPOINTS ---
+✅ | Chat/suggestions | 200 | 7ms
+✅ | Dropdowns | 200 | 8ms

@@ -1,0 +1,6 @@
+67:    invoice_date: Optional[str] = None
+68:    due_date: Optional[str] = None
+69:    payment_terms: str = "net_30"
+225:        "invoice_date": request.invoice_date or datetime.now().strftime("%Y-%m-%d"),
+226:        "due_date": request.due_date,
+227:        "payment_terms": request.payment_terms,

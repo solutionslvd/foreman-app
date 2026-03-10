@@ -1,0 +1,31 @@
+=== ISSUE 1: Billing/payments requires admin token (BUG-NEW-A) ===
+  User token -> 401: {'detail': 'Invalid or expired admin token'}
+  Admin token -> 200: {'payments': [], 'total': 0, 'count': 0}
+
+=== ISSUE 2: Financial/payroll 405 Method Not Allowed (BUG-NEW-B) ===
+  POST -> 422: {'detail': [{'type': 'missing', 'loc': ['body', 'employee_name'], 'msg': 'Field required', 'input': {'test': True}, 'url': 'https://errors.pydantic.dev/2.5/v/missing'}, {'type': 'missing', 'loc': ['body', 'hours_worked'], 'msg': 'Field required', 'input': {'test': True}, 'url': 'https://errors.pydantic.dev/2.5/v/missing'}, {'type': 'missing', 'loc': ['body', 'hourly_rate'], 'msg': 'Field required', 'input': {'test': True}, 'url': 'https://errors.pydantic.dev/2.5/v/missing'}]}
+  OPTIONS -> HTTP Error 405: Method Not Allowed
+
+=== ISSUE 3: Billing/subscription 405 (BUG-NEW-C) ===
+  POST -> 422: {'detail': [{'type': 'missing', 'loc': ['body', 'user_email'], 'msg': 'Field required', 'input': {'plan_id': 'professional'}, 'url': 'https://errors.pydantic.dev/2.5/v/missing'}, {'type': 'missing', 'loc': ['body', 'plan'], 'msg': 'Field required', 'input': {'plan_id': 'professional'}, 'url': 'https://errors.pydantic.dev/2.5/v/missing'}]}
+  PUT -> 405: {'detail': 'Method Not Allowed'}
+
+=== ISSUE 4: Ledger reports need manager role (BUG-NEW-D) ===
+  Current user role: ?, plan: starter
+  Admin access -> 200: {'period': {'from': '2026-01-01', 'to': '2026-12-31'}, 'income': [], 'total_income': 0, 'cost_of_goo
+
+=== ISSUE 5: Compliance shows 'warning' for new user (BUG-NEW-E) ===
+  Status: warning, Score: 80.0
+  not_configured: None
+  WCB: not_registered
+
+=== ISSUE 6: NDA not accepted - check flow ===
+  already_accepted: False
+  NDA text length: 4921 chars
+
+=== PERFORMANCE BASELINE ===
+  /api/projects/                                200 1ms
+  /api/financial/summary                        200 0ms
+  /api/ledger/accounts                          200 1ms
+  /api/compliance/status                        200 0ms
+  /api/admin/dashboard                          200 0ms

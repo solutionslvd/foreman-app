@@ -1,0 +1,11 @@
+572:  document.getElementById('chat-input').value = prompt;
+573:  sendMessage();
+579:    sendMessage();
+603:    const res = await fetch(`${API}/api/chat/message`, {
+633:      document.getElementById('chat-input').value = transcript;
+635:      sendMessage();
+4495:// Override sendMessage to include app data context
+4496:async function sendMessage() {
+4497:  const input = document.getElementById('chat-input');
+4520:    const res = await fetch(`${API}/api/chat/message`, {
+4926:    const input = document.getElementById('chat-input');

@@ -1,0 +1,5 @@
+372:        compliance_score = sum(compliance_items) / len(compliance_items) * 100
+375:        if compliance_score >= 90:
+377:        elif compliance_score >= 70:
+379:        elif compliance_score >= 50:
+386:            "compliance_score": compliance_score,

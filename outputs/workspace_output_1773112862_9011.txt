@@ -1,0 +1,22 @@
+======================================================================
+ADMIN.HTML - DEAD END ANALYSIS
+======================================================================
+
+Total elements with onclick: 37
+External scripts: []
+Functions defined in inline scripts: 66
+Functions called from onclick: 30
+
+✅ All onclick functions defined in inline script
+
+Internal links: 1
+Broken internal links: 0
+
+======================================================================
+INDEX.HTML - DEAD END ANALYSIS
+======================================================================
+  index.html returns 404 (likely redirected)
+
+======================================================================
+COMPLETE AUDIT SUMMARY
+======================================================================

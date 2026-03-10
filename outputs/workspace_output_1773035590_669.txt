@@ -1,0 +1,2 @@
+130:async def get_profile(authorization: Optional[str] = Header(None)):
+133:    return {k: v for k, v in user.items() if k != "password_hash"}

@@ -1,0 +1,21 @@
+// ═══════════════════════════════════════════════════════════════
+
+function handleProfilePhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('Image must be under 5MB', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    localStorage.setItem('profilePhoto', dataUrl);
+    const img = document.getElementById('profile-avatar-img');
+    const avatar = document.getElementById('profile-avatar-display');
+    if (img) { img.src = dataUrl; img.style.display = 'block'; }
+    if (avatar) avatar.style.backgroundImage = `url(${dataUrl})`;
+    showToast('Profile photo updated!', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeProfilePhoto() {
+  localStorage.removeItem('profilePhoto');

@@ -1,0 +1,62 @@
+=== syncStore CALLS (UNDEFINED FUNCTION - CRITICAL BUG) ===
+2610:      syncStore();
+4237:  try { await syncStore(); } catch (e) { console.error('Sync error:', e); }
+4248:    syncStore();
+4670:  try { await syncStore(); } catch(e) {}
+4725:  try { syncStore(); } catch(e) {}
+=== apiDelete MISSING ===
+=== PLAN PRICING MISMATCH ===
+27:        "starter": {"price": 49, "name": "Starter", "users": 1, "features": ["AI Chat", "Invoicing", "Basic Compliance"]},
+28:        "professional": {"price": 99, "name": "Professional", "users": 3, "features": ["All Starter", "Email AI", "Payroll", "Advanced Reports"]},
+29:        "business": {"price": 199, "name": "Business", "users": -1, "features": ["All Professional", "White Label", "Priority Support", "API Access"]},
+30:        "enterprise": {"price": 499, "name": "Enterprise", "users": -1, "features": ["All Business", "Custom Domain", "Dedicated Support", "SLA"]},
+95:          <option value="starter">Starter - $49/mo (1 user)</option>
+96:          <option value="professional">Professional - $149/mo (5 users)</option>
+97:          <option value="business">Business - $299/mo (15 users)</option>
+1852:            <div class="plan-price">$49<span>/mo</span></div>
+1869:            <div class="plan-price">$149<span>/mo</span></div>
+1885:            <div class="plan-price">$299<span>/mo</span></div>
+=== MISSING escapeHtml / XSS PROTECTION ===
+3029:function escapeHtml(text) {
+=== TOKEN EXPIRY HANDLING ===
+=== MISSING apiDelete DEFINITION ===
+=== BACKEND: user store not persisted to API ===
+=== BACKEND: project auth - no user isolation ===
+@router.get("/")
+async def list_projects(status: Optional[str] = None, project_type: Optional[str] = None):
+    """List all projects"""
+    result = projects_db
+    if status:
+        result = [p for p in result if p.get("status") == status]
+    if project_type:
+        result = [p for p in result if p.get("project_type") == project_type]
+    return {"projects": result, "total": len(result)}
+
+@router.post("/")
+async def create_project(request: CreateProjectRequest):
+    """Create a new project"""
+    project = {
+        "id": str(uuid.uuid4())[:8],
+        **request.dict(),
+        "invoices": [],
+        "expenses": [],
+        "created_at": datetime.now().isoformat(),
+        "updated_at": datetime.now().isoformat(),
+    }
+    projects_db.append(project)
+    logger.info(f"Project created: {project['name']}")
+    return {"success": True, "project": project}
+
+@router.get("/{project_id}")
+async def get_project(project_id: str):
+    """Get a specific project"""
+    project = next((p for p in projects_db if p["id"] == project_id), None)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    return project
+
+@router.put("/{project_id}")
+async def update_project(project_id: str, request: UpdateProjectRequest):
+    """Update a project"""
+    project = next((p for p in projects_db if p["id"] == project_id), None)
+    if not project:

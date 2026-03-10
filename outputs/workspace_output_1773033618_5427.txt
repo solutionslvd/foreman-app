@@ -1,0 +1,64 @@
+    def _check_wcb_status(self) -> Dict[str, Any]:
+        """Check WCB compliance status"""
+        if not self.wcb_records:
+            return {
+                "compliant": False,
+                "status": "not_registered",
+                "message": "WCB account not registered"
+            }
+        
+        today = datetime.now().date()
+        next_payment = self.wcb_records.get("next_payment_due")
+        
+        if next_payment and next_payment < today:
+            return {
+                "compliant": False,
+                "status": "payment_overdue",
+                "message": f"WCB payment overdue since {next_payment}"
+            }
+        
+        return {
+            "compliant": True,
+            "status": "active",
+            "message": "WCB coverage is active"
+        }
+    
+    def _check_permit_status(self, today: date) -> Dict[str, Any]:
+        """Check permit compliance status"""
+        if not self.permits:
+            return {
+                "compliant": True,
+                "status": "no_permits",
+                "message": "No permits to check"
+            }
+        
+        expired_permits = [
+            p for p in self.permits
+            if p["expiry_date"] < today
+        ]
+        
+        expiring_soon = [
+            p for p in self.permits
+            if 0 <= (p["expiry_date"] - today).days <= 30
+        ]
+        
+        if expired_permits:
+            return {
+                "compliant": False,
+                "status": "expired",
+                "message": f"{len(expired_permits)} permit(s) expired",
+                "expired_permits": expired_permits
+            }
+        
+        if expiring_soon:
+            return {
+                "compliant": True,
+                "status": "expiring_soon",
+                "message": f"{len(expiring_soon)} permit(s) expiring soon",
+                "expiring_permits": expiring_soon
+            }
+        
+        return {
+            "compliant": True,
+            "status": "active",
+            "message": "All permits are active"

@@ -1,0 +1,4 @@
+  File "<stdin>", line 10
+    new = "        ${p.address ? `<div style="font-size:12px;color:var(--text-muted);margin-top:.3rem">\U0001f4cd ${escapeHtml(p.address || '')}</div>` : ''}\n"
+                                                         ^
+SyntaxError: invalid decimal literal

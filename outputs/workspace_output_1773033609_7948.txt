@@ -1,0 +1,56 @@
+        """
+        Get overall compliance status
+        
+        Returns:
+            Comprehensive compliance overview
+        """
+        today = datetime.now().date()
+        
+        # Check WCB status
+        wcb_status = self._check_wcb_status()
+        
+        # Check permits
+        permit_status = self._check_permit_status(today)
+        
+        # Check inspections
+        inspection_status = self._check_inspection_status(today)
+        
+        # Check training
+        training_status = self._check_training_status(today)
+        
+        # Check safety incidents
+        safety_status = self._check_safety_status(today)
+        
+        # Calculate overall compliance score
+        compliance_items = [
+            wcb_status["compliant"],
+            permit_status["compliant"],
+            inspection_status["compliant"],
+            training_status["compliant"],
+            safety_status["compliant"]
+        ]
+        
+        compliance_score = sum(compliance_items) / len(compliance_items) * 100
+        
+        # Determine overall status
+        if compliance_score >= 90:
+            overall_status = ComplianceStatus.COMPLIANT
+        elif compliance_score >= 70:
+            overall_status = ComplianceStatus.WARNING
+        elif compliance_score >= 50:
+            overall_status = ComplianceStatus.ACTION_REQUIRED
+        else:
+            overall_status = ComplianceStatus.NON_COMPLIANT
+        
+        return {
+            "overall_status": overall_status.value,
+            "compliance_score": compliance_score,
+            "wcb_status": wcb_status,
+            "permit_status": permit_status,
+            "inspection_status": inspection_status,
+            "training_status": training_status,
+            "safety_status": safety_status,
+            "action_items": self._generate_action_items(
+                wcb_status, permit_status, inspection_status, training_status, safety_status
+            )
+        }

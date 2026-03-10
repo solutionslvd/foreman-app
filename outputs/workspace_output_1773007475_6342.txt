@@ -1,0 +1,47 @@
+=== ENDPOINT DIAGNOSTIC SWEEP ===
+--- /ping ---
+{"pong":true,"ts":1773007475}
+--- /api/dropdowns ---
+{
+    "project_types": [
+        {
+            "value": "residential_framing",
+            "label": "Residential Framing"
+        },
+        {
+            "value": "commercial_framing",
+            "label": "Commercial Framing"
+        },
+        {
+            "value": "carpentry",
+            "label": "Carpentry & Millwork"
+        },
+        {
+            "value": "general_contracting",
+            "label": "General Contracting"
+        },
+        {
+            "value": "electrical",
+--- /api/compliance/summary ---
+{
+    "safety_forms": 0,
+    "permits": 0,
+    "inspections": 0
+}
+--- /api/financial/transactions ---
+{
+    "transactions": [],
+    "total": 0,
+    "skip": 0,
+    "limit": 100
+}
+--- /api/projects/summary/overview ---
+{
+    "total_projects": 0,
+    "total_estimates": 0,
+    "total_contract_value": 0,
+    "total_invoiced": 0,
+    "total_collected": 0,
+    "outstanding": 0,
+    "by_status": {}
+}

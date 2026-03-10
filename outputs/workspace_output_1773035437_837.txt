@@ -1,0 +1,349 @@
+#!/usr/bin/env python3
+"""
+Foreman AI - Automated Daily Diagnostic Reporter
+Runs comprehensive tests every day at 7:00 AM Mountain Time
+and generates a detailed bug/status report.
+"""
+
+import asyncio
+import httpx
+import json
+import os
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+BASE_URL = "http://127.0.0.1:8050"
+REPORT_DIR = Path("/workspace/reports")
+REPORT_DIR.mkdir(exist_ok=True)
+
+MOUNTAIN_TZ_OFFSET = -7  # MDT (UTC-7), MST is UTC-6
+
+async def run_diagnostic():
+    """Run full diagnostic sweep and return results."""
+    results = {
+        "timestamp": datetime.utcnow().isoformat(),
+        "tests": [],
+        "bugs_found": [],
+        "server_status": "unknown",
+        "total_pass": 0,
+        "total_fail": 0,
+        "total_warn": 0,
+    }
+
+    async with httpx.AsyncClient(timeout=10) as client:
+
+        # ── Health Check ──────────────────────────────────────────────────────
+        try:
+            r = await client.get(f"{BASE_URL}/health")
+            if r.status_code == 200 and r.json().get("status") == "healthy":
+                results["server_status"] = "🟢 ONLINE"
+                results["tests"].append({"name": "Health Check", "status": "PASS", "detail": "Server healthy"})
+                results["total_pass"] += 1
+            else:
+                results["server_status"] = "🔴 DEGRADED"
+                results["tests"].append({"name": "Health Check", "status": "FAIL", "detail": f"Status: {r.status_code}"})
+                results["total_fail"] += 1
+        except Exception as e:
+            results["server_status"] = "🔴 OFFLINE"
+            results["tests"].append({"name": "Health Check", "status": "FAIL", "detail": str(e)})
+            results["total_fail"] += 1
+            return results
+
+        # ── Auth System ───────────────────────────────────────────────────────
+        token = None
+        try:
+            r = await client.post(f"{BASE_URL}/api/users/login",
+                json={"email": "test@foreman.ca", "password": "Test1234!"})
+            if r.status_code == 200:
+                token = r.json().get("token")
+                results["tests"].append({"name": "User Login", "status": "PASS", "detail": "Token obtained"})
+                results["total_pass"] += 1
+            else:
+                results["tests"].append({"name": "User Login", "status": "FAIL", "detail": f"HTTP {r.status_code}"})
+                results["total_fail"] += 1
+                results["bugs_found"].append("AUTH: Login endpoint returning non-200")
+        except Exception as e:
+            results["tests"].append({"name": "User Login", "status": "FAIL", "detail": str(e)})
+            results["total_fail"] += 1
+
+        headers = {"Authorization": f"Bearer {token}"} if token else {}
+
+        # ── BUG-004 Check: Projects require auth ──────────────────────────────
+        try:
+            r = await client.get(f"{BASE_URL}/api/projects/")
+            if r.status_code == 401:
+                results["tests"].append({"name": "BUG-004: Projects Auth", "status": "PASS", "detail": "Unauthenticated blocked"})
+                results["total_pass"] += 1
+            else:
+                results["tests"].append({"name": "BUG-004: Projects Auth", "status": "FAIL", "detail": f"Projects exposed! HTTP {r.status_code}"})
+                results["total_fail"] += 1
+                results["bugs_found"].append("SECURITY: Projects endpoint accessible without auth!")
+        except Exception as e:
+            results["tests"].append({"name": "BUG-004: Projects Auth", "status": "WARN", "detail": str(e)})
+            results["total_warn"] += 1
+
+        # ── Projects CRUD ─────────────────────────────────────────────────────
+        if token:
+            try:
+                r = await client.get(f"{BASE_URL}/api/projects/", headers=headers)
+                if r.status_code == 200:
+                    count = r.json().get("total", 0)
+                    results["tests"].append({"name": "Projects List", "status": "PASS", "detail": f"{count} projects"})
+                    results["total_pass"] += 1
+                else:
+                    results["tests"].append({"name": "Projects List", "status": "FAIL", "detail": f"HTTP {r.status_code}"})
+                    results["total_fail"] += 1
+            except Exception as e:
+                results["tests"].append({"name": "Projects List", "status": "FAIL", "detail": str(e)})
+                results["total_fail"] += 1
+
+        # ── Invoice due_date ──────────────────────────────────────────────────
+        if token:
+            try:
+                r = await client.post(f"{BASE_URL}/api/projects/invoice/standalone",
+                    headers={**headers, "Content-Type": "application/json"},
+                    json={"client_name": "DiagTest", "payment_terms": "net_30",
+                          "line_items": [{"description": "Test", "quantity": 1, "unit": "ls", "rate": 100}]})
+                if r.status_code == 200:
+                    inv = r.json().get("invoice", {})
+                    due = inv.get("due_date")
+                    if due:
+                        results["tests"].append({"name": "BUG-007: Invoice due_date", "status": "PASS", "detail": f"due_date={due}"})
+                        results["total_pass"] += 1
+                    else:
+                        results["tests"].append({"name": "BUG-007: Invoice due_date", "status": "FAIL", "detail": "due_date is null"})
+                        results["total_fail"] += 1
+                        results["bugs_found"].append("INVOICE: due_date is null on new invoices")
+            except Exception as e:
+                results["tests"].append({"name": "BUG-007: Invoice due_date", "status": "WARN", "detail": str(e)})
+                results["total_warn"] += 1
+
+        # ── Store Sync ────────────────────────────────────────────────────────
+        if token:
+            try:
+                r = await client.put(f"{BASE_URL}/api/users/store",
+                    headers={**headers, "Content-Type": "application/json"},
+                    json={"store": {"diagnostic_run": datetime.utcnow().isoformat()}})
+                if r.status_code == 200 and r.json().get("success"):
+                    results["tests"].append({"name": "BUG-001: Store Sync", "status": "PASS", "detail": "syncStore working"})
+                    results["total_pass"] += 1
+                else:
+                    results["tests"].append({"name": "BUG-001: Store Sync", "status": "FAIL", "detail": f"HTTP {r.status_code}"})
+                    results["total_fail"] += 1
+                    results["bugs_found"].append("SYNC: Store sync endpoint failing")
+            except Exception as e:
+                results["tests"].append({"name": "BUG-001: Store Sync", "status": "FAIL", "detail": str(e)})
+                results["total_fail"] += 1
+
+        # ── Financial System ──────────────────────────────────────────────────
+        if token:
+            try:
+                r = await client.get(f"{BASE_URL}/api/financial/summary", headers=headers)
+                if r.status_code == 200:
+                    results["tests"].append({"name": "Financial Summary", "status": "PASS", "detail": "OK"})
+                    results["total_pass"] += 1
+                else:
+                    results["tests"].append({"name": "Financial Summary", "status": "FAIL", "detail": f"HTTP {r.status_code}"})
+                    results["total_fail"] += 1
+            except Exception as e:
+                results["tests"].append({"name": "Financial Summary", "status": "WARN", "detail": str(e)})
+                results["total_warn"] += 1
+
+        # ── Ledger Dashboard ──────────────────────────────────────────────────
+        if token:
+            try:
+                r = await client.get(f"{BASE_URL}/api/ledger/reports/dashboard-summary", headers=headers)
+                if r.status_code == 200:
+                    results["tests"].append({"name": "Ledger Dashboard", "status": "PASS", "detail": "OK"})
+                    results["total_pass"] += 1
+                else:
+                    results["tests"].append({"name": "Ledger Dashboard", "status": "FAIL", "detail": f"HTTP {r.status_code}"})
+                    results["total_fail"] += 1
+            except Exception as e:
+                results["tests"].append({"name": "Ledger Dashboard", "status": "WARN", "detail": str(e)})
+                results["total_warn"] += 1
+
+        # ── Compliance ────────────────────────────────────────────────────────
+        if token:
+            try:
+                r = await client.get(f"{BASE_URL}/api/compliance/status", headers=headers)
+                if r.status_code == 200:
+                    score = r.json().get("compliance_score", 0)
+                    results["tests"].append({"name": "Compliance Status", "status": "PASS", "detail": f"Score: {score}%"})
+                    results["total_pass"] += 1
+                else:
+                    results["tests"].append({"name": "Compliance Status", "status": "FAIL", "detail": f"HTTP {r.status_code}"})
+                    results["total_fail"] += 1
+            except Exception as e:
+                results["tests"].append({"name": "Compliance Status", "status": "WARN", "detail": str(e)})
+                results["total_warn"] += 1
+
+        # ── Billing Plans ─────────────────────────────────────────────────────
+        try:
+            r = await client.get(f"{BASE_URL}/api/billing/plans")
+            if r.status_code == 200:
+                plans = r.json().get("plans", {})
+                pro_price = plans.get("professional", {}).get("price", 0)
+                biz_price = plans.get("business", {}).get("price", 0)
+                if pro_price == 149 and biz_price == 299:
+                    results["tests"].append({"name": "BUG-006: Pricing", "status": "PASS", "detail": f"Pro=${pro_price} Biz=${biz_price}"})
+                    results["total_pass"] += 1
+                else:
+                    results["tests"].append({"name": "BUG-006: Pricing", "status": "FAIL", "detail": f"Mismatch Pro=${pro_price} Biz=${biz_price}"})
+                    results["total_fail"] += 1
+                    results["bugs_found"].append(f"BILLING: Price mismatch Pro=${pro_price} Biz=${biz_price}")
+        except Exception as e:
+            results["tests"].append({"name": "BUG-006: Pricing", "status": "WARN", "detail": str(e)})
+            results["total_warn"] += 1
+
+        # ── Admin Login ───────────────────────────────────────────────────────
+        try:
+            r = await client.post(f"{BASE_URL}/api/admin/login",
+                json={"username": "admin", "password": "ChangeMe2024!"})
+            if r.status_code == 200:
+                admin_token = r.json().get("token")
+                results["tests"].append({"name": "Admin Login", "status": "PASS", "detail": "OK"})
+                results["total_pass"] += 1
+
+                # Admin dashboard
+                r2 = await client.get(f"{BASE_URL}/api/admin/dashboard",
+                    headers={"Authorization": f"Bearer {admin_token}"})
+                if r2.status_code == 200:
+                    dash = r2.json()
+                    users = dash.get("platform", {}).get("total_users", 0)
+                    results["tests"].append({"name": "Admin Dashboard", "status": "PASS", "detail": f"{users} users"})
+                    results["total_pass"] += 1
+            else:
+                results["tests"].append({"name": "Admin Login", "status": "FAIL", "detail": f"HTTP {r.status_code}"})
+                results["total_fail"] += 1
+        except Exception as e:
+            results["tests"].append({"name": "Admin Login", "status": "WARN", "detail": str(e)})
+            results["total_warn"] += 1
+
+        # ── Persistence Check ─────────────────────────────────────────────────
+        try:
+            from app.persistence import get_data_stats
+            stats = get_data_stats()
+            file_count = len(stats.get("files", {}))
+            results["tests"].append({"name": "BUG-005: Persistence", "status": "PASS", "detail": f"{file_count} data files on disk"})
+            results["total_pass"] += 1
+        except Exception as e:
+            results["tests"].append({"name": "BUG-005: Persistence", "status": "FAIL", "detail": str(e)})
+            results["total_fail"] += 1
+
+        # ── Chat AI ───────────────────────────────────────────────────────────
+        if token:
+            try:
+                r = await client.post(f"{BASE_URL}/api/chat/message",
+                    headers={**headers, "Content-Type": "application/json"},
+                    json={"message": "Daily diagnostic ping", "context": "dashboard"})
+                if r.status_code == 200:
+                    resp = r.json().get("response", "")
+                    has_ai_key = "API key" not in resp
+                    status = "PASS" if has_ai_key else "WARN"
+                    detail = "AI responding" if has_ai_key else "No AI API key configured"
+                    results["tests"].append({"name": "AI Chat", "status": status, "detail": detail})
+                    if status == "WARN":
+                        results["total_warn"] += 1
+                        results["bugs_found"].append("AI: No OpenAI/Anthropic API key configured - AI features disabled")
+                    else:
+                        results["total_pass"] += 1
+            except Exception as e:
+                results["tests"].append({"name": "AI Chat", "status": "WARN", "detail": str(e)})
+                results["total_warn"] += 1
+
+    return results
+
+
+def generate_report(results: dict) -> str:
+    """Generate a formatted markdown report."""
+    now = datetime.utcnow()
+    # Convert to Mountain Time (approximate)
+    mt_hour = (now.hour + MOUNTAIN_TZ_OFFSET) % 24
+    mt_date = now.strftime("%A, %B %d, %Y")
+
+    total = results["total_pass"] + results["total_fail"] + results["total_warn"]
+    pass_rate = (results["total_pass"] / total * 100) if total > 0 else 0
+
+    status_emoji = "🟢" if results["total_fail"] == 0 else ("🟡" if results["total_fail"] <= 2 else "🔴")
+
+    lines = [
+        f"# 🏗️ THE FOREMAN — AI CONTROL CENTER",
+        f"## Daily Diagnostic Report",
+        f"**Date:** {mt_date} — 7:00 AM MT",
+        f"**Server Status:** {results['server_status']}",
+        f"**Overall Health:** {status_emoji} {pass_rate:.0f}% ({results['total_pass']}/{total} tests passing)",
+        f"",
+        f"---",
+        f"",
+        f"## 📊 Test Results",
+        f"",
+        f"| Test | Status | Detail |",
+        f"|------|--------|--------|",
+    ]
+
+    for t in results["tests"]:
+        emoji = "✅" if t["status"] == "PASS" else ("⚠️" if t["status"] == "WARN" else "❌")
+        lines.append(f"| {t['name']} | {emoji} {t['status']} | {t['detail']} |")
+
+    lines += [
+        f"",
+        f"---",
+        f"",
+        f"## 🚨 Issues Detected ({len(results['bugs_found'])})",
+        f"",
+    ]
+
+    if results["bugs_found"]:
+        for bug in results["bugs_found"]:
+            lines.append(f"- ❌ {bug}")
+    else:
+        lines.append("✅ **No new issues detected. All systems nominal.**")
+
+    lines += [
+        f"",
+        f"---",
+        f"",
+        f"## 📈 Summary",
+        f"",
+        f"- **Tests Run:** {total}",
+        f"- **Passing:** {results['total_pass']} ✅",
+        f"- **Warnings:** {results['total_warn']} ⚠️",
+        f"- **Failing:** {results['total_fail']} ❌",
+        f"- **Pass Rate:** {pass_rate:.1f}%",
+        f"",
+        f"---",
+        f"*Report generated by Foreman AI Central Intelligence*",
+        f"*Next report: Tomorrow at 7:00 AM MT*",
+    ]
+
+    return "\n".join(lines)
+
+
+async def main():
+    print(f"🏗️ Foreman AI Diagnostic — {datetime.utcnow().isoformat()}")
+    print("Running comprehensive diagnostic sweep...")
+
+    results = await run_diagnostic()
+    report = generate_report(results)
+
+    # Save report
+    date_str = datetime.utcnow().strftime("%Y-%m-%d")
+    report_path = REPORT_DIR / f"DAILY_REPORT_{date_str}.md"
+    report_path.write_text(report)
+
+    # Also save JSON results
+    json_path = REPORT_DIR / f"diagnostic_{date_str}.json"
+    json_path.write_text(json.dumps(results, indent=2))
+
+    print(report)
+    print(f"\n📄 Report saved to: {report_path}")
+
+    return results["total_fail"] == 0
+
+
+if __name__ == "__main__":
+    success = asyncio.run(main())
+    sys.exit(0 if success else 1)

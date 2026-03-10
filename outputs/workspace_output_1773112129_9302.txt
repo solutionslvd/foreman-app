@@ -1,0 +1,20 @@
+const API = '';  // Same origin
+let authToken = null;
+let isAdmin = false;
+let currentUser = null;
+let currentPage = 'dashboard';
+let timerInterval = null;
+let timerSeconds = 0;
+let timerRunning = false;
+let currentReport = 'pl';
+let recognition = null;
+let voiceActive = false;
+const store = {
+function loadUnifiedStore() {
+    const saved = localStorage.getItem('foreman_store');
+      const parsed = JSON.parse(saved);
+function migrateLegacyStorage() {
+  const legacyKeys = {
+  let migrated = false;
+    const raw = localStorage.getItem(key);
+  const savedToken = localStorage.getItem('foreman_token');

@@ -1,0 +1,3397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#FF6B35">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Foreman">
+<meta name="description" content="AI-powered construction management for Alberta contractors">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+<title>Foreman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/app.css">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body class="dark-theme">
+
+<!-- ═══════════════════════════════════════════════════════
+     AUTH SCREEN
+═══════════════════════════════════════════════════════ -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="logo-icon">🏗️</div>
+      <h1 class="auth-title">Foreman</h1>
+      <p class="auth-subtitle">Alberta Construction Assistant</p>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login-form" class="auth-form active">
+      <h2>Welcome Back</h2>
+      <div class="form-group">
+        <label>Email or Username</label>
+        <input type="text" id="login-email" placeholder="admin or your@email.com" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-with-icon">
+          <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password">
+          <button class="toggle-pw" onclick="togglePassword('login-password')">👁</button>
+        </div>
+      </div>
+      <div id="login-error" class="error-msg hidden"></div>
+      <button class="btn-primary btn-full" onclick="handleLogin()">
+        <span>Sign In</span>
+      </button>
+      <p class="auth-switch">Don't have an account? <a href="#" onclick="showForm('register-form')">Sign Up</a></p>
+      <p class="auth-switch"><a href="#" onclick="showForm('admin-login-form')">Admin Login →</a></p>
+      <div style="margin-top:16px;padding:12px;background:#dbeafe;border-radius:8px;font-size:0.8rem;color:#1e40af;text-align:center">
+        <strong>Demo Account:</strong><br>test@foreman.ca &bull; Test1234!
+      </div>
+    </div>
+
+    <!-- Register Form -->
+    <div id="register-form" class="auth-form">
+      <h2>Create Account</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" placeholder="John Smith">
+        </div>
+        <div class="form-group">
+          <label>Business Name</label>
+          <input type="text" id="reg-business" placeholder="Smith Framing Ltd.">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="john@smithframing.ca">
+      </div>
+      <div class="form-group">
+        <label>Trade</label>
+        <select id="reg-trade">
+          <option value="framing">Framing</option>
+          <option value="carpentry">Carpentry</option>
+          <option value="general_contracting">General Contracting</option>
+          <option value="renovation">Renovation</option>
+          <option value="roofing">Roofing</option>
+          <option value="electrical">Electrical</option>
+          <option value="plumbing">Plumbing</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="reg-phone" placeholder="(780) 555-0100">
+      </div>
+      <div class="form-group">
+        <label>Plan</label>
+        <select id="reg-plan">
+          <option value="starter">Starter - $49/mo (1 user)</option>
+          <option value="professional">Professional - $149/mo (5 users)</option>
+          <option value="business">Business - $299/mo (15 users)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="Min 8 characters">
+      </div>
+      <div id="reg-error" class="error-msg hidden"></div>
+      <button class="btn-primary btn-full" onclick="handleRegister()">Create Account</button>
+      <p class="auth-switch">Already have an account? <a href="#" onclick="showForm('login-form')">Sign In</a></p>
+    </div>
+
+    <!-- Admin Login Form -->
+    <div id="admin-login-form" class="auth-form">
+      <h2>🔐 Admin Login</h2>
+      <div class="form-group">
+        <label>Admin Username</label>
+        <input type="text" id="admin-username" placeholder="admin" value="admin">
+      </div>
+      <div class="form-group">
+        <label>Admin Password</label>
+        <input type="password" id="admin-password" placeholder="Admin password">
+      </div>
+      <div id="admin-login-error" class="error-msg hidden"></div>
+      <button class="btn-primary btn-full" onclick="handleAdminLogin()">Admin Sign In</button>
+      <p class="auth-switch"><a href="#" onclick="showForm('login-form')">← Back to Login</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════════════════ -->
+<div id="main-app" class="main-app hidden">
+
+  <!-- Top Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="header-brand">
+        <span class="brand-icon">🏗️</span>
+        <span class="brand-name" id="header-app-name">Foreman</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" onclick="toggleAIPanel()" title="AI Assistant">🤖</button>
+      <button class="header-btn notification-btn" onclick="showNotifications()" title="Notifications">
+        🔔<span class="notif-badge hidden" id="notif-count">0</span>
+      </button>
+      <div class="user-avatar" onclick="toggleUserMenu()" id="user-avatar">A</div>
+    </div>
+  </header>
+
+  <!-- User Dropdown Menu -->
+  <div id="user-menu" class="user-menu hidden">
+    <div class="user-menu-header">
+      <div class="user-menu-avatar" id="menu-avatar">A</div>
+      <div>
+        <div class="user-menu-name" id="menu-user-name">Admin</div>
+        <div class="user-menu-role" id="menu-user-role">Administrator</div>
+      </div>
+    </div>
+    <div class="user-menu-items">
+      <a href="#" onclick="navigateTo('profile'); toggleUserMenu()">👤 My Profile</a>
+      <a href="#" onclick="navigateTo('profile'); toggleUserMenu()">⚙️ Preferences</a>
+      <a href="#" onclick="navigateTo('help'); toggleUserMenu()">❓ Help & Support</a>
+      <div class="menu-divider"></div>
+      <a href="#" onclick="handleLogout()" class="logout-link">🚪 Sign Out</a>
+    </div>
+  </div>
+
+  <!-- Sidebar Navigation -->
+  <nav id="sidebar" class="sidebar">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar-content">
+      <div class="sidebar-header">
+        <span class="sidebar-logo">🏗️</span>
+        <span class="sidebar-title" id="sidebar-app-name">Foreman</span>
+        <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebar-avatar">A</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">Loading...</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">User</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Main</div>
+        <a class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+          <span class="nav-icon">📊</span><span>Dashboard</span>
+        </a>
+        <a class="nav-item" data-page="ai-chat" onclick="navigateTo('ai-chat')">
+          <span class="nav-icon">🤖</span><span>AI Assistant</span>
+        </a>
+        <a class="nav-item" data-page="projects" onclick="navigateTo('projects')">
+          <span class="nav-icon">🏗️</span><span>Projects</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Finance</div>
+        <a class="nav-item" data-page="invoices" onclick="navigateTo('invoices')">
+          <span class="nav-icon">📄</span><span>Invoices</span>
+        </a>
+        <a class="nav-item" data-page="expenses" onclick="navigateTo('expenses')">
+          <span class="nav-icon">💳</span><span>Expenses</span>
+        </a>
+        <a class="nav-item" data-page="reports" onclick="navigateTo('reports')">
+          <span class="nav-icon">📈</span><span>Reports</span>
+        </a>
+        <a class="nav-item" data-page="payroll" onclick="navigateTo('payroll')">
+          <span class="nav-icon">👷</span><span>Payroll</span>
+        </a>
+        <a class="nav-item" data-page="accounting" onclick="navigateTo('accounting')">
+          <span class="nav-icon">📒</span><span>Accounting</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Operations</div>
+        <a class="nav-item" data-page="compliance" onclick="navigateTo('compliance')">
+          <span class="nav-icon">✅</span><span>Compliance</span>
+        </a>
+        <a class="nav-item" data-page="documents" onclick="navigateTo('documents')">
+          <span class="nav-icon">📁</span><span>Documents</span>
+        </a>
+        <a class="nav-item" data-page="time-tracking" onclick="navigateTo('time-tracking')">
+          <span class="nav-icon">⏱️</span><span>Time Tracking</span>
+        </a>
+      </div>
+
+      <!-- Admin-only section -->
+      <div class="nav-section admin-only hidden" id="admin-nav-section">
+        <div class="nav-label">Admin</div>
+        <a class="nav-item" data-page="admin-settings" onclick="navigateTo('admin-settings')">
+          <span class="nav-icon">⚙️</span><span>Settings</span>
+        </a>
+        <a class="nav-item" data-page="user-management" onclick="navigateTo('user-management')">
+          <span class="nav-icon">👥</span><span>Users</span>
+        </a>
+        <a class="nav-item" data-page="billing" onclick="navigateTo('billing')">
+          <span class="nav-icon">💰</span><span>Billing</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="app-version">v2.0.0 · Alberta Construction AI</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="app-main" id="app-main">
+
+    <!-- ── DASHBOARD ─────────────────────────────────────── -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <div class="page-actions">
+          <button class="btn-secondary btn-sm" onclick="refreshDashboard()">↻ Refresh</button>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card revenue">
+          <div class="kpi-icon">💰</div>
+          <div class="kpi-content">
+            <div class="kpi-value" id="kpi-revenue">$0</div>
+            <div class="kpi-label">YTD Revenue</div>
+            <div class="kpi-trend positive" id="kpi-revenue-trend">↑ This year</div>
+          </div>
+        </div>
+        <div class="kpi-card profit">
+          <div class="kpi-icon">📈</div>
+          <div class="kpi-content">
+            <div class="kpi-value" id="kpi-profit">$0</div>
+            <div class="kpi-label">Net Income</div>
+            <div class="kpi-trend" id="kpi-margin">0% margin</div>
+          </div>
+        </div>
+        <div class="kpi-card ar">
+          <div class="kpi-icon">📋</div>
+          <div class="kpi-content">
+            <div class="kpi-value" id="kpi-ar">$0</div>
+            <div class="kpi-label">Outstanding AR</div>
+            <div class="kpi-trend warning" id="kpi-ar-overdue">$0 overdue</div>
+          </div>
+        </div>
+        <div class="kpi-card bank">
+          <div class="kpi-icon">🏦</div>
+          <div class="kpi-content">
+            <div class="kpi-value" id="kpi-bank">$0</div>
+            <div class="kpi-label">Bank Balance</div>
+            <div class="kpi-trend" id="kpi-bank-sub">Chequing</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section-card">
+        <h3 class="section-title">Quick Actions</h3>
+        <div class="quick-actions">
+          <button class="quick-btn" onclick="openInvoiceModal()">
+            <span class="qa-icon">📄</span>
+            <span>New Invoice</span>
+          </button>
+          <button class="quick-btn" onclick="openModal('new-expense-modal')">
+            <span class="qa-icon">💳</span>
+            <span>Add Expense</span>
+          </button>
+          <button class="quick-btn" onclick="navigateTo('ai-chat')">
+            <span class="qa-icon">🤖</span>
+            <span>Ask AI</span>
+          </button>
+          <button class="quick-btn" onclick="openModal('new-project-modal')">
+            <span class="qa-icon">🏗️</span>
+            <span>New Project</span>
+          </button>
+          <button class="quick-btn" onclick="navigateTo('compliance')">
+            <span class="qa-icon">✅</span>
+            <span>Compliance</span>
+          </button>
+          <button class="quick-btn" onclick="navigateTo('time-tracking')">
+            <span class="qa-icon">⏱️</span>
+            <span>Log Time</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Activity + Compliance -->
+      <div class="two-col-grid">
+        <div class="section-card">
+          <h3 class="section-title">Recent Transactions</h3>
+          <div id="recent-transactions" class="activity-list">
+            <div class="empty-state-sm">No transactions yet</div>
+          </div>
+        </div>
+        <div class="section-card">
+          <h3 class="section-title">Compliance Status</h3>
+          <div id="compliance-status" class="compliance-list">
+            <div class="compliance-item good">
+              <span class="ci-icon">✅</span>
+              <span class="ci-label">WCB Registration</span>
+              <span class="ci-status">Active</span>
+            </div>
+            <div class="compliance-item warning">
+              <span class="ci-icon">⚠️</span>
+              <span class="ci-label">Safety Inspection</span>
+              <span class="ci-status">Due Soon</span>
+            </div>
+            <div class="compliance-item good">
+              <span class="ci-icon">✅</span>
+              <span class="ci-label">WHMIS Training</span>
+              <span class="ci-status">Current</span>
+            </div>
+            <div class="compliance-item warning">
+              <span class="ci-icon">⚠️</span>
+              <span class="ci-label">GST Filing</span>
+              <span class="ci-status">Q4 Due</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AI CHAT ─────────────────────────────────────────── -->
+    <div id="page-ai-chat" class="page">
+      <div class="page-header">
+        <h1 class="page-title">🤖 AI Assistant</h1>
+        <div class="page-actions">
+          <button class="btn-secondary btn-sm" onclick="clearChat()">Clear Chat</button>
+          <button class="btn-secondary btn-sm" onclick="showAIContext()">📊 Context</button>
+        </div>
+      </div>
+      
+      <!-- AI Context Banner -->
+      <div id="ai-context-banner" style="background:linear-gradient(135deg,#1e3a5f,#2c5282);color:white;padding:10px 16px;border-radius:8px;margin-bottom:12px;font-size:0.85rem;display:flex;align-items:center;gap:10px">
+        <span>🧠</span>
+        <span id="ai-context-summary">AI has access to your live app data — projects, invoices, expenses, payroll, and documents.</span>
+      </div>
+      
+      <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-message ai">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+              <div class="msg-content">
+                <p>Hi! I'm <strong>Foreman AI</strong> — your construction business assistant. I have full access to your live data including projects, invoices, expenses, payroll, and documents.</p>
+                <p style="margin-top:8px">Ask me anything about your business or Alberta construction:</p>
+              </div>
+              <div class="quick-prompts" id="ai-quick-prompts" style="margin-top:10px">
+                <!-- BUG-020 FIX: Populated dynamically by renderDynamicChatSuggestions() -->
+                <button onclick="sendQuickPrompt('What invoices are outstanding?')">💰 Outstanding Invoices</button>
+                <button onclick="sendQuickPrompt('Summarize my active projects')">📋 Active Projects</button>
+                <button onclick="sendQuickPrompt('How do I calculate GST on an invoice?')">🧾 GST Help</button>
+                <button onclick="sendQuickPrompt('What WCB requirements do I need?')">⚠️ WCB Info</button>
+                <button onclick="sendQuickPrompt('Help me write a quote for a framing job')">📝 Write Quote</button>
+                <button onclick="sendQuickPrompt('What permits do I need in Alberta?')">🏗️ Permits</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <button class="voice-btn" onclick="toggleVoice()" id="voice-btn" title="Voice input">🎤</button>
+            <textarea id="chat-input" placeholder="Ask about your projects, invoices, regulations, or anything construction..." rows="1"
+              onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" onclick="sendMessage()" id="send-btn">➤</button>
+          </div>
+          <div class="chat-suggestions" id="chat-suggestions"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PROJECTS ───────────────────────────────────────── -->
+    <div id="page-projects" class="page">
+      <div class="page-header">
+        <h1 class="page-title">Projects</h1>
+        <div class="page-actions">
+          <button class="btn-primary btn-sm" onclick="openModal('new-project-modal')">+ New Project</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterProjects('all')">All</button>
+        <button class="filter-btn" onclick="filterProjects('active')">Active</button>
+        <button class="filter-btn" onclick="filterProjects('completed')">Completed</button>
+        <button class="filter-btn" onclick="filterProjects('pending')">Pending</button>
+      </div>
+      <div id="projects-list" class="projects-grid">
+        <div class="empty-state">
+          <div class="empty-icon">🏗️</div>
+          <h3>No Projects Yet</h3>
+          <p>Create your first project to get started</p>
+          <button class="btn-primary" onclick="openModal('new-project-modal')">+ New Project</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── INVOICES ───────────────────────────────────────── -->
+    <div id="page-invoices" class="page">
+      <div class="page-header">
+        <h1 class="page-title">Invoices &amp; Estimates</h1>
+        <div class="page-actions">
+          <button class="btn-secondary btn-sm" onclick="openEstimateModal()">📋 New Estimate</button>
+          <button class="btn-primary btn-sm" onclick="openInvoiceModal()">+ New Invoice</button>
+        </div>
+      </div>
+      <div class="inv-tabs">
+        <button class="inv-tab active" onclick="showInvTab('invoices', this)">📄 Invoices</button>
+        <button class="inv-tab" onclick="showInvTab('estimates', this)">📋 Estimates</button>
+      </div>
+      <div id="inv-tab-invoices">
+        <div class="invoice-summary-bar">
+          <div class="inv-stat">
+            <span class="inv-stat-val" id="inv-total">$0</span>
+            <span class="inv-stat-label">Total Invoiced</span>
+          </div>
+          <div class="inv-stat">
+            <span class="inv-stat-val green" id="inv-paid">$0</span>
+            <span class="inv-stat-label">Paid</span>
+          </div>
+          <div class="inv-stat">
+            <span class="inv-stat-val orange" id="inv-outstanding">$0</span>
+            <span class="inv-stat-label">Outstanding</span>
+          </div>
+          <div class="inv-stat">
+            <span class="inv-stat-val red" id="inv-overdue">$0</span>
+            <span class="inv-stat-label">Overdue</span>
+          </div>
+        </div>
+        <div id="invoices-list" class="data-table-container">
+          <div class="empty-state">
+            <div class="empty-icon">📄</div>
+            <h3>No Invoices Yet</h3>
+            <p>Create your first invoice with line items, quantities, rates, and GST</p>
+            <button class="btn-primary" onclick="openInvoiceModal()">+ New Invoice</button>
+          </div>
+        </div>
+      </div>
+      <div id="inv-tab-estimates" style="display:none">
+        <div id="estimates-list" class="data-table-container">
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h3>No Estimates Yet</h3>
+            <p>Create quotes and estimates for clients</p>
+            <button class="btn-primary" onclick="openEstimateModal()">📋 New Estimate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EXPENSES ───────────────────────────────────────── -->
+    <div id="page-expenses" class="page">
+      <div class="page-header">
+        <h1 class="page-title">Expenses</h1>
+        <div class="page-actions">
+          <button class="btn-secondary btn-sm" onclick="showExpenseTab('receipts',this)">📷 Receipts</button>
+          <button class="btn-primary btn-sm" onclick="openModal('new-expense-modal')">+ Add Expense</button>
+        </div>
+      </div>
+
+      <!-- Expense Sub-tabs -->
+      <div style="display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap;border-bottom:1px solid var(--border-light);padding-bottom:.75rem">
+        <button class="filter-btn active" id="etab-list" onclick="showExpenseTab('list',this)">📋 All Expenses</button>
+        <button class="filter-btn" id="etab-receipts" onclick="showExpenseTab('receipts',this)">📷 Receipt Snapshots</button>
+        <button class="filter-btn" id="etab-summary" onclick="showExpenseTab('summary',this)">📊 Summary</button>
+      </div>
+
+      <!-- ALL EXPENSES TAB -->
+      <div id="etab-content-list">
+        <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center">
+          <select id="exp-filter-cat" onchange="renderExpenses()" style="padding:.4rem .75rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.83rem">
+            <option value="all">All Categories</option>
+            <option value="5000">Materials</option>
+            <option value="5100">Subcontractors</option>
+            <option value="6100">Vehicle</option>
+            <option value="6110">Tools & Equipment</option>
+            <option value="6200">Insurance</option>
+            <option value="6310">Phone & Internet</option>
+            <option value="6320">Software</option>
+            <option value="6400">Advertising</option>
+            <option value="6500">Professional Fees</option>
+            <option value="6600">Meals</option>
+            <option value="6999">Miscellaneous</option>
+          </select>
+          <select id="exp-filter-month" onchange="renderExpenses()" style="padding:.4rem .75rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.83rem">
+            <option value="all">All Time</option>
+            <option value="this-month">This Month</option>
+            <option value="last-month">Last Month</option>
+            <option value="this-year">This Year</option>
+          </select>
+          <button class="btn-secondary btn-sm" onclick="exportExpensesCSV()">⬇️ Export CSV</button>
+          <span id="exp-total-display" style="margin-left:auto;font-weight:700;color:var(--primary-light)"></span>
+        </div>
+        <div id="expenses-list" class="data-table-container">
+          <div class="empty-state">
+            <div class="empty-icon">💳</div>
+            <h3>No Expenses Yet</h3>
+            <p>Track your business expenses and attach receipts</p>
+            <button class="btn-primary" onclick="openModal('new-expense-modal')">+ Add Expense</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECEIPT SNAPSHOTS TAB -->
+      <div id="etab-content-receipts" style="display:none">
+        <div class="section-card">
+          <h3 class="section-title">📷 Receipt Snapshots</h3>
+          <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem">Snap or upload a photo of any receipt. The app will help you fill in the expense details automatically.</p>
+
+          <!-- Upload area -->
+          <div id="receipt-drop-zone" style="border:2px dashed var(--border-light);border-radius:12px;padding:2rem;text-align:center;cursor:pointer;transition:.2s;margin-bottom:1.5rem" onclick="document.getElementById('receipt-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--primary)'" ondragleave="this.style.borderColor='var(--border-light)'" ondrop="handleReceiptDrop(event)">
+            <div style="font-size:3rem;margin-bottom:.5rem">📸</div>
+            <div style="font-weight:600;margin-bottom:.25rem">Click to upload or drag & drop a receipt</div>
+            <div style="font-size:.8rem;color:var(--text-muted)">JPG, PNG, PDF, HEIC supported · Max 10MB per file</div>
+            <input type="file" id="receipt-file-input" accept="image/*,application/pdf" multiple style="display:none" onchange="handleReceiptUpload(this)">
+          </div>
+
+          <!-- Camera capture (mobile) -->
+          <div style="display:flex;gap:.75rem;margin-bottom:1.5rem;flex-wrap:wrap">
+            <button class="btn-secondary" onclick="document.getElementById('receipt-camera-input').click()">📷 Take Photo (Mobile)</button>
+            <input type="file" id="receipt-camera-input" accept="image/*" capture="environment" style="display:none" onchange="handleReceiptUpload(this)">
+            <button class="btn-secondary" onclick="openModal('new-expense-modal')">✏️ Manual Entry</button>
+          </div>
+
+          <!-- Receipt gallery -->
+          <div id="receipt-gallery">
+            <div class="empty-state-sm">No receipts uploaded yet. Snap or upload your first receipt above.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUMMARY TAB -->
+      <div id="etab-content-summary" style="display:none">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem;margin-bottom:1.5rem" id="exp-summary-cards"></div>
+        <div class="section-card">
+          <h3 class="section-title">Expenses by Category</h3>
+          <div id="exp-category-breakdown"></div>
+        </div>
+        <div class="section-card" style="margin-top:1rem">
+          <h3 class="section-title">Monthly Trend</h3>
+          <div id="exp-monthly-trend"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REPORTS ────────────────────────────────────────── -->
+    <div id="page-reports" class="page">
+      <div class="page-header">
+        <h1 class="page-title">Financial Reports</h1>
+      </div>
+      <div class="report-tabs">
+        <button class="report-tab active" onclick="showReport('pl')">P&L Statement</button>
+        <button class="report-tab" onclick="showReport('balance')">Balance Sheet</button>
+        <button class="report-tab" onclick="showReport('gst')">GST Summary</button>
+        <button class="report-tab" onclick="showReport('cashflow')">Cash Flow</button>
+        <button class="report-tab" onclick="showReport('ar-aging')">AR Aging</button>
+      </div>
+      <div class="report-controls">
+        <div class="date-range">
+          <input type="date" id="report-from" class="date-input">
+          <span>to</span>
+          <input type="date" id="report-to" class="date-input">
+          <button class="btn-primary btn-sm" onclick="loadReport()">Generate</button>
+        </div>
+      </div>
+      <div id="report-content" class="report-content">
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <h3>Select a Report</h3>
+          <p>Choose a report type and date range above</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAYROLL ────────────────────────────────────────── -->
+    <!-- ── PAYROLL ── -->
+    <div id="page-payroll" class="page">
+      <div class="page-header">
+        <h1 class="page-title">Payroll &amp; Financials</h1>
+        <div class="page-actions">
+          <button class="btn-secondary btn-sm" onclick="showPayrollTab('chart',this)">📊 Chart of Accounts</button>
+          <button class="btn-secondary btn-sm" onclick="showPayrollTab('bank',this)">🏦 Bank Feed</button>
+          <button class="btn-secondary btn-sm" onclick="showPayrollTab('tax',this)">🇨🇦 CRA Tax</button>
+          <button class="btn-primary btn-sm" onclick="showPayrollTab('run',this)">+ Run Payroll</button>
+        </div>
+      </div>
+
+      <!-- Sub-tabs -->
+      <div style="display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap;border-bottom:1px solid var(--border-light);padding-bottom:.75rem">
+        <button class="filter-btn active" id="ptab-employees" onclick="showPayrollTab('employees',this)">👷 Employees</button>
+        <button class="filter-btn" id="ptab-contractors" onclick="showPayrollTab('contractors',this)">🔨 Contractors</button>
+        <button class="filter-btn" id="ptab-run" onclick="showPayrollTab('run',this)">💰 Run Payroll</button>
+        <button class="filter-btn" id="ptab-history" onclick="showPayrollTab('history',this)">📋 History</button>
+        <button class="filter-btn" id="ptab-chart" onclick="showPayrollTab('chart',this)">📊 Chart of Accounts</button>
+        <button class="filter-btn" id="ptab-bank" onclick="showPayrollTab('bank',this)">🏦 Bank Feed</button>
+        <button class="filter-btn" id="ptab-tax" onclick="showPayrollTab('tax',this)">🇨🇦 CRA Tax</button>
+        <button class="filter-btn" id="ptab-backdate" onclick="showPayrollTab('backdate',this)">📅 Backdate</button>
+      </div>
+
+      <!-- EMPLOYEES TAB -->
+      <div id="ptab-content-employees" class="payroll-tab-content">
+        <div class="section-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <h3 class="section-title" style="margin:0">Employee Roster</h3>
+            <button class="btn-primary btn-sm" onclick="openModal('add-employee-modal')">+ Add Employee</button>
+          </div>
+          <div id="employee-list">
+            <div class="empty-state-sm">No employees added yet. Add your first employee to get started.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTRACTORS TAB -->
+      <div id="ptab-content-contractors" class="payroll-tab-content" style="display:none">
+        <div class="section-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <h3 class="section-title" style="margin:0">Contractor / Subcontractor Roster</h3>
+            <button class="btn-primary btn-sm" onclick="openModal('add-contractor-modal')">+ Add Contractor</button>
+          </div>
+          <div style="background:rgba(255,111,0,.08);border:1px solid rgba(255,111,0,.3);border-radius:8px;padding:.75rem 1rem;font-size:.83rem;margin-bottom:1rem;color:#ffa726">
+            ⚠️ <strong>CRA Note:</strong> Contractors are not employees. No CPP/EI deductions. Issue T4A slips for payments over $500/year. Ensure they have their own WCB coverage or add them to yours.
+          </div>
+          <div id="contractor-list">
+            <div class="empty-state-sm">No contractors added yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RUN PAYROLL TAB -->
+      <div id="ptab-content-run" class="payroll-tab-content" style="display:none">
+        <div class="section-card">
+          <h3 class="section-title">Payroll Calculator</h3>
+          <div class="payroll-calc">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Employee / Worker</label>
+                <select id="pay-worker-select" onchange="prefillWorker()">
+                  <option value="">— Select or enter manually —</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Worker Name</label>
+                <input type="text" id="pay-name" placeholder="Full name">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Pay Type</label>
+                <select id="pay-type" onchange="togglePayType()">
+                  <option value="hourly">Hourly</option>
+                  <option value="salary">Salary</option>
+                  <option value="contractor">Contractor (T4A)</option>
+                </select>
+              </div>
+              <div class="form-group" id="pay-hours-group">
+                <label>Hours Worked</label>
+                <input type="number" id="pay-hours" placeholder="0" step="0.5" oninput="calcPayroll()">
+              </div>
+              <div class="form-group">
+                <label id="pay-rate-label">Hourly Rate ($)</label>
+                <input type="number" id="pay-rate" placeholder="0.00" step="0.01" oninput="calcPayroll()">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Overtime Hours (1.5×)</label>
+                <input type="number" id="pay-ot-hours" placeholder="0" step="0.5" oninput="calcPayroll()">
+              </div>
+              <div class="form-group">
+                <label>Trade / WCB Class</label>
+                <select id="pay-trade" onchange="calcPayroll()">
+                  <option value="framing">Framing (3.20%)</option>
+                  <option value="carpentry">Carpentry (2.80%)</option>
+                  <option value="electrical">Electrical (2.10%)</option>
+                  <option value="plumbing">Plumbing (2.10%)</option>
+                  <option value="hvac">HVAC (2.40%)</option>
+                  <option value="roofing">Roofing (4.80%)</option>
+                  <option value="concrete">Concrete (3.50%)</option>
+                  <option value="drywall">Drywall (2.60%)</option>
+                  <option value="painting">Painting (2.20%)</option>
+                  <option value="excavation">Excavation (3.80%)</option>
+                  <option value="general">General Labour (2.50%)</option>
+                  <option value="supervisor">Supervisor/Foreman (1.80%)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Pay Period</label>
+                <select id="pay-period">
+                  <option value="weekly">Weekly</option>
+                  <option value="biweekly">Bi-Weekly</option>
+                  <option value="semimonthly">Semi-Monthly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Province</label>
+                <select id="pay-province" onchange="calcPayroll()">
+                  <option value="AB" selected>Alberta</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="ON">Ontario</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Pay Date</label>
+                <input type="date" id="pay-date">
+              </div>
+              <div class="form-group">
+                <label>Project (optional)</label>
+                <select id="pay-project">
+                  <option value="">— No project —</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Vacation Pay (4%)</label>
+                <select id="pay-vacation" onchange="calcPayroll()">
+                  <option value="included">Include (4%)</option>
+                  <option value="accrued">Accrue (track separately)</option>
+                  <option value="none">Not applicable</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Additional Deductions ($)</label>
+                <input type="number" id="pay-extra-deductions" placeholder="0.00" step="0.01" oninput="calcPayroll()">
+              </div>
+              <div class="form-group">
+                <label>Bonus / Other Pay ($)</label>
+                <input type="number" id="pay-bonus" placeholder="0.00" step="0.01" oninput="calcPayroll()">
+              </div>
+            </div>
+
+            <!-- Payroll Breakdown -->
+            <div class="payroll-breakdown" id="payroll-breakdown" style="margin-top:1rem">
+              <div style="font-size:.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem">Pay Stub Preview</div>
+              <div class="pb-row"><span>Regular Pay (<span id="pb-hrs">0</span> hrs × $<span id="pb-rate-disp">0</span>)</span><span id="pb-regular">$0.00</span></div>
+              <div class="pb-row" id="pb-ot-row" style="display:none"><span>Overtime Pay (<span id="pb-ot-hrs">0</span> hrs × 1.5×)</span><span id="pb-ot">$0.00</span></div>
+              <div class="pb-row" id="pb-bonus-row" style="display:none"><span>Bonus / Other</span><span id="pb-bonus-disp">$0.00</span></div>
+              <div class="pb-row" id="pb-vac-row"><span>Vacation Pay (4%)</span><span id="pb-vac">$0.00</span></div>
+              <div class="pb-row" style="font-weight:600"><span>Gross Wages</span><span id="pb-gross">$0.00</span></div>
+              <div class="pb-divider"></div>
+              <div style="font-size:.78rem;color:var(--text-muted);margin:.4rem 0">Employee Deductions</div>
+              <div class="pb-row deduction"><span>CPP (Employee 5.95%)</span><span id="pb-cpp">-$0.00</span></div>
+              <div class="pb-row deduction"><span>EI (Employee 1.66%)</span><span id="pb-ei">-$0.00</span></div>
+              <div class="pb-row deduction"><span>Federal Income Tax</span><span id="pb-fed-tax">-$0.00</span></div>
+              <div class="pb-row deduction"><span>Alberta Provincial Tax</span><span id="pb-prov-tax">-$0.00</span></div>
+              <div class="pb-row deduction" id="pb-extra-row" style="display:none"><span>Additional Deductions</span><span id="pb-extra">-$0.00</span></div>
+              <div class="pb-row total"><span>💵 Net Pay (Take-Home)</span><span id="pb-net">$0.00</span></div>
+              <div class="pb-divider"></div>
+              <div style="font-size:.78rem;color:var(--text-muted);margin:.4rem 0">Employer Costs (your expense)</div>
+              <div class="pb-row employer"><span>Employer CPP Match</span><span id="pb-emp-cpp">$0.00</span></div>
+              <div class="pb-row employer"><span>Employer EI (×1.4)</span><span id="pb-emp-ei">$0.00</span></div>
+              <div class="pb-row employer"><span>WCB Premium (<span id="pb-wcb-rate">2.50</span>%)</span><span id="pb-wcb">$0.00</span></div>
+              <div class="pb-row total-cost"><span>🏗️ Total Labour Cost</span><span id="pb-total">$0.00</span></div>
+              <div class="pb-divider"></div>
+              <div style="font-size:.78rem;color:var(--text-muted);margin:.4rem 0">CRA Remittance (due 15th of following month)</div>
+              <div class="pb-row" style="font-size:.83rem"><span>Payroll Deductions Remittance</span><span id="pb-remittance">$0.00</span></div>
+              <div class="pb-row" style="font-size:.83rem"><span>WCB Remittance</span><span id="pb-wcb-remit">$0.00</span></div>
+            </div>
+            <div style="display:flex;gap:.75rem;margin-top:1rem">
+              <button class="btn-primary" style="flex:1" onclick="postPayroll()">✅ Post Payroll Entry</button>
+              <button class="btn-secondary" onclick="printPayStub()">🖨️ Print Pay Stub</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY TAB -->
+      <div id="ptab-content-history" class="payroll-tab-content" style="display:none">
+        <div class="section-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <h3 class="section-title" style="margin:0">Payroll History</h3>
+            <div style="display:flex;gap:.5rem">
+              <select id="payroll-filter-year" onchange="renderPayrollHistory()" style="padding:.4rem .75rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.83rem">
+                <option value="all">All Years</option>
+              </select>
+              <select id="payroll-filter-worker" onchange="renderPayrollHistory()" style="padding:.4rem .75rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.83rem">
+                <option value="all">All Workers</option>
+              </select>
+              <button class="btn-secondary btn-sm" onclick="exportPayrollCSV()">⬇️ Export CSV</button>
+            </div>
+          </div>
+          <!-- YTD Summary -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.75rem;margin-bottom:1rem" id="payroll-ytd-summary">
+          </div>
+          <div id="payroll-history-table">
+            <div class="empty-state-sm">No payroll entries yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHART OF ACCOUNTS TAB -->
+      <div id="ptab-content-chart" class="payroll-tab-content" style="display:none">
+        <div class="section-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <h3 class="section-title" style="margin:0">Chart of Accounts</h3>
+            <div style="display:flex;gap:.5rem">
+              <select id="coa-period-select" onchange="renderChartOfAccounts()" style="padding:.4rem .75rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.83rem">
+                <option value="current">Current Period</option>
+              </select>
+              <button class="btn-secondary btn-sm" onclick="exportCOACSV()">⬇️ Export CSV</button>
+              <button class="btn-primary btn-sm" onclick="openModal('add-transaction-modal')">+ Add Entry</button>
+            </div>
+          </div>
+          <div id="coa-table-container">
+            <table style="width:100%;border-collapse:collapse;font-size:.85rem" id="coa-table">
+              <thead>
+                <tr style="background:var(--bg2)">
+                  <th style="padding:.6rem .75rem;text-align:left;border-bottom:1px solid var(--border-light)">Account #</th>
+                  <th style="padding:.6rem .75rem;text-align:left;border-bottom:1px solid var(--border-light)">Account Name</th>
+                  <th style="padding:.6rem .75rem;text-align:right;border-bottom:1px solid var(--border-light)" id="coa-col-1">Period 1</th>
+                  <th style="padding:.6rem .75rem;text-align:right;border-bottom:1px solid var(--border-light)" id="coa-col-2">Period 2</th>
+                  <th style="padding:.6rem .75rem;text-align:right;border-bottom:1px solid var(--border-light)" id="coa-col-3">Period 3</th>
+                  <th style="padding:.6rem .75rem;text-align:right;border-bottom:1px solid var(--border-light)" id="coa-col-4">Period 4</th>
+                  <th style="padding:.6rem .75rem;text-align:right;border-bottom:1px solid var(--border-light);color:var(--primary)">YTD Total</th>
+                </tr>
+              </thead>
+              <tbody id="coa-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- BANK FEED TAB -->
+      <div id="ptab-content-bank" class="payroll-tab-content" style="display:none">
+        <div class="section-card">
+          <h3 class="section-title">Bank Feed &amp; Transaction Import</h3>
+          <div style="background:rgba(26,35,126,.15);border:1px solid rgba(26,35,126,.4);border-radius:8px;padding:1rem;margin-bottom:1rem;font-size:.85rem">
+            <strong>🏦 Connect Your Bank</strong><br>
+            <span style="color:var(--text-muted)">Import transactions from your bank to automatically record and classify expenses. Supports CSV export from all major Canadian banks (RBC, TD, BMO, Scotiabank, CIBC, ATB).</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+            <div>
+              <h4 style="font-size:.9rem;margin-bottom:.75rem">📁 Import Bank CSV</h4>
+              <div style="border:2px dashed var(--border-light);border-radius:8px;padding:1.5rem;text-align:center;cursor:pointer" onclick="document.getElementById('bank-csv-input').click()">
+                <div style="font-size:2rem;margin-bottom:.5rem">📂</div>
+                <div style="font-size:.85rem;color:var(--text-muted)">Click to upload bank CSV export</div>
+                <div style="font-size:.75rem;color:var(--text-muted);margin-top:.3rem">Supports RBC, TD, BMO, Scotiabank, CIBC, ATB formats</div>
+                <input type="file" id="bank-csv-input" accept=".csv" style="display:none" onchange="importBankCSV(event)">
+              </div>
+              <div style="margin-top:.75rem">
+                <label style="font-size:.83rem;color:var(--text-muted);display:block;margin-bottom:.3rem">Bank Format</label>
+                <select id="bank-format" style="width:100%;padding:.5rem .75rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.85rem">
+                  <option value="rbc">RBC Royal Bank</option>
+                  <option value="td">TD Bank</option>
+                  <option value="bmo">BMO Bank of Montreal</option>
+                  <option value="scotiabank">Scotiabank</option>
+                  <option value="cibc">CIBC</option>
+                  <option value="atb">ATB Financial</option>
+                  <option value="generic">Generic (Date, Description, Amount)</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <h4 style="font-size:.9rem;margin-bottom:.75rem">✏️ Manual Entry</h4>
+              <div class="form-group"><label>Date</label><input type="date" id="txn-date"></div>
+              <div class="form-group"><label>Description</label><input type="text" id="txn-desc" placeholder="e.g., Home Depot - lumber"></div>
+              <div class="form-row">
+                <div class="form-group"><label>Amount ($)</label><input type="number" id="txn-amount" step="0.01" placeholder="0.00"></div>
+                <div class="form-group"><label>Type</label>
+                  <select id="txn-type">
+                    <option value="expense">Expense (debit)</option>
+                    <option value="income">Income (credit)</option>
+                    <option value="transfer">Transfer</option>
+                    <option value="owner_draw">Owner Draw</option>
+                    <option value="owner_contribution">Owner Contribution</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group"><label>Account Category</label>
+                <select id="txn-account" style="width:100%;padding:.5rem .75rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.85rem">
+                  <optgroup label="Income">
+                    <option value="100">100 - Sales</option>
+                    <option value="101">101 - Affiliate Income</option>
+                    <option value="102">102 - Returns (contra)</option>
+                  </optgroup>
+                  <optgroup label="Expenses">
+                    <option value="200">200 - Advertising</option>
+                    <option value="201">201 - Contract Labor</option>
+                    <option value="202">202 - Insurance</option>
+                    <option value="203">203 - Legal &amp; Professional</option>
+                    <option value="204">204 - Office Expenses</option>
+                    <option value="205">205 - Wages</option>
+                    <option value="206">206 - Meals</option>
+                    <option value="207">207 - Software Expenses</option>
+                    <option value="208">208 - Fleet Fuel</option>
+                    <option value="209">209 - Equipment Fuel</option>
+                    <option value="210">210 - Consumables</option>
+                    <option value="211">211 - Other Expenses</option>
+                    <option value="212">212 - Equipment Rentals</option>
+                    <option value="213">213 - Loans</option>
+                    <option value="214">214 - Fleet Maintenance</option>
+                  </optgroup>
+                  <optgroup label="Other (Non-P&amp;L)">
+                    <option value="300">300 - Owner's Contribution</option>
+                    <option value="301">301 - Owner's Draws</option>
+                    <option value="302">302 - Transfers Between Accounts</option>
+                  </optgroup>
+                </select>
+              </div>
+              <div class="form-group"><label>GST Included?</label>
+                <select id="txn-gst">
+                  <option value="none">No GST</option>
+                  <option value="included">GST Included (÷1.05)</option>
+                  <option value="on_top">GST on Top (+5%)</option>
+                  <option value="exempt">GST Exempt</option>
+                </select>
+              </div>
+              <button class="btn-primary btn-sm" style="width:100%;margin-top:.5rem" onclick="addManualTransaction()">+ Add Transaction</button>
+            </div>
+          </div>
+
+          <!-- Unclassified transactions -->
+          <div id="bank-review-section" style="display:none">
+            <h4 style="font-size:.9rem;margin-bottom:.75rem">🔍 Review &amp; Classify Imported Transactions</h4>
+            <div id="bank-review-list"></div>
+          </div>
+
+          <!-- All transactions table -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;margin-top:1rem">
+            <h4 style="font-size:.9rem">All Transactions</h4>
+            <div style="display:flex;gap:.5rem">
+              <select id="txn-filter-account" onchange="renderTransactions()" style="padding:.35rem .6rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.8rem">
+                <option value="all">All Accounts</option>
+                <option value="income">Income Only</option>
+                <option value="expense">Expenses Only</option>
+                <option value="other">Other</option>
+              </select>
+              <button class="btn-secondary btn-sm" onclick="exportTransactionsCSV()">⬇️ Export</button>
+            </div>
+          </div>
+          <div id="transactions-table-container">
+            <div class="empty-state-sm">No transactions yet. Import a bank CSV or add manually.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRA TAX TAB -->
+      <div id="ptab-content-tax" class="payroll-tab-content" style="display:none">
+        <div class="section-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <h3 class="section-title" style="margin:0">🇨🇦 CRA Tax Summary</h3>
+            <div style="display:flex;gap:.5rem">
+              <select id="tax-year-select" onchange="renderTaxSummary()" style="padding:.4rem .75rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.85rem">
+              </select>
+              <button class="btn-secondary btn-sm" onclick="exportTaxReport()">⬇️ Export PDF</button>
+            </div>
+          </div>
+
+          <!-- GST/HST Summary -->
+          <div style="background:rgba(46,125,50,.08);border:1px solid rgba(46,125,50,.3);border-radius:10px;padding:1.2rem;margin-bottom:1rem">
+            <h4 style="font-size:.9rem;margin-bottom:.75rem;color:#66bb6a">📋 GST/HST Return Summary</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem">
+              <div style="text-align:center"><div style="font-size:1.4rem;font-weight:700" id="tax-gst-collected">$0.00</div><div style="font-size:.75rem;color:var(--text-muted)">GST Collected (Line 103)</div></div>
+              <div style="text-align:center"><div style="font-size:1.4rem;font-weight:700" id="tax-itc">$0.00</div><div style="font-size:.75rem;color:var(--text-muted)">Input Tax Credits (Line 106)</div></div>
+              <div style="text-align:center"><div style="font-size:1.4rem;font-weight:700;color:#ff6f00" id="tax-gst-owing">$0.00</div><div style="font-size:.75rem;color:var(--text-muted)">Net GST Owing (Line 109)</div></div>
+            </div>
+          </div>
+
+          <!-- Payroll Remittance -->
+          <div style="background:rgba(26,35,126,.1);border:1px solid rgba(26,35,126,.3);border-radius:10px;padding:1.2rem;margin-bottom:1rem">
+            <h4 style="font-size:.9rem;margin-bottom:.75rem;color:#7986cb">👷 Payroll Deductions Remittance (PD7A)</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem">
+              <div style="text-align:center"><div style="font-size:1.4rem;font-weight:700" id="tax-cpp-total">$0.00</div><div style="font-size:.75rem;color:var(--text-muted)">Total CPP (Emp + Employer)</div></div>
+              <div style="text-align:center"><div style="font-size:1.4rem;font-weight:700" id="tax-ei-total">$0.00</div><div style="font-size:.75rem;color:var(--text-muted)">Total EI (Emp + Employer)</div></div>
+              <div style="text-align:center"><div style="font-size:1.4rem;font-weight:700" id="tax-it-total">$0.00</div><div style="font-size:.75rem;color:var(--text-muted)">Income Tax Withheld</div></div>
+              <div style="text-align:center"><div style="font-size:1.4rem;font-weight:700;color:#ff6f00" id="tax-remittance-total">$0.00</div><div style="font-size:.75rem;color:var(--text-muted)">Total Remittance Due</div></div>
+            </div>
+          </div>
+
+          <!-- T4 Summary -->
+          <div style="background:rgba(245,127,23,.08);border:1px solid rgba(245,127,23,.3);border-radius:10px;padding:1.2rem;margin-bottom:1rem">
+            <h4 style="font-size:.9rem;margin-bottom:.75rem;color:#ffa726">📄 T4 Summary (Employees)</h4>
+            <div id="t4-summary-table">
+              <div class="empty-state-sm">No payroll entries for this year.</div>
+            </div>
+          </div>
+
+          <!-- T4A Summary (Contractors) -->
+          <div style="background:rgba(198,40,40,.08);border:1px solid rgba(198,40,40,.3);border-radius:10px;padding:1.2rem;margin-bottom:1rem">
+            <h4 style="font-size:.9rem;margin-bottom:.75rem;color:#ef9a9a">📄 T4A Summary (Contractors)</h4>
+            <div id="t4a-summary-table">
+              <div class="empty-state-sm">No contractor payments for this year.</div>
+            </div>
+          </div>
+
+          <!-- Income Statement -->
+          <div style="background:rgba(255,255,255,.03);border:1px solid var(--border-light);border-radius:10px;padding:1.2rem">
+            <h4 style="font-size:.9rem;margin-bottom:.75rem">📊 Income Statement (P&amp;L) — CRA T2125</h4>
+            <div id="income-statement-table">
+              <div class="empty-state-sm">Add transactions to generate income statement.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BACKDATE TAB -->
+      <div id="ptab-content-backdate" class="payroll-tab-content" style="display:none">
+        <div class="section-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <h3 class="section-title" style="margin:0">📅 3-Year Tax Backdate</h3>
+            <span style="font-size:.8rem;color:var(--text-muted)">Enter historical data for CRA compliance</span>
+          </div>
+          <div style="background:rgba(245,127,23,.1);border:1px solid rgba(245,127,23,.4);border-radius:8px;padding:1rem;margin-bottom:1.5rem;font-size:.85rem">
+            ⚠️ <strong>Important:</strong> Backdating allows you to enter historical financial data for previous tax years. Useful for catching up on bookkeeping. Each year card covers all CRA-required figures: Revenue, Expenses (by account), GST/HST, and Payroll slips. Always consult a CPA before filing amended returns with CRA.
+          </div>
+          <!-- Year cards rendered by JS -->
+          <div id="backdate-years-container">
+            <div class="empty-state-sm">Loading year cards...</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-payroll -->
+
+    <!-- ── ACCOUNTING & BOOKKEEPING ──────────────────────────────────────────── -->
+    <div id="page-accounting" class="page">
+      <div class="page-header">
+        <h1 class="page-title">📒 Accounting &amp; Bookkeeping</h1>
+        <div class="page-actions">
+          <button class="btn-secondary btn-sm" onclick="exportAcctReport()">⬇️ Export</button>
+          <button class="btn-primary btn-sm" onclick="openModal('add-journal-modal')">+ Journal Entry</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap;border-bottom:1px solid var(--border-light);padding-bottom:.75rem">
+        <button class="filter-btn active" id="acct-tab-overview" onclick="showAcctTab('overview',this)">📊 Overview</button>
+        <button class="filter-btn" id="acct-tab-journal" onclick="showAcctTab('journal',this)">📝 Journal Entries</button>
+        <button class="filter-btn" id="acct-tab-ar" onclick="showAcctTab('ar',this)">📥 Accounts Receivable</button>
+        <button class="filter-btn" id="acct-tab-ap" onclick="showAcctTab('ap',this)">📤 Accounts Payable</button>
+        <button class="filter-btn" id="acct-tab-reconcile" onclick="showAcctTab('reconcile',this)">🔄 Reconciliation</button>
+        <button class="filter-btn" id="acct-tab-trial" onclick="showAcctTab('trial',this)">⚖️ Trial Balance</button>
+        <button class="filter-btn" id="acct-tab-balance" onclick="showAcctTab('balance',this)">🏦 Balance Sheet</button>
+      </div>
+
+      <!-- OVERVIEW TAB -->
+      <div id="acct-content-overview">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem;margin-bottom:1.5rem" id="acct-kpi-cards"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;flex-wrap:wrap">
+          <div class="section-card">
+            <h3 class="section-title">Recent Journal Entries</h3>
+            <div id="acct-recent-journal"><div class="empty-state-sm">No entries yet.</div></div>
+          </div>
+          <div class="section-card">
+            <h3 class="section-title">Outstanding Balances</h3>
+            <div class="cra-line"><span>Total AR (owed to you)</span><span id="acct-ar-total" style="color:#66bb6a">$0.00</span></div>
+            <div class="cra-line"><span>Total AP (you owe)</span><span id="acct-ap-total" style="color:#ef5350">$0.00</span></div>
+            <div class="cra-line total"><span>Net Position</span><span id="acct-net-position">$0.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JOURNAL TAB -->
+      <div id="acct-content-journal" style="display:none">
+        <div class="section-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <h3 class="section-title" style="margin:0">General Journal</h3>
+            <div style="display:flex;gap:.5rem">
+              <select id="journal-filter-type" onchange="renderJournal()" style="padding:.35rem .6rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.8rem">
+                <option value="all">All Types</option>
+                <option value="revenue">Revenue</option>
+                <option value="expense">Expense</option>
+                <option value="asset">Asset</option>
+                <option value="liability">Liability</option>
+                <option value="equity">Equity</option>
+                <option value="adjustment">Adjustment</option>
+              </select>
+              <button class="btn-primary btn-sm" onclick="openModal('add-journal-modal')">+ New Entry</button>
+            </div>
+          </div>
+          <div id="journal-table-container"><div class="empty-state-sm">No journal entries yet.</div></div>
+        </div>
+      </div>
+
+      <!-- AR TAB -->
+      <div id="acct-content-ar" style="display:none">
+        <div class="section-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <h3 class="section-title" style="margin:0">Accounts Receivable</h3>
+            <button class="btn-primary btn-sm" onclick="openModal('add-ar-modal')">+ Add AR Entry</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;margin-bottom:1rem" id="ar-summary-cards"></div>
+          <div id="ar-table-container"><div class="empty-state-sm">No AR entries. Add invoices or manual AR entries.</div></div>
+        </div>
+      </div>
+
+      <!-- AP TAB -->
+      <div id="acct-content-ap" style="display:none">
+        <div class="section-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <h3 class="section-title" style="margin:0">Accounts Payable</h3>
+            <button class="btn-primary btn-sm" onclick="openModal('add-ap-modal')">+ Add AP Entry</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;margin-bottom:1rem" id="ap-summary-cards"></div>
+          <div id="ap-table-container"><div class="empty-state-sm">No AP entries. Add bills or manual AP entries.</div></div>
+        </div>
+      </div>
+
+      <!-- RECONCILIATION TAB -->
+      <div id="acct-content-reconcile" style="display:none">
+        <div class="section-card">
+          <h3 class="section-title">🔄 Bank Reconciliation</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+            <div>
+              <div class="form-group"><label>Bank Statement Ending Balance</label><input type="number" id="recon-bank-balance" placeholder="0.00" step="0.01" oninput="calcReconciliation()"></div>
+              <div class="form-group"><label>Statement Date</label><input type="date" id="recon-date"></div>
+              <div class="form-group"><label>Account Name</label><input type="text" id="recon-account-name" placeholder="e.g. RBC Chequing"></div>
+            </div>
+            <div>
+              <div class="form-group"><label>Book Balance (from ledger)</label><input type="number" id="recon-book-balance" placeholder="0.00" step="0.01" oninput="calcReconciliation()"></div>
+              <div class="form-group"><label>Outstanding Cheques (–)</label><input type="number" id="recon-outstanding-cheques" placeholder="0.00" step="0.01" oninput="calcReconciliation()"></div>
+              <div class="form-group"><label>Deposits in Transit (+)</label><input type="number" id="recon-deposits-transit" placeholder="0.00" step="0.01" oninput="calcReconciliation()"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Bank Errors / Fees (±)</label><input type="number" id="recon-bank-errors" placeholder="0.00" step="0.01" oninput="calcReconciliation()"></div>
+            <div class="form-group"><label>Book Errors / Omissions (±)</label><input type="number" id="recon-book-errors" placeholder="0.00" step="0.01" oninput="calcReconciliation()"></div>
+          </div>
+          <div class="cra-card" style="margin-top:1rem">
+            <h4>Reconciliation Result</h4>
+            <div class="cra-line"><span>Adjusted Bank Balance</span><span id="recon-adj-bank">$0.00</span></div>
+            <div class="cra-line"><span>Adjusted Book Balance</span><span id="recon-adj-book">$0.00</span></div>
+            <div class="cra-line total"><span>Difference</span><span id="recon-difference">$0.00</span></div>
+            <div id="recon-status" style="margin-top:.75rem;font-size:.9rem;font-weight:600"></div>
+          </div>
+          <div style="display:flex;gap:.75rem;margin-top:1rem">
+            <button class="btn-primary" onclick="saveReconciliation()">💾 Save Reconciliation</button>
+            <button class="btn-secondary" onclick="exportReconciliation()">⬇️ Export CSV</button>
+          </div>
+          <div style="margin-top:1.5rem">
+            <h4 style="font-size:.9rem;margin-bottom:.75rem">Reconciliation History</h4>
+            <div id="recon-history"><div class="empty-state-sm">No saved reconciliations yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRIAL BALANCE TAB -->
+      <div id="acct-content-trial" style="display:none">
+        <div class="section-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <h3 class="section-title" style="margin:0">⚖️ Trial Balance</h3>
+            <div style="display:flex;gap:.5rem">
+              <input type="date" id="trial-as-of" style="padding:.4rem .75rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.83rem">
+              <button class="btn-primary btn-sm" onclick="renderTrialBalance()">Generate</button>
+              <button class="btn-secondary btn-sm" onclick="exportTrialBalance()">⬇️ Export</button>
+            </div>
+          </div>
+          <div id="trial-balance-container"><div class="empty-state-sm">Set a date and click Generate.</div></div>
+        </div>
+      </div>
+
+      <!-- BALANCE SHEET TAB -->
+      <div id="acct-content-balance" style="display:none">
+        <div class="section-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <h3 class="section-title" style="margin:0">🏦 Balance Sheet</h3>
+            <div style="display:flex;gap:.5rem">
+              <input type="date" id="balance-as-of" style="padding:.4rem .75rem;background:var(--bg2);border:1px solid var(--border-light);border-radius:6px;color:var(--text);font-size:.83rem">
+              <button class="btn-primary btn-sm" onclick="renderBalanceSheetAcct()">Generate</button>
+              <button class="btn-secondary btn-sm" onclick="exportBalanceSheetAcct()">⬇️ Export</button>
+            </div>
+          </div>
+          <div id="balance-sheet-acct-container"><div class="empty-state-sm">Set a date and click Generate.</div></div>
+        </div>
+      </div>
+
+    </div><!-- /page-accounting -->
+
+
+    <!-- ── COMPLIANCE ─────────────────────────────────────── -->
+    <div id="page-compliance" class="page">
+      <div class="page-header">
+        <h1 class="page-title">Compliance</h1>
+        <div class="page-actions">
+          <button class="btn-secondary btn-sm" onclick="openModal('incident-modal')">⚠️ Report Incident</button>
+        </div>
+      </div>
+      <div class="compliance-grid">
+        <div class="section-card">
+          <h3 class="section-title">WCB Alberta</h3>
+          <div class="compliance-detail">
+            <div class="cd-item">
+              <span class="cd-label">Account Status</span>
+              <span class="cd-value badge-green">Active</span>
+            </div>
+            <div class="cd-item">
+              <span class="cd-label">Current Rate</span>
+              <span class="cd-value" id="wcb-rate">3.20% (Framing)</span>
+            </div>
+            <div class="cd-item">
+              <span class="cd-label">Next Filing</span>
+              <span class="cd-value">Mar 31, 2025</span>
+            </div>
+            <div class="cd-item">
+              <span class="cd-label">YTD Premiums</span>
+              <span class="cd-value" id="wcb-ytd">$0.00</span>
+            </div>
+          </div>
+        </div>
+        <div class="section-card">
+          <h3 class="section-title">Safety Training</h3>
+          <div id="training-list" class="training-list">
+            <div class="training-item current">
+              <span class="ti-icon">✅</span>
+              <div class="ti-info">
+                <span class="ti-name">WHMIS 2015</span>
+                <span class="ti-date">Expires: Dec 2025</span>
+              </div>
+              <span class="ti-status">Current</span>
+            </div>
+            <div class="training-item current">
+              <span class="ti-icon">✅</span>
+              <div class="ti-info">
+                <span class="ti-name">Fall Protection</span>
+                <span class="ti-date">Expires: Jun 2025</span>
+              </div>
+              <span class="ti-status">Current</span>
+            </div>
+            <div class="training-item expiring">
+              <span class="ti-icon">⚠️</span>
+              <div class="ti-info">
+                <span class="ti-name">First Aid Level 1</span>
+                <span class="ti-date">Expires: Feb 2025</span>
+              </div>
+              <span class="ti-status warning">Expiring</span>
+            </div>
+          </div>
+        </div>
+        <div class="section-card">
+          <h3 class="section-title">Building Permits</h3>
+          <div id="permits-list" class="empty-state-sm">No active permits</div>
+          <button class="btn-secondary btn-sm mt-2" onclick="openModal('permit-modal')">+ Add Permit</button>
+        </div>
+        <div class="section-card">
+          <h3 class="section-title">Safety Checklist</h3>
+          <div class="safety-checklist" id="safety-checklist">
+            <label class="check-item"><input type="checkbox"> Hard Hat worn on site</label>
+            <label class="check-item"><input type="checkbox"> Safety vest visible</label>
+            <label class="check-item"><input type="checkbox"> Steel toe boots</label>
+            <label class="check-item"><input type="checkbox"> Fall protection in place (>3m)</label>
+            <label class="check-item"><input type="checkbox"> WHMIS labels on chemicals</label>
+            <label class="check-item"><input type="checkbox"> First aid kit accessible</label>
+            <label class="check-item"><input type="checkbox"> Emergency contacts posted</label>
+            <label class="check-item"><input type="checkbox"> Toolbox talk completed</label>
+          </div>
+          <button class="btn-primary btn-sm mt-2" onclick="submitChecklist()">Submit Checklist</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DOCUMENTS ──────────────────────────────────────── -->
+    <div id="page-documents" class="page">
+      <div class="page-header">
+        <h1 class="page-title">📁 Documents</h1>
+        <div class="page-actions">
+          <button class="btn-primary btn-sm" onclick="openUploadDocModal()">+ Upload</button>
+        </div>
+      </div>
+
+      <!-- Search + Filter Bar -->
+      <div class="doc-toolbar">
+        <div class="doc-search-wrap">
+          <input type="text" id="doc-search" placeholder="🔍 Search documents..." 
+            oninput="filterDocuments('all', null, this.value)" class="doc-search-input">
+        </div>
+        <div class="doc-filter-tabs">
+          <button class="doc-cat active" id="doc-cat-all" onclick="filterDocuments('all', this)">All</button>
+          <button class="doc-cat" id="doc-cat-Blueprint" onclick="filterDocuments('Blueprint', this)">📐 Blueprints</button>
+          <button class="doc-cat" id="doc-cat-Contract" onclick="filterDocuments('Contract', this)">📄 Contracts</button>
+          <button class="doc-cat" id="doc-cat-Permit" onclick="filterDocuments('Permit', this)">🏛️ Permits</button>
+          <button class="doc-cat" id="doc-cat-Photo" onclick="filterDocuments('Photo', this)">📷 Photos</button>
+          <button class="doc-cat" id="doc-cat-Invoice" onclick="filterDocuments('Invoice', this)">🧾 Invoices</button>
+          <button class="doc-cat" id="doc-cat-Other" onclick="filterDocuments('Other', this)">📎 Other</button>
+        </div>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="doc-stats-bar" id="doc-stats-bar">
+        <span id="doc-count-label">0 documents</span>
+        <span class="doc-stat-sep">•</span>
+        <span id="doc-client-count-label">0 shared with clients</span>
+      </div>
+
+      <!-- Drop Zone (always visible) -->
+      <div id="doc-drop-zone-page" class="doc-drop-zone-page"
+        ondragover="event.preventDefault(); this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="handleDocumentDropPage(event)"
+        onclick="openUploadDocModal()">
+        <span>📂 Drop files here or click to upload</span>
+      </div>
+
+      <!-- Documents Grid -->
+      <div id="documents-grid" class="documents-grid">
+        <!-- Populated by renderDocuments() -->
+      </div>
+
+      <!-- Empty State (shown when no docs) -->
+      <div id="documents-empty" class="empty-state" style="display:none">
+        <div class="empty-icon">📁</div>
+        <h3>No Documents Yet</h3>
+        <p>Upload blueprints, contracts, permits, photos and more</p>
+        <button class="btn-primary" onclick="openUploadDocModal()">+ Upload First Document</button>
+      </div>
+    </div>
+
+    <!-- ── TIME TRACKING ──────────────────────────────────── -->
+    <div id="page-time-tracking" class="page">
+      <div class="page-header">
+        <h1 class="page-title">Time Tracking</h1>
+      </div>
+      <div class="section-card">
+        <h3 class="section-title">Log Time</h3>
+        <div class="time-logger">
+          <div class="timer-display" id="timer-display">00:00:00</div>
+          <div class="timer-controls">
+            <button class="btn-primary" id="timer-btn" onclick="toggleTimer()">▶ Start Timer</button>
+            <button class="btn-secondary" onclick="logManualTime()">+ Manual Entry</button>
+          </div>
+          <div class="form-row mt-2">
+            <div class="form-group">
+              <label>Project</label>
+              <select id="time-project">
+                <option value="">Select project...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Work Type</label>
+              <select id="time-type">
+                <option value="framing">Framing</option>
+                <option value="carpentry">Carpentry</option>
+                <option value="cleanup">Cleanup</option>
+                <option value="travel">Travel</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <input type="text" id="time-notes" placeholder="What did you work on?">
+          </div>
+        </div>
+      </div>
+      <div class="section-card">
+        <h3 class="section-title">This Week</h3>
+        <div id="time-entries" class="empty-state-sm">No time entries this week</div>
+      </div>
+    </div>
+
+    <!-- ── ADMIN SETTINGS ─────────────────────────────────── -->
+    <div id="page-admin-settings" class="page admin-only-page">
+      <div class="page-header">
+        <h1 class="page-title">⚙️ Admin Settings</h1>
+        <div class="page-actions">
+          <span class="admin-badge">Admin Only</span>
+        </div>
+      </div>
+
+      <div class="settings-tabs">
+        <button class="settings-tab active" onclick="showSettingsTab('branding')">🎨 Branding</button>
+        <button class="settings-tab" onclick="showSettingsTab('business')">🏢 Business</button>
+        <button class="settings-tab" onclick="showSettingsTab('ai-settings')">🤖 AI</button>
+        <button class="settings-tab" onclick="showSettingsTab('financial-settings')">💰 Financial</button>
+        <button class="settings-tab" onclick="showSettingsTab('compliance-settings')">✅ Compliance</button>
+        <button class="settings-tab" onclick="showSettingsTab('notifications-settings')">🔔 Notifications</button>
+        <button class="settings-tab" onclick="showSettingsTab('integrations-settings')">🔗 Integrations</button>
+        <button class="settings-tab" onclick="showSettingsTab('security-settings')">🔐 Security</button>
+      </div>
+
+      <!-- Branding Settings -->
+      <div id="settings-branding" class="settings-panel active">
+        <div class="section-card">
+          <h3 class="section-title">App Branding</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>App Name</label>
+              <input type="text" id="s-app-name" placeholder="Foreman">
+            </div>
+            <div class="form-group">
+              <label>Tagline</label>
+              <input type="text" id="s-tagline" placeholder="Your AI Construction Assistant">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Primary Color</label>
+              <div class="color-input-row">
+                <input type="color" id="s-primary-color" value="#FF6B35">
+                <input type="text" id="s-primary-color-text" placeholder="#FF6B35" oninput="syncColor('primary')">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Accent Color</label>
+              <div class="color-input-row">
+                <input type="color" id="s-accent-color" value="#4CAF50">
+                <input type="text" id="s-accent-color-text" placeholder="#4CAF50" oninput="syncColor('accent')">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Logo URL (optional)</label>
+            <input type="url" id="s-logo-url" placeholder="https://yourdomain.com/logo.png">
+          </div>
+          <div class="form-group">
+            <label>Font Family</label>
+            <select id="s-font">
+              <option value="Inter">Inter (Default)</option>
+              <option value="Roboto">Roboto</option>
+              <option value="Open Sans">Open Sans</option>
+              <option value="Poppins">Poppins</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Default Theme</label>
+            <select id="s-theme">
+              <option value="dark">Dark Mode</option>
+              <option value="light">Light Mode</option>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="saveBranding()">💾 Save Branding</button>
+        </div>
+      </div>
+
+      <!-- Business Settings -->
+      <div id="settings-business" class="settings-panel">
+        <div class="section-card">
+          <h3 class="section-title">Business Information</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Business Name</label>
+              <input type="text" id="s-biz-name" placeholder="Your Business Name">
+            </div>
+            <div class="form-group">
+              <label>Business Type</label>
+              <select id="s-biz-type">
+                <option value="framing">Framing</option>
+                <option value="carpentry">Carpentry</option>
+                <option value="general_contracting">General Contracting</option>
+                <option value="renovation">Renovation</option>
+                <option value="roofing">Roofing</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" id="s-biz-phone" placeholder="(780) 555-0100">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="s-biz-email" placeholder="info@yourbusiness.ca">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Address</label>
+            <input type="text" id="s-biz-address" placeholder="123 Main St, Edmonton, AB T5J 0N3">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>CRA Business Number</label>
+              <input type="text" id="s-biz-bn" placeholder="123456789RT0001">
+            </div>
+            <div class="form-group">
+              <label>WCB Account Number</label>
+              <input type="text" id="s-wcb-acct" placeholder="WCB Account #">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>GST/HST Number</label>
+            <input type="text" id="s-gst-num" placeholder="123456789RT0001">
+          </div>
+          <button class="btn-primary" onclick="saveBusiness()">💾 Save Business Info</button>
+        </div>
+      </div>
+
+      <!-- AI Settings -->
+      <div id="settings-ai-settings" class="settings-panel">
+        <div class="section-card">
+          <h3 class="section-title">AI Assistant Configuration</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Assistant Name</label>
+              <input type="text" id="s-ai-name" placeholder="Foreman">
+            </div>
+            <div class="form-group">
+              <label>Personality</label>
+              <select id="s-ai-personality">
+                <option value="professional">Professional</option>
+                <option value="friendly">Friendly & Casual</option>
+                <option value="concise">Concise & Direct</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Trade Focus</label>
+              <select id="s-ai-trade">
+                <option value="framing">Framing</option>
+                <option value="carpentry">Carpentry</option>
+                <option value="general_contracting">General Contracting</option>
+                <option value="renovation">Renovation</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Knowledge Level</label>
+              <select id="s-ai-knowledge">
+                <option value="expert">Expert</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="basic">Basic</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Greeting Message</label>
+            <textarea id="s-ai-greeting" rows="3" placeholder="Hi! I'm your construction AI assistant..."></textarea>
+          </div>
+          <div class="toggle-row">
+            <label>Voice Commands Enabled</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-ai-voice" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Proactive Suggestions</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-ai-proactive" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <button class="btn-primary" onclick="saveAISettings()">💾 Save AI Settings</button>
+        </div>
+      </div>
+
+      <!-- Financial Settings -->
+      <div id="settings-financial-settings" class="settings-panel">
+        <div class="section-card">
+          <h3 class="section-title">Financial Configuration</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>GST Rate (%)</label>
+              <input type="number" id="s-gst-rate" value="5" step="0.1" min="0" max="20">
+            </div>
+            <div class="form-group">
+              <label>Invoice Prefix</label>
+              <input type="text" id="s-inv-prefix" placeholder="INV">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Payment Terms</label>
+              <select id="s-payment-terms">
+                <option value="Due on receipt">Due on Receipt</option>
+                <option value="Net 15">Net 15</option>
+                <option value="Net 30">Net 30</option>
+                <option value="Net 45">Net 45</option>
+                <option value="Net 60">Net 60</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Late Fee (%)</label>
+              <input type="number" id="s-late-fee" value="2.0" step="0.5" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Default Labour Rate ($/hr)</label>
+              <input type="number" id="s-labour-rate" value="65" step="5">
+            </div>
+            <div class="form-group">
+              <label>Default Markup (%)</label>
+              <input type="number" id="s-markup" value="20" step="5">
+            </div>
+          </div>
+          <h4 class="subsection-title">WCB Premium Rates</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Framing Rate (%)</label>
+              <input type="number" id="s-wcb-framing" value="3.20" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Carpentry Rate (%)</label>
+              <input type="number" id="s-wcb-carpentry" value="2.80" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>General Rate (%)</label>
+              <input type="number" id="s-wcb-general" value="2.50" step="0.01">
+            </div>
+          </div>
+          <button class="btn-primary" onclick="saveFinancialSettings()">💾 Save Financial Settings</button>
+        </div>
+      </div>
+
+      <!-- Compliance Settings -->
+      <div id="settings-compliance-settings" class="settings-panel">
+        <div class="section-card">
+          <h3 class="section-title">Compliance Configuration</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Safety Inspection Frequency</label>
+              <select id="s-inspection-freq">
+                <option value="daily">Daily</option>
+                <option value="weekly" selected>Weekly</option>
+                <option value="bi-weekly">Bi-Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Toolbox Talk Frequency</label>
+              <select id="s-toolbox-freq">
+                <option value="daily">Daily</option>
+                <option value="weekly" selected>Weekly</option>
+                <option value="bi-weekly">Bi-Weekly</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Required Training (comma-separated)</label>
+            <input type="text" id="s-required-training" placeholder="WHMIS, Fall Protection, First Aid">
+          </div>
+          <div class="form-group">
+            <label>Required PPE (comma-separated)</label>
+            <input type="text" id="s-ppe-req" placeholder="Hard Hat, Safety Vest, Steel Toe Boots">
+          </div>
+          <div class="toggle-row">
+            <label>Incident Reporting Required</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-incident-req" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <button class="btn-primary" onclick="saveComplianceSettings()">💾 Save Compliance Settings</button>
+        </div>
+      </div>
+
+      <!-- Notifications Settings -->
+      <div id="settings-notifications-settings" class="settings-panel">
+        <div class="section-card">
+          <h3 class="section-title">Notification Settings</h3>
+          <div class="toggle-row">
+            <label>Email Notifications</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-notif-email">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Push Notifications</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-notif-push" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Notification Email</label>
+            <input type="email" id="s-notif-email-addr" placeholder="alerts@yourbusiness.ca">
+          </div>
+          <div class="toggle-row">
+            <label>Daily Summary Report</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-daily-summary" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Weekly Report</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-weekly-report" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <button class="btn-primary" onclick="saveNotificationSettings()">💾 Save Notification Settings</button>
+        </div>
+      </div>
+
+      <!-- Integrations Settings -->
+      <div id="settings-integrations-settings" class="settings-panel">
+        <div class="section-card">
+          <h3 class="section-title">Integrations</h3>
+          <div class="integration-item">
+            <div class="int-info">
+              <span class="int-icon">📧</span>
+              <div>
+                <div class="int-name">Gmail / Email</div>
+                <div class="int-desc">Auto-process incoming emails</div>
+              </div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-gmail-enabled">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-group" id="gmail-config">
+            <label>Connected Email</label>
+            <input type="email" id="s-email-addr" placeholder="your@gmail.com">
+          </div>
+          <div class="integration-item">
+            <div class="int-info">
+              <span class="int-icon">📁</span>
+              <div>
+                <div class="int-name">Google Drive</div>
+                <div class="int-desc">Auto-save documents and files</div>
+              </div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-gdrive-enabled">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="integration-item">
+            <div class="int-info">
+              <span class="int-icon">💳</span>
+              <div>
+                <div class="int-name">Stripe Payments</div>
+                <div class="int-desc">Accept online invoice payments</div>
+              </div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-stripe-enabled">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <button class="btn-primary" onclick="saveIntegrations()">💾 Save Integrations</button>
+        </div>
+      </div>
+
+      <!-- Security Settings -->
+      <div id="settings-security-settings" class="settings-panel">
+        <div class="section-card">
+          <h3 class="section-title">Security</h3>
+          <div class="form-group">
+            <label>New Admin Password</label>
+            <input type="password" id="s-new-pw" placeholder="New password (min 8 chars)">
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="s-confirm-pw" placeholder="Confirm new password">
+          </div>
+          <button class="btn-primary" onclick="changeAdminPassword()">🔐 Change Password</button>
+          <div class="divider"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Session Timeout (hours)</label>
+              <input type="number" id="s-session-timeout" value="8" min="1" max="72">
+            </div>
+            <div class="form-group">
+              <label>Max File Size (MB)</label>
+              <input type="number" id="s-max-file" value="10" min="1" max="100">
+            </div>
+          </div>
+          <div class="toggle-row">
+            <label>Allow New Registrations</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-allow-reg" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Require NDA Acceptance</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="s-require-nda" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <button class="btn-secondary" onclick="saveSecuritySettings()">💾 Save Security Settings</button>
+          <div class="danger-zone">
+            <h4>⚠️ Danger Zone</h4>
+            <button class="btn-danger" onclick="confirmReset()">🗑️ Reset All Data</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── USER MANAGEMENT ────────────────────────────────── -->
+    <div id="page-user-management" class="page admin-only-page">
+      <div class="page-header">
+        <h1 class="page-title">👥 User Management</h1>
+        <div class="page-actions">
+          <span class="admin-badge">Admin Only</span>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="users-header">
+          <div id="platform-stats" class="platform-stats">
+            <div class="ps-item"><span class="ps-val" id="ps-total">0</span><span class="ps-label">Total Users</span></div>
+            <div class="ps-item"><span class="ps-val green" id="ps-active">0</span><span class="ps-label">Active</span></div>
+            <div class="ps-item"><span class="ps-val orange" id="ps-starter">0</span><span class="ps-label">Starter</span></div>
+            <div class="ps-item"><span class="ps-val blue" id="ps-pro">0</span><span class="ps-label">Pro</span></div>
+          </div>
+        </div>
+        <div id="users-table" class="users-table">
+          <div class="empty-state-sm">Loading users...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BILLING ─────────────────────────────────────────── -->
+    <div id="page-billing" class="page admin-only-page">
+      <div class="page-header">
+        <h1 class="page-title">💰 Billing & Subscription</h1>
+      </div>
+      <div class="billing-plans">
+        <div class="plan-card" id="plan-starter">
+          <div class="plan-header">
+            <h3>Starter</h3>
+            <div class="plan-price">$49<span>/mo</span></div>
+          </div>
+          <ul class="plan-features">
+            <li>✅ 1 User</li>
+            <li>✅ 5 Projects</li>
+            <li>✅ AI Assistant</li>
+            <li>✅ Basic Invoicing</li>
+            <li>✅ Compliance Tracking</li>
+            <li>❌ Advanced Reports</li>
+            <li>❌ Payroll</li>
+          </ul>
+          <button class="btn-secondary" onclick="selectPlan('starter')">Current Plan</button>
+        </div>
+        <div class="plan-card featured" id="plan-professional">
+          <div class="plan-badge">Most Popular</div>
+          <div class="plan-header">
+            <h3>Professional</h3>
+            <div class="plan-price">$149<span>/mo</span></div>
+          </div>
+          <ul class="plan-features">
+            <li>✅ 5 Users</li>
+            <li>✅ Unlimited Projects</li>
+            <li>✅ AI Assistant</li>
+            <li>✅ Full Invoicing</li>
+            <li>✅ Advanced Reports</li>
+            <li>✅ Payroll</li>
+            <li>✅ Email AI</li>
+          </ul>
+          <button class="btn-primary" onclick="selectPlan('professional')">Upgrade</button>
+        </div>
+        <div class="plan-card" id="plan-business">
+          <div class="plan-header">
+            <h3>Business</h3>
+            <div class="plan-price">$299<span>/mo</span></div>
+          </div>
+          <ul class="plan-features">
+            <li>✅ 15 Users</li>
+            <li>✅ Unlimited Everything</li>
+            <li>✅ Priority AI</li>
+            <li>✅ Custom Branding</li>
+            <li>✅ API Access</li>
+            <li>✅ Dedicated Support</li>
+            <li>✅ White Label</li>
+          </ul>
+          <button class="btn-primary" onclick="selectPlan('business')">Upgrade</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PROFILE ─────────────────────────────────────────── -->
+    <div id="page-profile" class="page">
+      <div class="page-header">
+        <h1 class="page-title">My Profile</h1>
+        <div class="page-actions">
+          <button class="btn-primary btn-sm" onclick="saveProfile()">💾 Save All Changes</button>
+        </div>
+      </div>
+
+      <!-- Profile Photo + Identity -->
+      <div class="section-card">
+        <h3 class="section-title">Profile Photo & Identity</h3>
+        <div style="display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap">
+          <!-- Avatar area -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.75rem;min-width:140px">
+            <div id="profile-avatar-display" style="width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-light));display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;color:#fff;cursor:pointer;position:relative;overflow:hidden;border:3px solid var(--border-light)" onclick="document.getElementById('p-photo-input').click()">
+              <span id="profile-avatar-initial">A</span>
+              <img id="profile-avatar-img" src="" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0">
+              <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.5);text-align:center;font-size:.65rem;padding:.2rem;opacity:0;transition:.2s" id="avatar-hover-label">Change</div>
+            </div>
+            <input type="file" id="p-photo-input" accept="image/*" style="display:none" onchange="handleProfilePhoto(this)">
+            <button class="btn-secondary btn-sm" onclick="document.getElementById('p-photo-input').click()">📷 Upload Photo</button>
+            <button class="btn-secondary btn-sm" onclick="removeProfilePhoto()">🗑️ Remove</button>
+            <div style="font-size:.75rem;color:var(--text-muted);text-align:center">JPG, PNG, GIF<br>Max 5MB</div>
+          </div>
+          <!-- Avatar color picker -->
+          <div style="flex:1;min-width:200px">
+            <div class="form-group">
+              <label>Avatar Background Color</label>
+              <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.4rem" id="avatar-color-swatches">
+                <div class="avatar-swatch" style="background:linear-gradient(135deg,#1a237e,#3949ab)" onclick="setAvatarColor('linear-gradient(135deg,#1a237e,#3949ab)')"></div>
+                <div class="avatar-swatch" style="background:linear-gradient(135deg,#e65100,#ff6d00)" onclick="setAvatarColor('linear-gradient(135deg,#e65100,#ff6d00)')"></div>
+                <div class="avatar-swatch" style="background:linear-gradient(135deg,#1b5e20,#43a047)" onclick="setAvatarColor('linear-gradient(135deg,#1b5e20,#43a047)')"></div>
+                <div class="avatar-swatch" style="background:linear-gradient(135deg,#880e4f,#e91e63)" onclick="setAvatarColor('linear-gradient(135deg,#880e4f,#e91e63)')"></div>
+                <div class="avatar-swatch" style="background:linear-gradient(135deg,#4a148c,#9c27b0)" onclick="setAvatarColor('linear-gradient(135deg,#4a148c,#9c27b0)')"></div>
+                <div class="avatar-swatch" style="background:linear-gradient(135deg,#006064,#00bcd4)" onclick="setAvatarColor('linear-gradient(135deg,#006064,#00bcd4)')"></div>
+                <div class="avatar-swatch" style="background:linear-gradient(135deg,#bf360c,#ff5722)" onclick="setAvatarColor('linear-gradient(135deg,#bf360c,#ff5722)')"></div>
+                <div class="avatar-swatch" style="background:linear-gradient(135deg,#37474f,#78909c)" onclick="setAvatarColor('linear-gradient(135deg,#37474f,#78909c)')"></div>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top:.75rem">
+              <label>Display Initials</label>
+              <input type="text" id="p-initials" placeholder="e.g. JD" maxlength="3" style="max-width:80px" oninput="updateAvatarInitials(this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal Information -->
+      <div class="section-card">
+        <h3 class="section-title">Personal Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="p-name" placeholder="Your full name">
+          </div>
+          <div class="form-group">
+            <label>Display Name / Nickname</label>
+            <input type="text" id="p-display-name" placeholder="How you appear in the app">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" id="p-email" placeholder="your@email.com">
+            <div style="font-size:.75rem;color:var(--text-muted);margin-top:.25rem">Used for notifications and login</div>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="p-phone" placeholder="(780) 555-0100">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Job Title / Role</label>
+            <input type="text" id="p-job-title" placeholder="e.g. Site Foreman, Project Manager">
+          </div>
+          <div class="form-group">
+            <label>Company Role</label>
+            <select id="p-company-role">
+              <option value="owner">Owner / Principal</option>
+              <option value="foreman">Foreman</option>
+              <option value="pm">Project Manager</option>
+              <option value="estimator">Estimator</option>
+              <option value="admin">Office Admin</option>
+              <option value="accountant">Accountant / Bookkeeper</option>
+              <option value="field">Field Worker</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Province</label>
+            <select id="p-province">
+              <option value="AB">Alberta</option>
+              <option value="BC">British Columbia</option>
+              <option value="SK">Saskatchewan</option>
+              <option value="MB">Manitoba</option>
+              <option value="ON">Ontario</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Time Zone</label>
+            <select id="p-timezone">
+              <option value="MT">Mountain Time (Alberta)</option>
+              <option value="PT">Pacific Time (BC)</option>
+              <option value="CT">Central Time (SK/MB)</option>
+              <option value="ET">Eastern Time (ON/QC)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Bio / About</label>
+          <textarea id="p-bio" rows="2" placeholder="Brief description of your role or expertise..."></textarea>
+        </div>
+      </div>
+
+      <!-- Email Signature -->
+      <div class="section-card">
+        <h3 class="section-title">Email Signature</h3>
+        <div class="form-group">
+          <label>Signature Text</label>
+          <textarea id="p-signature" rows="4" placeholder="e.g.&#10;John Doe | Site Foreman&#10;JM Precision Contracting Ltd.&#10;780-555-0100 | john@jmprecision.ca"></textarea>
+        </div>
+        <div style="font-size:.8rem;color:var(--text-muted)">This signature will be appended to emails sent from the app.</div>
+      </div>
+
+      <!-- Social / Contact Links -->
+      <div class="section-card">
+        <h3 class="section-title">Contact & Social Links</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>LinkedIn Profile URL</label>
+            <input type="url" id="p-linkedin" placeholder="https://linkedin.com/in/yourname">
+          </div>
+          <div class="form-group">
+            <label>Website</label>
+            <input type="url" id="p-website" placeholder="https://yourcompany.ca">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Emergency Contact Name</label>
+            <input type="text" id="p-emergency-name" placeholder="Contact name">
+          </div>
+          <div class="form-group">
+            <label>Emergency Contact Phone</label>
+            <input type="tel" id="p-emergency-phone" placeholder="(780) 555-0000">
+          </div>
+        </div>
+      </div>
+
+      <!-- Security -->
+      <div class="section-card">
+        <h3 class="section-title">Security</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" id="p-current-pw" placeholder="Enter current password">
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="p-new-pw" placeholder="New password (min 8 chars)">
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" id="p-confirm-pw" placeholder="Repeat new password">
+          </div>
+        </div>
+        <button class="btn-secondary btn-sm" onclick="changePassword()">🔒 Change Password</button>
+      </div>
+
+      <!-- Preferences -->
+      <div class="section-card">
+        <h3 class="section-title">App Preferences</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Theme</label>
+            <select id="p-theme" onchange="applyTheme(this.value)">
+              <option value="dark">🌙 Dark Mode</option>
+              <option value="light">☀️ Light Mode</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Language</label>
+            <select id="p-language">
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Currency</label>
+            <select id="p-currency">
+              <option value="CAD">CAD – Canadian Dollar</option>
+              <option value="USD">USD – US Dollar</option>
+            </select>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <label>Push Notifications</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="p-push-notif" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <label>Email Notifications</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="p-email-notif">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <label>Show Dashboard Tips</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="p-show-tips" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div style="display:flex;gap:.75rem;margin-top:1rem;flex-wrap:wrap">
+          <button class="btn-primary" onclick="saveProfile()">💾 Save All Changes</button>
+          <button class="btn-secondary" onclick="savePreferences()">⚙️ Save Preferences Only</button>
+        </div>
+        <div class="restriction-notice" style="margin-top:1rem">
+          <span class="rn-icon">🔒</span>
+          <span>Business name, GST rates, and branding can only be changed by the Admin in Settings.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HELP ───────────────────────────────────────────── -->
+    <div id="page-help" class="page">
+      <div class="page-header">
+        <h1 class="page-title">Help & Support</h1>
+      </div>
+      <div class="help-grid">
+        <div class="section-card">
+          <h3 class="section-title">Quick Help</h3>
+          <div class="help-items">
+            <div class="help-item" onclick="sendQuickPrompt('How do I create an invoice?'); navigateTo('ai-chat')">
+              <span class="hi-icon">📄</span>
+              <div><strong>Creating Invoices</strong><p>Learn how to create and send invoices</p></div>
+            </div>
+            <div class="help-item" onclick="sendQuickPrompt('How do I track WCB compliance?'); navigateTo('ai-chat')">
+              <span class="hi-icon">✅</span>
+              <div><strong>WCB Compliance</strong><p>Understanding WCB requirements</p></div>
+            </div>
+            <div class="help-item" onclick="sendQuickPrompt('How do I file GST in Alberta?'); navigateTo('ai-chat')">
+              <span class="hi-icon">🧾</span>
+              <div><strong>GST Filing</strong><p>Alberta GST filing guide</p></div>
+            </div>
+            <div class="help-item" onclick="sendQuickPrompt('What permits do I need for construction in Alberta?'); navigateTo('ai-chat')">
+              <span class="hi-icon">📋</span>
+              <div><strong>Building Permits</strong><p>Alberta permit requirements</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="section-card">
+          <h3 class="section-title">Contact Support</h3>
+          <div class="support-options">
+            <div class="support-item">
+              <span>🤖</span>
+              <div><strong>AI Assistant</strong><p>Ask anything in the AI Chat</p></div>
+            </div>
+            <div class="support-item">
+              <span>📧</span>
+              <div><strong>Email Support</strong><p>support@foreman.ca</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation (Mobile) -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <a class="bn-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+      <span class="bn-icon">📊</span>
+      <span class="bn-label">Home</span>
+    </a>
+    <a class="bn-item" data-page="ai-chat" onclick="navigateTo('ai-chat')">
+      <span class="bn-icon">🤖</span>
+      <span class="bn-label">AI</span>
+    </a>
+    <a class="bn-item" data-page="invoices" onclick="navigateTo('invoices')">
+      <span class="bn-icon">📄</span>
+      <span class="bn-label">Invoices</span>
+    </a>
+    <a class="bn-item" data-page="projects" onclick="navigateTo('projects')">
+      <span class="bn-icon">🏗️</span>
+      <span class="bn-label">Projects</span>
+    </a>
+    <a class="bn-item" data-page="compliance" onclick="navigateTo('compliance')">
+      <span class="bn-icon">✅</span>
+      <span class="bn-label">Safety</span>
+    </a>
+  </nav>
+
+  <!-- Floating AI Button (mobile) -->
+  <button class="fab-ai" onclick="navigateTo('ai-chat')" title="AI Assistant">🤖</button>
+
+</div><!-- end main-app -->
+
+<!-- ═══════════════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════════════ -->
+
+<!-- New Invoice Modal -->
+<div id="new-invoice-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:780px;width:95vw">
+    <div class="modal-header">
+      <h3>📄 Invoice Builder</h3>
+      <button class="modal-close" onclick="closeModal('new-invoice-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Bill To (Customer Name) *</label>
+          <input type="text" id="inv-customer" placeholder="Customer or company name">
+        </div>
+        <div class="form-group">
+          <label>Project</label>
+          <select id="inv-project">
+            <option value="">Select project...</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Invoice Date</label>
+          <input type="date" id="inv-date">
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="inv-due-date">
+        </div>
+        <div class="form-group">
+          <label>Payment Terms</label>
+          <select id="inv-terms">
+            <option value="net30">Net 30</option>
+            <option value="net15">Net 15</option>
+            <option value="net7">Net 7</option>
+            <option value="due_on_receipt">Due on Receipt</option>
+            <option value="net60">Net 60</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin:1rem 0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+          <strong style="font-size:.9rem">Line Items</strong>
+          <button class="btn-secondary btn-sm" onclick="addInvoiceLine()" style="font-size:.8rem;padding:.3rem .8rem">+ Add Line</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:.85rem" id="inv-lines-table">
+            <thead>
+              <tr style="background:rgba(255,255,255,.05)">
+                <th style="padding:.5rem .4rem;text-align:left;min-width:180px">Description</th>
+                <th style="padding:.5rem .4rem;text-align:center;width:70px">Qty</th>
+                <th style="padding:.5rem .4rem;text-align:center;width:60px">Unit</th>
+                <th style="padding:.5rem .4rem;text-align:right;width:100px">Rate ($)</th>
+                <th style="padding:.5rem .4rem;text-align:right;width:100px">Price ($)</th>
+                <th style="padding:.5rem .4rem;text-align:center;width:60px">GST</th>
+                <th style="padding:.5rem .4rem;width:36px"></th>
+              </tr>
+            </thead>
+            <tbody id="inv-lines-body"></tbody>
+          </table>
+        </div>
+        <button class="btn-secondary btn-sm" onclick="addInvoiceLine()" style="font-size:.8rem;padding:.3rem .8rem;margin-top:.5rem;width:100%">+ Add Another Line</button>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:1rem">
+        <div style="min-width:280px;background:rgba(255,255,255,.04);border-radius:8px;padding:1rem">
+          <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;font-size:.88rem">
+            <span>Subtotal</span><span id="inv-subtotal">$0.00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;font-size:.88rem;color:#8b949e">
+            <span>GST (5%)</span><span id="inv-gst-total">$0.00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:1.05rem;font-weight:700;border-top:1px solid rgba(255,255,255,.1);padding-top:.5rem;margin-top:.5rem">
+            <span>Total</span><span id="inv-grand-total" style="color:#ff6f00">$0.00</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:1rem">
+        <label>Notes / Terms</label>
+        <textarea id="inv-notes" rows="2" placeholder="Payment instructions, thank you note, etc."></textarea>
+      </div>
+    </div>
+    
+      <!-- Scope of Work Checklist Section -->
+      <div class="form-section" style="margin-top:20px;border-top:1px solid #e0e0e0;padding-top:15px">
+        <h4 style="margin:0 0 10px 0;font-size:1rem;font-weight:600">📋 Scope of Work Checklist</h4>
+        <p style="font-size:0.85rem;color:#666;margin-bottom:10px">Add checklist items to track project progress.</p>
+        <div id="proj-sow-container" style="max-height:200px;overflow-y:auto">
+          <p style="color:#999;font-style:italic">No scope items added yet</p>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <input type="text" id="proj-new-sow" placeholder="Add new scope item..." style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px">
+          <button type="button" class="btn-secondary" onclick="addScopeOfWorkItem('add')" style="padding:8px 16px;cursor:pointer">+ Add Item</button>
+        </div>
+      </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('new-invoice-modal')">Cancel</button>
+      <button class="btn-primary" onclick="createInvoice()">💾 Create Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Expense Modal -->
+<div id="new-expense-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>💳 Add Expense</h3>
+      <button class="modal-close" onclick="closeModal('new-expense-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Description *</label>
+          <input type="text" id="exp-desc" placeholder="What was this expense for?">
+        </div>
+        <div class="form-group">
+          <label>Amount (incl. GST) *</label>
+          <input type="number" id="exp-amount" placeholder="0.00" step="0.01" oninput="calcExpenseGST()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>GST Paid</label>
+          <input type="number" id="exp-gst" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="exp-category">
+            <option value="5000">Materials - Lumber</option>
+            <option value="5010">Materials - Hardware</option>
+            <option value="5020">Materials - Plywood/OSB</option>
+            <option value="5030">Materials - Other</option>
+            <option value="5100">Subcontractors</option>
+            <option value="6100">Vehicle Expenses</option>
+            <option value="6110">Tools & Equipment</option>
+            <option value="6200">Insurance</option>
+            <option value="6210">Licenses & Permits</option>
+            <option value="6310">Phone & Internet</option>
+            <option value="6320">Software & Subscriptions</option>
+            <option value="6400">Advertising</option>
+            <option value="6500">Professional Fees</option>
+            <option value="6600">Meals & Entertainment</option>
+            <option value="6999">Miscellaneous</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="exp-date">
+      </div>
+      <div class="form-group">
+        <label>Paid From</label>
+        <select id="exp-paid-from">
+          <option value="1010">Chequing Account</option>
+          <option value="2010">Credit Card</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('new-expense-modal')">Cancel</button>
+      <button class="btn-primary" onclick="createExpense()">Add Expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Project Modal -->
+<div id="new-project-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:680px;width:95vw">
+    <div class="modal-header">
+      <h3>🏗️ New Project</h3>
+      <button class="modal-close" onclick="closeModal('new-project-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Project Name *</label>
+        <input type="text" id="proj-name" placeholder="e.g., Smith Residence Framing">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Client Name</label>
+          <input type="text" id="proj-client" placeholder="Client name">
+        </div>
+        <div class="form-group">
+          <label>Client Email</label>
+          <input type="email" id="proj-client-email" placeholder="client@email.com">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Project Type / Trade *</label>
+          <select id="proj-trade">
+            <optgroup label="Structural">
+              <option value="framing">Framing</option>
+              <option value="concrete">Concrete &amp; Formwork</option>
+              <option value="masonry">Masonry &amp; Bricklaying</option>
+              <option value="ironwork">Structural Ironwork / Steel</option>
+              <option value="welding">Welding &amp; Fabrication</option>
+              <option value="boilermaking">Boilermaking</option>
+            </optgroup>
+            <optgroup label="Mechanical / Electrical">
+              <option value="electrical">Electrical</option>
+              <option value="plumbing">Plumbing</option>
+              <option value="hvac">HVAC / Sheet Metal</option>
+              <option value="pipefitting">Pipefitting</option>
+              <option value="refrigeration">Refrigeration &amp; AC</option>
+              <option value="sprinkler">Sprinkler Systems</option>
+              <option value="elevator">Elevator Installation</option>
+              <option value="powerline">Powerline Technician</option>
+              <option value="instrumentation">Instrumentation &amp; Controls</option>
+              <option value="industrial_mechanic">Industrial Mechanic (Millwright)</option>
+            </optgroup>
+            <optgroup label="Interior / Finishing">
+              <option value="carpentry">Carpentry &amp; Joinery</option>
+              <option value="drywall">Drywall &amp; Plastering</option>
+              <option value="painting">Painting &amp; Decorating</option>
+              <option value="flooring">Flooring Installation</option>
+              <option value="tile_setting">Tile Setting</option>
+              <option value="insulation">Insulation</option>
+              <option value="glazing">Glazing &amp; Window Installation</option>
+              <option value="cabinet_making">Cabinet Making &amp; Millwork</option>
+            </optgroup>
+            <optgroup label="Exterior / Civil">
+              <option value="roofing">Roofing</option>
+              <option value="landscaping">Landscaping &amp; Hardscaping</option>
+              <option value="excavation">Excavation &amp; Grading</option>
+              <option value="demolition">Demolition</option>
+              <option value="surveying">Surveying</option>
+            </optgroup>
+            <optgroup label="Heavy Industry">
+              <option value="crane_operation">Crane Operation</option>
+              <option value="heavy_equipment">Heavy Equipment Operation</option>
+              <option value="telecommunications">Telecommunications</option>
+            </optgroup>
+            <optgroup label="General">
+              <option value="renovation">General Renovation</option>
+              <option value="general_contracting">General Contracting</option>
+              <option value="other">Other</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Contract Value ($)</label>
+          <input type="number" id="proj-budget" placeholder="0.00" step="0.01">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="date" id="proj-start">
+        </div>
+        <div class="form-group">
+          <label>Scheduled Finish Date</label>
+          <input type="date" id="proj-finish">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Status</label>
+          <select id="proj-status">
+            <option value="pending">Pending</option>
+            <option value="active" selected>Active</option>
+            <option value="on_hold">On Hold</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Address / Location</label>
+          <input type="text" id="proj-address" placeholder="Job site address">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description / Scope of Work</label>
+        <textarea id="proj-desc" rows="3" placeholder="Project details, scope of work..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('new-project-modal')">Cancel</button>
+      <button class="btn-primary" onclick="createProject()">🏗️ Create Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- Estimate Modal -->
+<div id="new-estimate-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:780px;width:95vw">
+    <div class="modal-header">
+      <h3>📋 New Estimate / Quote</h3>
+      <button class="modal-close" onclick="closeModal('new-estimate-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Client Name *</label>
+          <input type="text" id="est-customer" placeholder="Customer or company name">
+        </div>
+        <div class="form-group">
+          <label>Project / Job Description</label>
+          <input type="text" id="est-project-desc" placeholder="Brief description of work">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Estimate Date</label>
+          <input type="date" id="est-date">
+        </div>
+        <div class="form-group">
+          <label>Valid Until</label>
+          <input type="date" id="est-valid-until">
+        </div>
+      </div>
+      <div style="margin:1rem 0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+          <strong style="font-size:.9rem">Line Items</strong>
+          <button class="btn-secondary btn-sm" onclick="addEstimateLine()" style="font-size:.8rem;padding:.3rem .8rem">+ Add Line</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:.85rem" id="est-lines-table">
+            <thead>
+              <tr style="background:rgba(255,255,255,.05)">
+                <th style="padding:.5rem .4rem;text-align:left;min-width:180px">Description</th>
+                <th style="padding:.5rem .4rem;text-align:center;width:70px">Qty</th>
+                <th style="padding:.5rem .4rem;text-align:center;width:60px">Unit</th>
+                <th style="padding:.5rem .4rem;text-align:right;width:100px">Rate ($)</th>
+                <th style="padding:.5rem .4rem;text-align:right;width:100px">Price ($)</th>
+                <th style="padding:.5rem .4rem;text-align:center;width:60px">GST</th>
+                <th style="padding:.5rem .4rem;width:36px"></th>
+              </tr>
+            </thead>
+            <tbody id="est-lines-body"></tbody>
+          </table>
+        </div>
+        <button class="btn-secondary btn-sm" onclick="addEstimateLine()" style="font-size:.8rem;padding:.3rem .8rem;margin-top:.5rem;width:100%">+ Add Another Line</button>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:1rem">
+        <div style="min-width:280px;background:rgba(255,255,255,.04);border-radius:8px;padding:1rem">
+          <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;font-size:.88rem">
+            <span>Subtotal</span><span id="est-subtotal">$0.00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;font-size:.88rem;color:#8b949e">
+            <span>GST (5%)</span><span id="est-gst-total">$0.00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:1.05rem;font-weight:700;border-top:1px solid rgba(255,255,255,.1);padding-top:.5rem;margin-top:.5rem">
+            <span>Total</span><span id="est-grand-total" style="color:#ff6f00">$0.00</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:1rem">
+        <label>Notes / Terms</label>
+        <textarea id="est-notes" rows="2" placeholder="Validity period, payment terms, exclusions..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('new-estimate-modal')">Cancel</button>
+      <button class="btn-primary" onclick="createEstimate()">📋 Create Estimate</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast hidden">
+  <span id="toast-icon">✅</span>
+  <span id="toast-msg">Success</span>
+</div>
+
+<!-- AI Floating Panel -->
+<div id="ai-panel" class="ai-panel hidden">
+  <div class="ai-panel-header">
+    <span>🤖 Quick AI</span>
+    <button onclick="toggleAIPanel()">✕</button>
+  </div>
+  <div class="ai-panel-body">
+    <div id="ai-panel-messages" class="ai-panel-msgs"></div>
+    <div class="ai-panel-input">
+      <input type="text" id="ai-panel-input" placeholder="Quick question..." onkeydown="handlePanelKey(event)">
+      <button onclick="sendPanelMessage()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ADD EMPLOYEE MODAL -->
+<!-- ============================================================ -->
+<div id="add-employee-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:560px;width:95vw">
+    <div class="modal-header">
+      <h3>👷 Add Employee</h3>
+      <button class="modal-close" onclick="closeModal('add-employee-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="emp-name" placeholder="First Last">
+        </div>
+        <div class="form-group">
+          <label>SIN (last 3 digits for records)</label>
+          <input type="text" id="emp-sin" placeholder="XXX-XXX-XXX" maxlength="11">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Trade / Role</label>
+          <select id="emp-trade">
+            <option value="framing">Framing (WCB 3.20%)</option>
+            <option value="carpentry">Carpentry (WCB 2.80%)</option>
+            <option value="electrical">Electrical (WCB 2.10%)</option>
+            <option value="plumbing">Plumbing (WCB 2.10%)</option>
+            <option value="hvac">HVAC (WCB 2.40%)</option>
+            <option value="roofing">Roofing (WCB 4.80%)</option>
+            <option value="concrete">Concrete (WCB 3.50%)</option>
+            <option value="drywall">Drywall (WCB 2.60%)</option>
+            <option value="painting">Painting (WCB 2.20%)</option>
+            <option value="excavation">Excavation (WCB 3.80%)</option>
+            <option value="general">General Labour (WCB 2.50%)</option>
+            <option value="supervisor">Supervisor/Foreman (WCB 1.80%)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Pay Type</label>
+          <select id="emp-pay-type">
+            <option value="hourly">Hourly</option>
+            <option value="salary">Salary</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Rate ($/hr or annual salary)</label>
+          <input type="number" id="emp-rate" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Province</label>
+          <select id="emp-province">
+            <option value="AB">Alberta</option>
+            <option value="BC">British Columbia</option>
+            <option value="SK">Saskatchewan</option>
+            <option value="MB">Manitoba</option>
+            <option value="ON">Ontario</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="emp-email" placeholder="employee@email.com">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="emp-phone" placeholder="780-555-0000">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="date" id="emp-start-date">
+        </div>
+        <div class="form-group">
+          <label>TD1 Claim Code</label>
+          <select id="emp-td1">
+            <option value="1">Code 1 – Basic personal amount</option>
+            <option value="2">Code 2</option>
+            <option value="3">Code 3</option>
+            <option value="0">Code 0 – No claim</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="emp-notes" rows="2" placeholder="Certifications, notes..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('add-employee-modal')">Cancel</button>
+      <button class="btn-primary" onclick="saveEmployee()">✅ Save Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ADD CONTRACTOR MODAL -->
+<!-- ============================================================ -->
+<div id="add-contractor-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:560px;width:95vw">
+    <div class="modal-header">
+      <h3>🔨 Add Contractor / Subcontractor</h3>
+      <button class="modal-close" onclick="closeModal('add-contractor-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:rgba(255,111,0,.08);border:1px solid rgba(255,111,0,.3);border-radius:8px;padding:.75rem 1rem;font-size:.83rem;margin-bottom:1rem;color:#ffa726">
+        ⚠️ <strong>CRA T4A Required</strong> for payments over $500/year. Contractors must provide their own WCB or be added to yours.
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Business / Person Name *</label>
+          <input type="text" id="con-name" placeholder="Name or company">
+        </div>
+        <div class="form-group">
+          <label>Business Number (BN) / SIN</label>
+          <input type="text" id="con-bn" placeholder="123456789 or SIN">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Trade / Service</label>
+          <select id="con-trade">
+            <option value="framing">Framing</option>
+            <option value="carpentry">Carpentry</option>
+            <option value="electrical">Electrical</option>
+            <option value="plumbing">Plumbing</option>
+            <option value="hvac">HVAC</option>
+            <option value="roofing">Roofing</option>
+            <option value="concrete">Concrete</option>
+            <option value="drywall">Drywall</option>
+            <option value="painting">Painting</option>
+            <option value="excavation">Excavation</option>
+            <option value="general">General Labour</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Default Rate ($/hr or flat)</label>
+          <input type="number" id="con-rate" placeholder="0.00" step="0.01">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="con-email" placeholder="contractor@email.com">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="con-phone" placeholder="780-555-0000">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>GST/HST Registered?</label>
+          <select id="con-gst">
+            <option value="yes">Yes – charges GST</option>
+            <option value="no">No – small supplier</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>WCB Coverage</label>
+          <select id="con-wcb">
+            <option value="own">Has own WCB</option>
+            <option value="ours">Add to our WCB</option>
+            <option value="none">None / Unknown</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Address (for T4A)</label>
+        <input type="text" id="con-address" placeholder="123 Main St, Edmonton, AB T5A 0A1">
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="con-notes" rows="2" placeholder="License numbers, certifications..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('add-contractor-modal')">Cancel</button>
+      <button class="btn-primary" onclick="saveContractor()">✅ Save Contractor</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ADD TRANSACTION MODAL -->
+<!-- ============================================================ -->
+<div id="add-transaction-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:560px;width:95vw">
+    <div class="modal-header">
+      <h3>💳 Add Transaction / Journal Entry</h3>
+      <button class="modal-close" onclick="closeModal('add-transaction-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" id="txn-date">
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="txn-type" onchange="updateTxnAccounts()">
+            <option value="expense">Expense / Payment</option>
+            <option value="income">Income / Revenue</option>
+            <option value="transfer">Transfer</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Account *</label>
+          <select id="txn-account">
+            <optgroup label="Income">
+              <option value="100">100 – Sales</option>
+              <option value="101">101 – Affiliate Income</option>
+              <option value="102">102 – Returns &amp; Allowances</option>
+            </optgroup>
+            <optgroup label="Expenses">
+              <option value="200">200 – Advertising &amp; Marketing</option>
+              <option value="201">201 – Contract Labour</option>
+              <option value="202">202 – Insurance</option>
+              <option value="203">203 – Legal &amp; Professional</option>
+              <option value="204">204 – Office &amp; Admin</option>
+              <option value="205">205 – Wages &amp; Salaries</option>
+              <option value="206">206 – Meals &amp; Entertainment</option>
+              <option value="207">207 – Software &amp; Subscriptions</option>
+              <option value="208">208 – Fleet Fuel</option>
+              <option value="209">209 – Equipment Fuel</option>
+              <option value="210">210 – Consumables &amp; Supplies</option>
+              <option value="211">211 – Other Expenses</option>
+              <option value="212">212 – Equipment Rentals</option>
+              <option value="213">213 – Loan Payments</option>
+              <option value="214">214 – Fleet Maintenance</option>
+            </optgroup>
+            <optgroup label="Other Non-P&amp;L">
+              <option value="300">300 – Owner's Contribution</option>
+              <option value="301">301 – Owner's Draws</option>
+              <option value="302">302 – Transfers Between Accounts</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Pay Period</label>
+          <select id="txn-period">
+            <option value="sept-oct-2024">Sept–Oct Cheq 2024</option>
+            <option value="oct-nov-2024">Oct–Nov Cheq 2024</option>
+            <option value="nov-dec-2024">Nov–Dec Cheq 2024</option>
+            <option value="dec-jan-2025">Dec–Jan Cheq 2025</option>
+            <option value="custom">Custom Period</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Amount ($) *</label>
+          <input type="number" id="txn-amount" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>GST Included?</label>
+          <select id="txn-gst">
+            <option value="no">No GST</option>
+            <option value="yes">Yes – includes 5% GST</option>
+            <option value="itc">Yes – ITC claimable</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Payee / Vendor</label>
+          <input type="text" id="txn-payee" placeholder="Who was paid / who paid you">
+        </div>
+        <div class="form-group">
+          <label>Reference / Cheque #</label>
+          <input type="text" id="txn-ref" placeholder="Cheque #, invoice #, etc.">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="txn-desc" placeholder="Brief description of transaction">
+      </div>
+      <div class="form-group">
+        <label>Project (optional)</label>
+        <select id="txn-project">
+          <option value="">— No project —</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('add-transaction-modal')">Cancel</button>
+      <button class="btn-primary" onclick="addManualTransaction()">✅ Save Transaction</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ADD JOURNAL ENTRY MODAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="add-journal-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📝 Add Journal Entry</h3>
+      <button class="modal-close" onclick="closeModal('add-journal-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" id="je-date">
+        </div>
+        <div class="form-group">
+          <label>Entry Type *</label>
+          <select id="je-type">
+            <option value="revenue">Revenue / Income</option>
+            <option value="expense">Expense</option>
+            <option value="asset">Asset</option>
+            <option value="liability">Liability</option>
+            <option value="equity">Equity</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description *</label>
+        <input type="text" id="je-description" placeholder="e.g. Invoice payment received from ABC Corp">
+      </div>
+      <div class="form-group">
+        <label>Account</label>
+        <input type="text" id="je-account" placeholder="e.g. Cash, Accounts Receivable, Revenue 101">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Debit Amount ($)</label>
+          <input type="number" id="je-debit" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Credit Amount ($)</label>
+          <input type="number" id="je-credit" placeholder="0.00" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Reference #</label>
+          <input type="text" id="je-reference" placeholder="Invoice #, cheque #, etc.">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="je-notes" rows="2" placeholder="Additional notes..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('add-journal-modal')">Cancel</button>
+      <button class="btn-primary" onclick="saveJournalEntry()">✅ Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ADD AR ENTRY MODAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="add-ar-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📥 Add Accounts Receivable Entry</h3>
+      <button class="modal-close" onclick="closeModal('add-ar-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" id="ar-date">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="ar-status">
+            <option value="outstanding">Outstanding</option>
+            <option value="partial">Partial Payment</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+            <option value="written-off">Written Off</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Customer / Client *</label>
+        <input type="text" id="ar-customer" placeholder="Customer name">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="ar-description" placeholder="e.g. Framing work — Phase 2">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Amount ($) *</label>
+          <input type="number" id="ar-amount" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="ar-due-date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Invoice Reference #</label>
+        <input type="text" id="ar-invoice-ref" placeholder="INV-001">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('add-ar-modal')">Cancel</button>
+      <button class="btn-primary" onclick="saveAREntry()">✅ Save AR Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ADD AP ENTRY MODAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="add-ap-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📤 Add Accounts Payable Entry</h3>
+      <button class="modal-close" onclick="closeModal('add-ap-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" id="ap-date">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="ap-status">
+            <option value="outstanding">Outstanding</option>
+            <option value="partial">Partial Payment</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+            <option value="disputed">Disputed</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Vendor / Supplier *</label>
+        <input type="text" id="ap-vendor" placeholder="Vendor name">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="ap-description" placeholder="e.g. Lumber delivery — Site A">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Amount ($) *</label>
+          <input type="number" id="ap-amount" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="ap-due-date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Bill / PO Reference #</label>
+        <input type="text" id="ap-bill-ref" placeholder="BILL-001 or PO-001">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('add-ap-modal')">Cancel</button>
+      <button class="btn-primary" onclick="saveAPEntry()">✅ Save AP Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- Permit Modal -->
+<div id="permit-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>🏗️ Add Building Permit</h3>
+      <button class="modal-close" onclick="closeModal('permit-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Permit Type *</label>
+          <select id="permit-type">
+            <option value="building">Building Permit</option>
+            <option value="electrical">Electrical Permit</option>
+            <option value="plumbing">Plumbing Permit</option>
+            <option value="mechanical">Mechanical/HVAC Permit</option>
+            <option value="demolition">Demolition Permit</option>
+            <option value="development">Development Permit</option>
+            <option value="grading">Grading Permit</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Permit Number *</label>
+          <input type="text" id="permit-number" placeholder="e.g. BP-2024-00123">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Project Address *</label>
+        <input type="text" id="permit-address" placeholder="e.g. 123 Main St, Calgary, AB">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Issue Date *</label>
+          <input type="date" id="permit-issue-date">
+        </div>
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="date" id="permit-expiry-date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Issuing Authority</label>
+        <input type="text" id="permit-authority" placeholder="e.g. City of Calgary" value="City of Calgary">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('permit-modal')">Cancel</button>
+      <button class="btn-primary" onclick="savePermit()">✅ Save Permit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Incident Modal -->
+<div id="incident-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>⚠️ Report Safety Incident</h3>
+      <button class="modal-close" onclick="closeModal('incident-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Incident Date *</label>
+          <input type="date" id="incident-date">
+        </div>
+        <div class="form-group">
+          <label>Severity *</label>
+          <select id="incident-severity">
+            <option value="minor">Minor</option>
+            <option value="moderate">Moderate</option>
+            <option value="serious">Serious</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Incident Type *</label>
+          <select id="incident-type">
+            <option value="near_miss">Near Miss</option>
+            <option value="injury">Injury</option>
+            <option value="property_damage">Property Damage</option>
+            <option value="environmental">Environmental</option>
+            <option value="vehicle">Vehicle Incident</option>
+            <option value="fire">Fire/Electrical</option>
+            <option value="fall">Fall/Slip</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Location *</label>
+          <input type="text" id="incident-location" placeholder="e.g. Site A - Main Floor">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea id="incident-description" rows="3" placeholder="Describe what happened..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Immediate Actions Taken</label>
+        <textarea id="incident-actions" rows="2" placeholder="Describe immediate actions taken..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Injuries (if any)</label>
+          <input type="text" id="incident-injuries" placeholder="e.g. Minor cut to left hand">
+        </div>
+        <div class="form-group">
+          <label>Witnesses</label>
+          <input type="text" id="incident-witnesses" placeholder="e.g. John D., Mike S.">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('incident-modal')">Cancel</button>
+      <button class="btn-primary" onclick="saveIncident()">✅ Submit Report</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+
+<!-- Edit Project Modal -->
+<div id="modal-edit-project" class="modal-overlay hidden">
+  <div class="modal" style="max-width:800px;width:95vw">
+    <div class="modal-header">
+      <h3>Edit Project</h3>
+      <span class="close-modal" onclick="closeModal('modal-edit-project')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Project Name *</label>
+          <input type="text" id="edit-proj-name" placeholder="Enter project name">
+        </div>
+        <div class="form-group">
+          <label>Client Name *</label>
+          <input type="text" id="edit-proj-client" placeholder="Enter client name">
+        </div>
+        <div class="form-group">
+          <label>Client Email</label>
+          <input type="email" id="edit-proj-client-email" placeholder="client@email.com">
+        </div>
+        <div class="form-group">
+          <label>Project Type</label>
+          <select id="edit-proj-type">
+            <option value="Residential">Residential</option>
+            <option value="Commercial">Commercial</option>
+            <option value="Industrial">Industrial</option>
+            <option value="Renovation">Renovation</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Contract Value ($)</label>
+          <input type="number" id="edit-proj-value" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="edit-proj-status">
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="On Hold">On Hold</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="date" id="edit-proj-start">
+        </div>
+        <div class="form-group">
+          <label>Expected Finish Date *</label>
+          <input type="date" id="edit-proj-finish">
+        </div>
+        <div class="form-group full-width">
+          <label>Address</label>
+          <input type="text" id="edit-proj-address" placeholder="Project address">
+        </div>
+        <div class="form-group full-width">
+          <label>Description</label>
+          <textarea id="edit-proj-desc" rows="3" placeholder="Project description"></textarea>
+        </div>
+      </div>
+      
+      <!-- Scope of Work Section -->
+      <div class="form-section" style="margin-top:20px">
+        <h4>Scope of Work Checklist</h4>
+        <div id="edit-proj-sow-container"></div>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <input type="text" id="edit-proj-new-sow" placeholder="Add new scope item..." style="flex:1">
+          <button type="button" class="btn btn-secondary" onclick="addScopeOfWorkItem('edit')">Add Item</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <input type="hidden" id="edit-proj-id">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-project')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditedProject()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Project Details Modal -->
+<div id="modal-project-details" class="modal-overlay hidden">
+  <div class="modal" style="max-width:600px;width:95vw">
+    <div class="modal-header">
+      <h3 id="proj-details-title">Project Details</h3>
+      <span class="close-modal" onclick="closeModal('modal-project-details')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div id="proj-details-info"></div>
+      <h4 style="margin-top:20px;margin-bottom:10px">Scope of Work</h4>
+      <div id="proj-details-scope" class="scope-list"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-project-details')">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Client Link Modal -->
+<div id="modal-client-link" class="modal-overlay hidden">
+  <div class="modal" style="max-width:500px;width:95vw">
+    <div class="modal-header">
+      <h3>Client Project Link</h3>
+      <span class="close-modal" onclick="closeModal('modal-client-link')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p>Share this link with your client to let them view project progress:</p>
+      <div style="display:flex;gap:10px;margin:15px 0">
+        <input type="text" id="client-link-url" readonly style="flex:1;padding:10px;background:#f5f5f5;border:1px solid #ddd;border-radius:4px;font-family:monospace">
+        <button class="btn btn-primary" onclick="copyClientLinkFromModal()">Copy</button>
+      </div>
+      <div style="background:#e3f2fd;padding:12px;border-radius:4px;font-size:0.9rem;color:#1565c0">
+        <strong>Note:</strong> Clients can view project details, scope of work checklist, and progress, but cannot make any changes.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('modal-client-link')">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Upload Document Modal -->
+<div id="modal-upload-document" class="modal-overlay hidden">
+  <div class="modal" style="max-width:600px;width:95vw">
+    <div class="modal-header">
+      <h3>📁 Upload Document</h3>
+      <button class="modal-close" onclick="closeModal('modal-upload-document')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Document Name *</label>
+          <input type="text" id="doc-name" placeholder="e.g., Smith Residence Floor Plan">
+        </div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="doc-category">
+            <option value="Blueprint">📐 Blueprint</option>
+            <option value="Contract">📄 Contract</option>
+            <option value="Permit">🏛️ Permit</option>
+            <option value="Photo">📷 Photo</option>
+            <option value="Invoice">🧾 Invoice</option>
+            <option value="Other">📎 Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Associated Project</label>
+          <select id="doc-project">
+            <option value="">No project</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Visible to Client?</label>
+          <select id="doc-client-visible">
+            <option value="true">✅ Yes — show on client link</option>
+            <option value="false">🔒 No — internal only</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description / Notes</label>
+        <textarea id="doc-description" rows="2" placeholder="Optional notes about this document..."></textarea>
+      </div>
+      
+      <!-- File Upload Area -->
+      <div id="doc-drop-zone" class="receipt-drop-zone" 
+        ondragover="event.preventDefault()" 
+        ondrop="handleDocumentDrop(event)"
+        onclick="document.getElementById('doc-file-input').click()"
+        style="margin-top:10px">
+        <div class="drop-zone-content">
+          <div style="font-size:2.5rem">📂</div>
+          <p><strong>Click to browse or drag & drop</strong></p>
+          <p style="font-size:0.85rem;color:#888">PDF, PNG, JPG, DWG, DXF, DOCX — up to 20MB</p>
+        </div>
+        <div id="doc-preview" style="display:none;margin-top:10px"></div>
+      </div>
+      <input type="file" id="doc-file-input" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.dwg,.dxf,.docx,.doc,.xlsx,.xls" 
+        style="display:none" onchange="handleDocumentFileSelect(this)">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-upload-document')">Cancel</button>
+      <button class="btn-primary" onclick="saveDocument()">💾 Save Document</button>
+    </div>
+  </div>
+</div>
+
+<!-- Document Viewer Modal -->
+<div id="modal-view-document" class="modal-overlay hidden">
+  <div class="modal" style="max-width:900px;width:95vw;max-height:90vh">
+    <div class="modal-header">
+      <h3 id="view-doc-title">Document</h3>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary btn-sm" onclick="downloadDocument(currentViewDocId)">⬇️ Download</button>
+        <button class="modal-close" onclick="closeModal('modal-view-document')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" style="padding:0;overflow:auto;max-height:calc(90vh - 120px)">
+      <div id="doc-viewer-content" style="min-height:400px;display:flex;align-items:center;justify-content:center"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

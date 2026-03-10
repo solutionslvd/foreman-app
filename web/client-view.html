@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Progress | Foreman</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+    .logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+    .logo span {
+      color: #f59e0b;
+    }
+    .project-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+    .project-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1e3a5f;
+    }
+    .project-client {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .info-item {
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    .info-label {
+      font-size: 0.8rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+    .info-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .status-pending, .status-not-started { background: #fef3c7; color: #92400e; }
+    .status-active, .status-in-progress { background: #dbeafe; color: #1d4ed8; }
+    .status-on-hold { background: #fef9c3; color: #854d0e; }
+    .status-completed { background: #dcfce7; color: #166534; }
+    
+    .progress-section {
+      margin-top: 25px;
+      padding-top: 25px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .progress-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .progress-percentage {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1e3a5f;
+    }
+    .progress-bar {
+      height: 12px;
+      background: #e5e7eb;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+      transition: width 0.5s ease;
+    }
+    .checklist {
+      list-style: none;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    .checklist-item.completed {
+      background: #f0fdf4;
+    }
+    .checklist-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #d1d5db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .checklist-item.completed .checklist-checkbox {
+      background: #10b981;
+      border-color: #10b981;
+    }
+    .checklist-item.completed .checklist-text {
+      text-decoration: line-through;
+      color: #9ca3af;
+    }
+    .loading {
+      text-align: center;
+      padding: 60px;
+    }
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e5e7eb;
+      border-top-color: #1e3a5f;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .error-state {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+    }
+    .error-title {
+      color: #dc2626;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .overdue-notice {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 12px 15px;
+      color: #dc2626;
+      font-weight: 500;
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Documents Section */
+    .docs-section {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      padding: 25px 30px;
+      margin-bottom: 20px;
+    }
+    .docs-section h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .doc-item {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .doc-item:hover {
+      border-color: #2c5282;
+      box-shadow: 0 2px 8px rgba(44,82,130,0.12);
+    }
+    .doc-item-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    .doc-item-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #333;
+      word-break: break-word;
+      margin-bottom: 4px;
+    }
+    .doc-item-meta {
+      font-size: 0.72rem;
+      color: #888;
+    }
+    .doc-item-thumb {
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    /* Contractor Card */
+    .contractor-card {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 20px 25px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .contractor-avatar {
+      width: 50px;
+      height: 50px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .contractor-info h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .contractor-info p {
+      font-size: 0.82rem;
+      opacity: 0.85;
+    }
+    .contractor-contact {
+      margin-top: 8px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .contractor-contact a {
+      color: #f59e0b;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    @media (max-width: 600px) {
+      .docs-section { padding: 20px; }
+      .docs-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    }
+
+  </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">🏗️ <span>Foreman</span></div>
+    <h1 id="page-title">Project Progress</h1>
+    <p id="page-subtitle">Real-time project updates</p>
+  </div>
+  
+  <div class="container">
+    <div id="content">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading project details...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const pathParts = window.location.pathname.split('/');
+    const linkId = pathParts[pathParts.length - 1];
+    
+    async function loadProject() {
+      try {
+        const response = await fetch(`/api/client-view/${linkId}`);
+        if (!response.ok) {
+          throw new Error('Project not found');
+        }
+        const project = await response.json();
+        renderProject(project);
+      } catch (error) {
+        document.getElementById('content').innerHTML = `
+          <div class="error-state">
+            <div class="error-title">⚠️ Project Not Found</div>
+            <p>The project link may be invalid or the project may have been removed.</p>
+            <p style="margin-top:15px;color:#666">Please contact your contractor for an updated link.</p>
+          </div>
+        `;
+      }
+    }
+    
+    function renderProject(project) {
+      const sow = project.scope_of_work || [];
+      const totalItems = sow.length;
+      const completedItems = sow.filter(item => item.completed).length;
+      const progress = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+      
+      const isOverdue = project.scheduled_finish_date && 
+                       new Date(project.scheduled_finish_date) < new Date() && 
+                       project.status !== 'completed' && project.status !== 'Completed';
+      
+      const statusMap = {
+        'pending': 'Not Started',
+        'active': 'In Progress',
+        'on_hold': 'On Hold',
+        'completed': 'Completed'
+      };
+      const statusDisplay = statusMap[project.status] || project.status || 'Unknown';
+      const statusClass = statusDisplay.toLowerCase().replace(' ', '-');
+      
+      const formatDate = (dateStr) => {
+        if (!dateStr) return 'Not set';
+        return new Date(dateStr).toLocaleDateString('en-CA', { 
+          year: 'numeric', month: 'long', day: 'numeric' 
+        });
+      };
+      
+      document.getElementById('page-subtitle').textContent = `${project.client_name || 'Client'}'s Project`;
+      
+      document.getElementById('content').innerHTML = `
+        <div class="project-card">
+          <div class="project-title">${escapeHtml(project.name)}</div>
+          <div class="project-client">📍 ${escapeHtml(project.address || 'Location not specified')}</div>
+          
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Status</div>
+              <div class="info-value">
+                <span class="status-badge status-${statusClass}">${statusDisplay}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Project Type</div>
+              <div class="info-value">${escapeHtml(project.project_type || project.trade || 'General')}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Start Date</div>
+              <div class="info-value">${formatDate(project.start_date)}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Expected Finish</div>
+              <div class="info-value">${formatDate(project.scheduled_finish_date)}</div>
+            </div>
+          </div>
+          
+          ${project.description ? `
+            <div style="margin-top:15px;padding:15px;background:#f8f9fa;border-radius:8px">
+              <div class="info-label">Description</div>
+              <p style="margin-top:5px;color:#444">${escapeHtml(project.description)}</p>
+            </div>
+          ` : ''}
+          
+          ${isOverdue ? `
+            <div class="overdue-notice">
+              ⚠️ This project is past its expected finish date
+            </div>
+          ` : ''}
+          
+          ${totalItems > 0 ? `
+            <div class="progress-section">
+              <div class="progress-header">
+                <div class="progress-title">📋 Scope of Work Progress</div>
+                <div class="progress-percentage">${progress}%</div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${progress}%"></div>
+              </div>
+              <ul class="checklist">
+                ${sow.map(item => `
+                  <li class="checklist-item ${item.completed ? 'completed' : ''}">
+                    <div class="checklist-checkbox">
+                      ${item.completed ? '✓' : ''}
+                    </div>
+                    <div class="checklist-text">${escapeHtml(item.text)}</div>
+                  </li>
+                `).join('')}
+              </ul>
+              <p style="text-align:center;color:#888;font-size:0.85rem;margin-top:15px">
+                ${completedItems} of ${totalItems} items completed
+              </p>
+            </div>
+          ` : ''}
+        </div>
+        
+        ${renderDocuments(project.documents || [])}
+        
+        ${renderContractor(project)}
+        
+        <div style="text-align:center;padding:20px;color:#666;font-size:0.9rem">
+          <p>Last updated: ${new Date(project.updated_at || project.created_at).toLocaleString()}</p>
+          <p style="margin-top:6px;font-size:0.78rem">This page auto-refreshes every 5 minutes</p>
+        </div>
+      `;
+    }
+    
+    function renderDocuments(docs) {
+      if (!docs || docs.length === 0) return '';
+      
+      const catIcons = {
+        'Blueprint': '📐', 'Contract': '📄', 'Permit': '🏛️',
+        'Photo': '📷', 'Invoice': '🧾', 'Other': '📎'
+      };
+      
+      return `
+        <div class="docs-section">
+          <h3>📁 Project Documents (${docs.length})</h3>
+          <div class="docs-grid">
+            ${docs.map(doc => {
+              const icon = catIcons[doc.category] || '📎';
+              const isImage = doc.file_type && doc.file_type.startsWith('image/');
+              return `
+                <div class="doc-item">
+                  ${isImage && doc.data_url 
+                    ? `<img src="${doc.data_url}" class="doc-item-thumb" alt="${escapeHtml(doc.name)}">`
+                    : `<div class="doc-item-icon">${icon}</div>`
+                  }
+                  <div class="doc-item-name">${escapeHtml(doc.name)}</div>
+                  <div class="doc-item-meta">${doc.category || 'Document'}</div>
+                  ${doc.description ? `<div class="doc-item-meta" style="margin-top:4px">${escapeHtml(doc.description)}</div>` : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    function renderContractor(project) {
+      if (!project.contractor_name && !project.contractor_company) return '';
+      return `
+        <div class="contractor-card">
+          <div class="contractor-avatar">👷</div>
+          <div class="contractor-info">
+            <h4>${escapeHtml(project.contractor_company || project.contractor_name)}</h4>
+            ${project.contractor_company && project.contractor_name 
+              ? `<p>${escapeHtml(project.contractor_name)}</p>` : ''}
+            <div class="contractor-contact">
+              ${project.contractor_phone 
+                ? `<a href="tel:${project.contractor_phone}">📞 ${escapeHtml(project.contractor_phone)}</a>` : ''}
+              ${project.contractor_email 
+                ? `<a href="mailto:${project.contractor_email}">✉️ ${escapeHtml(project.contractor_email)}</a>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    loadProject();
+    setInterval(loadProject, 5 * 60 * 1000);
+  </script>
+</body>
+</html>

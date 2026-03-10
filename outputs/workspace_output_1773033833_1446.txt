@@ -1,0 +1,28 @@
+            <div class="msg-bubble">
+              <div class="msg-content">
+                <p>Hi! I'm <strong>Foreman AI</strong> — your construction business assistant. I have full access to your live data including projects, invoices, expenses, payroll, and documents.</p>
+                <p style="margin-top:8px">Ask me anything about your business or Alberta construction:</p>
+              </div>
+              <div class="quick-prompts" style="margin-top:10px">
+                <button onclick="sendQuickPrompt('What invoices are outstanding?')">💰 Outstanding Invoices</button>
+                <button onclick="sendQuickPrompt('Summarize my active projects')">📋 Active Projects</button>
+                <button onclick="sendQuickPrompt('How do I calculate GST on an invoice?')">🧾 GST Help</button>
+                <button onclick="sendQuickPrompt('What WCB requirements do I need?')">⚠️ WCB Info</button>
+                <button onclick="sendQuickPrompt('Help me write a quote for a framing job')">📝 Write Quote</button>
+                <button onclick="sendQuickPrompt('What permits do I need in Alberta?')">🏗️ Permits</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <button class="voice-btn" onclick="toggleVoice()" id="voice-btn" title="Voice input">🎤</button>
+            <textarea id="chat-input" placeholder="Ask about your projects, invoices, regulations, or anything construction..." rows="1"
+              onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" onclick="sendMessage()" id="send-btn">➤</button>
+          </div>
+          <div class="chat-suggestions" id="chat-suggestions"></div>
+        </div>
+      </div>
+    </div>
+

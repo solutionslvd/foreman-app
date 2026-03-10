@@ -1,0 +1,7 @@
+194:async function loadPublicSettings() {
+489:async function loadDashboard() {
+1047:async function loadInvoices() {
+1137:async function loadExpenses() {
+2507:async function loadReport() {
+2771:async function loadAdminSettings() {
+3005:async function loadUsers() {

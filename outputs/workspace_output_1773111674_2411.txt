@@ -1,0 +1,81 @@
+=== APP.HTML NAVIGATION ===
+11:<link rel="manifest" href="/manifest.json">
+12:<link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+14:<link rel="preconnect" href="https://fonts.googleapis.com">
+15:<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+16:<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+17:<link rel="stylesheet" href="/static/app.css">
+44:          <button class="toggle-pw" onclick="togglePassword('login-password')">👁</button>
+48:      <button class="btn-primary btn-full" onclick="handleLogin()">
+51:      <p class="auth-switch">Don't have an account? <a href="#" onclick="showForm('register-form')">Sign Up</a></p>
+52:      <p class="auth-switch"><a href="#" onclick="showForm('admin-login-form')">Admin Login →</a></p>
+105:      <button class="btn-primary btn-full" onclick="handleRegister()">Create Account</button>
+106:      <p class="auth-switch">Already have an account? <a href="#" onclick="showForm('login-form')">Sign In</a></p>
+121:      <button class="btn-primary btn-full" onclick="handleAdminLogin()">Admin Sign In</button>
+122:      <p class="auth-switch"><a href="#" onclick="showForm('login-form')">← Back to Login</a></p>
+135:      <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">
+144:      <button class="header-btn" onclick="toggleAIPanel()" title="AI Assistant">🤖</button>
+145:      <button class="header-btn notification-btn" onclick="showNotifications()" title="Notifications">
+148:      <div class="user-avatar" onclick="toggleUserMenu()" id="user-avatar">A</div>
+162:      <a href="#" onclick="navigateTo('profile'); toggleUserMenu()">👤 My Profile</a>
+163:      <a href="#" onclick="navigateTo('profile'); toggleUserMenu()">⚙️ Preferences</a>
+164:      <a href="#" onclick="navigateTo('help'); toggleUserMenu()">❓ Help & Support</a>
+166:      <a href="#" onclick="handleLogout()" class="logout-link">🚪 Sign Out</a>
+172:    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+177:        <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+190:        <a class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+193:        <a class="nav-item" data-page="ai-chat" onclick="navigateTo('ai-chat')">
+196:        <a class="nav-item" data-page="projects" onclick="navigateTo('projects')">
+203:        <a class="nav-item" data-page="invoices" onclick="navigateTo('invoices')">
+206:        <a class="nav-item" data-page="expenses" onclick="navigateTo('expenses')">
+209:        <a class="nav-item" data-page="reports" onclick="navigateTo('reports')">
+212:        <a class="nav-item" data-page="payroll" onclick="navigateTo('payroll')">
+215:        <a class="nav-item" data-page="accounting" onclick="navigateTo('accounting')">
+222:        <a class="nav-item" data-page="compliance" onclick="navigateTo('compliance')">
+225:        <a class="nav-item" data-page="documents" onclick="navigateTo('documents')">
+228:        <a class="nav-item" data-page="time-tracking" onclick="navigateTo('time-tracking')">
+236:        <a class="nav-item" data-page="admin-settings" onclick="navigateTo('admin-settings')">
+239:        <a class="nav-item" data-page="user-management" onclick="navigateTo('user-management')">
+242:        <a class="nav-item" data-page="billing" onclick="navigateTo('billing')">
+261:          <button class="btn-secondary btn-sm" onclick="refreshDashboard()">↻ Refresh</button>
+305:          <button class="quick-btn" onclick="openInvoiceModal()">
+309:          <button class="quick-btn" onclick="openModal('new-expense-modal')">
+313:          <button class="quick-btn" onclick="navigateTo('ai-chat')">
+317:          <button class="quick-btn" onclick="openModal('new-project-modal')">
+321:          <button class="quick-btn" onclick="navigateTo('compliance')">
+325:          <button class="quick-btn" onclick="navigateTo('time-tracking')">
+373:          <button class="btn-secondary btn-sm" onclick="clearChat()">Clear Chat</button>
+374:          <button class="btn-secondary btn-sm" onclick="showAIContext()">📊 Context</button>
+395:                <button onclick="sendQuickPrompt('What invoices are outstanding?')">💰 Outstanding Invoices</button>
+396:                <button onclick="sendQuickPrompt('Summarize my active projects')">📋 Active Projects</button>
+397:                <button onclick="sendQuickPrompt('How do I calculate GST on an invoice?')">🧾 GST Help</button>
+398:                <button onclick="sendQuickPrompt('What WCB requirements do I need?')">⚠️ WCB Info</button>
+399:                <button onclick="sendQuickPrompt('Help me write a quote for a framing job')">📝 Write Quote</button>
+400:                <button onclick="sendQuickPrompt('What permits do I need in Alberta?')">🏗️ Permits</button>
+407:            <button class="voice-btn" onclick="toggleVoice()" id="voice-btn" title="Voice input">🎤</button>
+410:            <button class="send-btn" onclick="sendMessage()" id="send-btn">➤</button>
+422:          <button class="btn-primary btn-sm" onclick="openModal('new-project-modal')">+ New Project</button>
+426:        <button class="filter-btn active" onclick="filterProjects('all')">All</button>
+427:        <button class="filter-btn" onclick="filterProjects('active')">Active</button>
+428:        <button class="filter-btn" onclick="filterProjects('completed')">Completed</button>
+429:        <button class="filter-btn" onclick="filterProjects('pending')">Pending</button>
+436:          <button class="btn-primary" onclick="openModal('new-project-modal')">+ New Project</button>
+446:          <button class="btn-secondary btn-sm" onclick="openEstimateModal()">📋 New Estimate</button>
+447:          <button class="btn-primary btn-sm" onclick="openInvoiceModal()">+ New Invoice</button>
+451:        <button class="inv-tab active" onclick="showInvTab('invoices', this)">📄 Invoices</button>
+452:        <button class="inv-tab" onclick="showInvTab('estimates', this)">📋 Estimates</button>
+478:            <button class="btn-primary" onclick="openInvoiceModal()">+ New Invoice</button>
+488:            <button class="btn-primary" onclick="openEstimateModal()">📋 New Estimate</button>
+499:          <button class="btn-secondary btn-sm" onclick="showExpenseTab('receipts',this)">📷 Receipts</button>
+500:          <button class="btn-primary btn-sm" onclick="openModal('new-expense-modal')">+ Add Expense</button>
+506:        <button class="filter-btn active" id="etab-list" onclick="showExpenseTab('list',this)">📋 All Expenses</button>
+507:        <button class="filter-btn" id="etab-receipts" onclick="showExpenseTab('receipts',this)">📷 Receipt Snapshots</button>
+508:        <button class="filter-btn" id="etab-summary" onclick="showExpenseTab('summary',this)">📊 Summary</button>
+534:          <button class="btn-secondary btn-sm" onclick="exportExpensesCSV()">⬇️ Export CSV</button>
+542:            <button class="btn-primary" onclick="openModal('new-expense-modal')">+ Add Expense</button>
+554:          <div id="receipt-drop-zone" style="border:2px dashed var(--border-light);border-radius:12px;padding:2rem;text-align:center;cursor:pointer;transition:.2s;margin-bottom:1.5rem" onclick="document.getElementById('receipt-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--primary)'" ondragleave="this.style.borderColor='var(--border-light)'" ondrop="handleReceiptDrop(event)">
+563:            <button class="btn-secondary" onclick="document.getElementById('receipt-camera-input').click()">📷 Take Photo (Mobile)</button>
+565:            <button class="btn-secondary" onclick="openModal('new-expense-modal')">✏️ Manual Entry</button>
+595:        <button class="report-tab active" onclick="showReport('pl')">P&L Statement</button>
+596:        <button class="report-tab" onclick="showReport('balance')">Balance Sheet</button>
+597:        <button class="report-tab" onclick="showReport('gst')">GST Summary</button>

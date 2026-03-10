@@ -1,0 +1,9 @@
+2026-03-08 22:15:56,452 - app.settings_manager - INFO - Settings loaded from file
+2026-03-08 22:15:56,466 - app.financial_ledger - INFO - Initialized 48 accounts in chart of accounts
+INFO:     Started server process [2487]
+INFO:     Waiting for application startup.
+2026-03-08 22:15:56,619 - app.main - INFO - 🚀 Starting BuildAI Alberta v2.0...
+2026-03-08 22:15:56,619 - app.main - INFO - ✅ Application started successfully! Keep-alive task running.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8050 (Press CTRL+C to quit)
+=== SERVER STATUS ===

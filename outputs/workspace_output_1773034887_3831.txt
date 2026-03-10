@@ -1,0 +1,11 @@
+325:  const plan = document.getElementById('reg-plan').value;
+342:      body: JSON.stringify({ email, password, business_name: business, trade, contact_name: name, phone, plan })
+423:  const adminPages = ['admin-settings', 'user-management', 'billing'];
+2141:      var type = (dl.indexOf('deposit') >= 0 || dl.indexOf('payment received') >= 0) ? 'income' : 'expense';
+2164:  if (d.indexOf('software') >= 0 || d.indexOf('subscription') >= 0 || d.indexOf('adobe') >= 0 || d.indexOf('microsoft') >= 0) return '207';
+2171:  if (d.indexOf('sales') >= 0 || d.indexOf('invoice') >= 0 || d.indexOf('payment received') >= 0) return '100';
+2278:      t4aContainer.innerHTML = '<div class="empty-state-sm">No contractor payments yet.</div>';
+3030:          <div class="user-row-email">${u.email} · ${u.plan || 'starter'} · ${u.trade || 'general'}</div>
+3078:function selectPlan(plan) {
+3079:  showToast(`Upgrade to ${plan} - payment integration coming soon!`, 'info');
+4778:    if (name.includes('blueprint') || name.includes('plan') || name.endsWith('.dwg') || name.endsWith('.dxf')) {

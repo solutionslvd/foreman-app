@@ -1,0 +1,11 @@
+
+  if (!projects.length) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🏗️</div>
+      <h3>No Projects</h3>
+      <p>${filter === 'all' ? 'Create your first project' : `No ${filter} projects`}</p>
+      ${filter === 'all' ? '<button class="btn-primary" onclick="openModal(\'new-project-modal\')">+ New Project</button>' : ''}
+    </div>`;
+    return;
+  }
+

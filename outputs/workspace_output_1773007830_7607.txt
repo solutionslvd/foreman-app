@@ -1,0 +1,46 @@
+    balance_due = round(total - request.deposit_paid, 2)
+
+    invoice = {
+        "id": str(uuid.uuid4())[:8],
+        "invoice_number": request.invoice_number or next_invoice_number(),
+        "project_id": project["id"] if project else None,
+        "project_name": project["name"] if project else None,
+        "client_name": request.client_name,
+        "client_email": request.client_email,
+        "client_address": request.client_address,
+        "invoice_date": request.invoice_date or datetime.now().strftime("%Y-%m-%d"),
+        "due_date": request.due_date,
+        "payment_terms": request.payment_terms,
+        "line_items": processed_items,
+        "subtotal": subtotal,
+        "discount_percent": request.discount_percent,
+        "discount_amount": discount_amount,
+        "subtotal_after_discount": subtotal_after_discount,
+        "gst_rate": gst_rate,
+        "gst_total": gst_total,
+        "total": total,
+        "deposit_paid": request.deposit_paid,
+        "balance_due": balance_due,
+        "notes": request.notes,
+        "footer_text": request.footer_text,
+        "is_estimate": request.is_estimate,
+        "status": "draft",
+        "payments_received": [],
+        "created_at": datetime.now().isoformat(),
+        "updated_at": datetime.now().isoformat(),
+    }
+
+    if project:
+        project.setdefault("invoices", []).append(invoice)
+    else:
+        # Store in a global list
+        if not hasattr(create_standalone_invoice, "_store"):
+            create_standalone_invoice._store = []
+        create_standalone_invoice._store.append(invoice)
+
+    logger.info(f"Invoice created: {invoice['invoice_number']}")
+    return {"success": True, "invoice": invoice}
+
+@router.put("/invoice/{invoice_id}/status")
+async def update_invoice_status(invoice_id: str, request: dict):
+    """Update invoice status"""

@@ -1,0 +1,51 @@
+2610:      syncStore();
+4237:  try { await syncStore(); } catch (e) { console.error('Sync error:', e); }
+4248:    syncStore();
+4670:  try { await syncStore(); } catch(e) {}
+4725:  try { syncStore(); } catch(e) {}
+=== apiPost/apiGet/apiPut ===
+2991:async function apiGet(url) {
+2999:async function apiPost(url, body) {
+3012:async function apiPut(url, body) {
+=== Lines 2985-3025 (api helpers) ===
+  toastTimeout = setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// API HELPERS
+// ═══════════════════════════════════════════════════════════
+async function apiGet(url) {
+  const res = await fetch(`${API}${url}`, {
+    headers: { 'Authorization': `Bearer ${authToken}` }
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+async function apiPost(url, body) {
+  const res = await fetch(`${API}${url}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Request failed');
+  }
+  return res.json();
+}
+
+async function apiPut(url, body) {
+  const res = await fetch(`${API}${url}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════
+function formatCurrency(amount) {

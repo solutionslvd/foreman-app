@@ -1,0 +1,62 @@
+const store = {
+  projects: [],
+  invoices: [],
+  expenses: [],
+  transactions: [],
+  users: [],
+  settings: {},
+};
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load public settings (branding)
+  await loadPublicSettings();
+
+  // Check for saved session
+  const savedToken = localStorage.getItem('foreman_token');
+  const savedIsAdmin = localStorage.getItem('foreman_is_admin') === 'true';
+  const savedUser = localStorage.getItem('foreman_user');
+
+  if (savedToken) {
+    authToken = savedToken;
+    isAdmin = savedIsAdmin;
+    if (savedUser) {
+      try { currentUser = JSON.parse(savedUser); } catch(e) {}
+    }
+    showApp();
+  } else {
+    showAuth();
+  }
+
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+
+  // Set default dates for reports
+  const today = new Date();
+  const yearStart = `${today.getFullYear()}-01-01`;
+  const todayStr = today.toISOString().split('T')[0];
+  const fromEl = document.getElementById('report-from');
+  const toEl = document.getElementById('report-to');
+  if (fromEl) fromEl.value = yearStart;
+  if (toEl) toEl.value = todayStr;
+
+  // Set today's date on forms
+  const invDate = document.getElementById('inv-date');
+  const expDate = document.getElementById('exp-date');
+  if (invDate) invDate.value = todayStr;
+  if (expDate) expDate.value = todayStr;
+
+  // Init voice recognition
+  initVoiceRecognition();
+
+  // Start SSE data stream connection (keeps server alive + enables real-time updates)
+  startDataStream();
+});
+
+// ── SSE Data Stream ──────────────────────────────────────────────────────────
+let _sseConnection = null;
+let _sseReconnectTimer = null;

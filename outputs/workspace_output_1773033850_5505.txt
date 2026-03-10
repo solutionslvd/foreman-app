@@ -1,0 +1,5 @@
+537:// AI CHAT
+564:function clearChat() {
+571:function sendQuickPrompt(prompt) {
+4425:// UPGRADED AI CHAT FUNCTIONS
+4924:  navigateTo('ai-chat');

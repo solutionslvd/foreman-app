@@ -1,0 +1,30 @@
+grep: /workspace/app/api/__pycache__/projects.cpython-311.pyc: binary file matches
+grep: /workspace/app/api/__pycache__/dropdown_manager.cpython-311.pyc: binary file matches
+grep: /workspace/app/api/__pycache__/users.cpython-311.pyc: binary file matches
+grep: /workspace/app/__pycache__/ai_engine.cpython-311.pyc: binary file matches
+grep: /workspace/app/__pycache__/nda_generator.cpython-311.pyc: binary file matches
+/workspace/app/api/users.py:2:User Registration, Login, NDA, and Permissions API
+/workspace/app/api/users.py:12:    accept_nda, grant_email_access, grant_gdrive_access,
+/workspace/app/api/users.py:16:from app.nda_generator import (
+/workspace/app/api/users.py:17:    generate_nda, generate_email_permission_request,
+/workspace/app/api/users.py:42:class AcceptNDARequest(BaseModel):
+/workspace/app/api/users.py:97:            "next_step": "Please review and accept the NDA to activate all features"
+/workspace/app/api/users.py:121:            "nda_accepted": user["nda_accepted"],
+/workspace/app/api/users.py:135:# ─── NDA ──────────────────────────────────────────────────────────────────────
+/workspace/app/api/users.py:137:@router.get("/nda")
+/workspace/app/api/users.py:138:async def get_nda(authorization: Optional[str] = Header(None)):
+/workspace/app/api/users.py:139:    """Get NDA document for user to review"""
+/workspace/app/api/users.py:142:    nda_text = generate_nda(user, config)
+/workspace/app/api/users.py:144:        "nda_text": nda_text,
+/workspace/app/api/users.py:145:        "already_accepted": user["nda_accepted"],
+/workspace/app/api/users.py:146:        "accepted_at": user.get("nda_accepted_at")
+/workspace/app/api/users.py:150:@router.post("/nda/accept")
+/workspace/app/api/users.py:151:async def accept_nda_endpoint(
+/workspace/app/api/users.py:152:    request: AcceptNDARequest,
+/workspace/app/api/users.py:155:    """Accept the NDA"""
+/workspace/app/api/users.py:158:        raise HTTPException(status_code=400, detail="NDA must be accepted to proceed")
+grep: /workspace/app/__pycache__/email_ai.cpython-311.pyc: binary file matches
+grep: /workspace/app/__pycache__/user_system.cpython-311.pyc: binary file matches
+grep: /workspace/app/__pycache__/settings_manager.cpython-311.pyc: binary file matches
+grep: /workspace/app/__pycache__/config.cpython-311.pyc: binary file matches
+grep: /workspace/app/__pycache__/compliance_engine.cpython-311.pyc: binary file matches

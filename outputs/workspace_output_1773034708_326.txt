@@ -1,0 +1,155 @@
+=== ISSUE INVESTIGATION ===
+
+--- User Login Debug ---
+{
+    "detail": "Invalid email or password"
+}
+
+--- Register test user ---
+{
+    "success": true,
+    "message": "Account created successfully",
+    "user_id": "d1e457e96a55cfe7",
+    "next_step": "Please review and accept the NDA to activate all features"
+}
+
+--- Login after register ---
+Token: O1qNAdJU5_IpXaD-fmZWyWlUep7kjenPPAWSUIzXH-TN4x_v8bAwpAmDZx9HKNEnaC-xfQVz6DTM-1cCsW8XNQ
+
+--- 307 Redirect on /api/projects ---
+> GET /api/projects HTTP/1.1
+< HTTP/1.1 307 Temporary Redirect
+< date: Mon, 09 Mar 2026 05:38:27 GMT
+< server: uvicorn
+< content-length: 0
+< location: http://localhost:8050/api/projects/
+< 
+
+--- Missing endpoints: what routes are registered? ---
+/api/admin/change-password
+/api/admin/cleanup-sessions
+/api/admin/dashboard
+/api/admin/data/compliance
+/api/admin/data/financial
+/api/admin/data/reset
+/api/admin/login
+/api/admin/logout
+/api/admin/logs
+/api/admin/reset
+/api/admin/settings
+/api/admin/settings/ai
+/api/admin/settings/business
+/api/admin/settings/compliance
+/api/admin/settings/financial
+/api/admin/system/cleanup
+/api/admin/system/logs
+/api/admin/system/status
+/api/admin/users
+/api/admin/users/{user_email}
+/api/admin/users/{user_email}/status
+/api/admin/users/{user_email}/suspend
+/api/admin/verify
+/api/billing/admin/overview
+/api/billing/admin/plans
+/api/billing/admin/plans/{plan_id}
+/api/billing/admin/settings
+/api/billing/admin/subscription/{user_email}/override
+/api/billing/admin/subscriptions
+/api/billing/payment
+/api/billing/payments
+/api/billing/payments/{user_email}
+/api/billing/plans
+/api/billing/stripe-key
+/api/billing/subscription
+/api/billing/subscription/{user_email}
+/api/chat/message
+/api/chat/suggestions
+/api/client-view/{link_id}
+/api/compliance/incidents
+/api/compliance/inspections
+/api/compliance/permits
+/api/compliance/safety-checklist
+/api/compliance/status
+/api/compliance/summary
+/api/compliance/training
+/api/compliance/wcb
+/api/compliance/wcb/register
+/api/dropdowns
+/api/dropdowns/{key}
+/api/dropdowns/{key}/item
+/api/dropdowns/{key}/item/{value}
+/api/email/categorize
+/api/email/followups
+/api/email/gdrive-files
+/api/email/inbox
+/api/email/priority-rules
+/api/email/process
+/api/email/replies/pending
+/api/email/replies/{reply_id}/approve
+/api/email/stats
+/api/email/templates
+/api/financial/catch-up-priorities
+/api/financial/invoices
+/api/financial/payroll
+/api/financial/suggest-category
+/api/financial/summary
+/api/financial/tax-summary/{year}
+/api/financial/transactions
+/api/ledger/accounts
+/api/ledger/accounts/{account_code}/balance
+/api/ledger/reports/ar-aging
+/api/ledger/reports/balance-sheet
+/api/ledger/reports/cash-flow
+/api/ledger/reports/dashboard-summary
+/api/ledger/reports/gst-summary
+/api/ledger/reports/profit-loss
+/api/ledger/transactions
+/api/ledger/transactions/expense
+/api/ledger/transactions/invoice
+/api/ledger/transactions/payment-received
+/api/ledger/transactions/payroll
+/api/projects/
+/api/projects/estimate
+/api/projects/estimate/{estimate_id}/convert
+/api/projects/estimates/all
+/api/projects/invoice/standalone
+/api/projects/invoice/{invoice_id}/payment
+/api/projects/invoice/{invoice_id}/status
+/api/projects/invoices/all
+/api/projects/summary/overview
+/api/projects/{project_id}
+/api/projects/{project_id}/invoice
+/api/settings/admin/ai
+/api/settings/admin/all
+/api/settings/admin/branding
+/api/settings/admin/business
+/api/settings/admin/change-password
+/api/settings/admin/compliance
+/api/settings/admin/financial
+/api/settings/admin/integrations
+/api/settings/admin/notifications
+/api/settings/admin/subscription
+/api/settings/public
+/api/settings/user/preferences
+/api/settings/user/role-permissions
+/api/stream
+/api/users/admin/all
+/api/users/admin/stats
+/api/users/change-password
+/api/users/email-settings
+/api/users/login
+/api/users/me
+/api/users/nda
+/api/users/nda/accept
+/api/users/permissions/email
+/api/users/permissions/email/grant
+/api/users/permissions/email/revoke
+/api/users/permissions/gdrive
+/api/users/permissions/gdrive/grant
+/api/users/permissions/gdrive/revoke
+/api/users/register
+/api/users/store
+/health
+/manifest.json
+/ping
+/sw.js

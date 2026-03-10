@@ -1,0 +1,22 @@
+def verify_user_token(token: str) -> Optional[Dict]:
+    """Verify a user session token"""
+    session = user_sessions.get(token)
+    if not session:
+        return None
+    if datetime.now() > datetime.fromisoformat(session["expires_at"]):
+        del user_sessions[token]
+        return None
+    email = session["email"]
+    return users_db.get(email)
+
+
+def get_all_users() -> List[Dict]:
+    """Get all users (admin only)"""
+    return [
+        {k: v for k, v in u.items() if k != "password_hash"}
+        for u in users_db.values()
+    ]
+
+
+def get_user_by_id(user_id: str) -> Optional[Dict]:
+    for u in users_db.values():

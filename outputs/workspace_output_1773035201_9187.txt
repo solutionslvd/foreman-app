@@ -1,0 +1,15 @@
+5:from fastapi import APIRouter, HTTPException, Depends, Header, Query
+175:    limit: int = Query(50, le=200),
+176:    offset: int = Query(0),
+200:    from_date: str = Query(..., description="YYYY-MM-DD"),
+201:    to_date: str = Query(..., description="YYYY-MM-DD"),
+205:    return ledger.get_profit_and_loss(from_date, to_date)
+209:    as_of: Optional[str] = Query(None, description="YYYY-MM-DD"),
+216:async def gst_summary(
+217:    from_date: str = Query(..., description="YYYY-MM-DD"),
+218:    to_date: str = Query(..., description="YYYY-MM-DD"),
+222:    return ledger.get_gst_summary(from_date, to_date)
+225:async def cash_flow(
+226:    from_date: str = Query(..., description="YYYY-MM-DD"),
+227:    to_date: str = Query(..., description="YYYY-MM-DD"),
+231:    return ledger.get_cash_flow(from_date, to_date)

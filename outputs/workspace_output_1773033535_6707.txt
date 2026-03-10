@@ -1,0 +1,23 @@
+// ═══════════════════════════════════════════════════════════════
+
+// ── In-memory stores ──────────────────────────────────────────
+const payrollStore = {
+  employees: JSON.parse(localStorage.getItem('foreman_employees') || '[]'),
+  contractors: JSON.parse(localStorage.getItem('foreman_contractors') || '[]'),
+  history: JSON.parse(localStorage.getItem('foreman_payroll_history') || '[]'),
+  transactions: JSON.parse(localStorage.getItem('foreman_transactions') || '[]'),
+  backdateData: JSON.parse(localStorage.getItem('foreman_backdate') || '{}')
+};
+
+function savePayrollStore() {
+  localStorage.setItem('foreman_employees', JSON.stringify(payrollStore.employees));
+  localStorage.setItem('foreman_contractors', JSON.stringify(payrollStore.contractors));
+  localStorage.setItem('foreman_payroll_history', JSON.stringify(payrollStore.history));
+  localStorage.setItem('foreman_transactions', JSON.stringify(payrollStore.transactions));
+  localStorage.setItem('foreman_backdate', JSON.stringify(payrollStore.backdateData));
+}
+
+// WCB rates by trade (Alberta 2024)
+const WCB_RATES = {
+  framing: 0.0320, carpentry: 0.0280, electrical: 0.0210,
+  plumbing: 0.0210, hvac: 0.0240, roofing: 0.0480,

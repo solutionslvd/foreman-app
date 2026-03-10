@@ -1,0 +1,4 @@
+2840:  const res = await apiPost('/api/settings/admin/change-password', { new_password: newPw, confirm_password: confirmPw });
+3213:function changePassword() {
+3221:  const stored = localStorage.getItem('userPassword') || 'default';
+3222:  localStorage.setItem('userPassword', newPw);

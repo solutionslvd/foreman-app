@@ -1,0 +1,1 @@
+3065:<script src="/static/app.js"></script>

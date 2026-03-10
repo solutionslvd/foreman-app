@@ -1,0 +1,4 @@
+14:    users_db
+211:    users_db[user["email"]]["email_access_granted"] = False
+252:    users_db[user["email"]]["gdrive_access_granted"] = False
+281:    users_db[user["email"]]["email_settings"] = settings

@@ -1,0 +1,10 @@
+70:    from app.compliance_engine import compliance_engine
+74:    compliance_engine.config = config
+212:from app.api import chat, financial, compliance, admin
+216:from app.api import billing as billing_api
+221:app.include_router(compliance.router,    prefix="/api/compliance", tags=["Compliance"])
+227:app.include_router(billing_api.router,   prefix="/api/billing",    tags=["Billing"])
+300:@app.get("/api/compliance/summary", tags=["Compliance"])
+301:async def compliance_summary():
+302:    """Platform-wide compliance summary"""
+304:        from app.compliance_engine import (

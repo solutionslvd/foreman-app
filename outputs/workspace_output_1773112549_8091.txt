@@ -1,0 +1,41 @@
+function showAuth() {
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('main-app').classList.add('hidden');
+}
+
+function showApp() {
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('main-app').classList.remove('hidden');
+  setupUserUI();
+  loadDashboard();
+}
+
+function showForm(formId) {
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  document.getElementById(formId).classList.add('active');
+}
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+
+  if (!email || !password) {
+    showError(errEl, 'Please enter email and password');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/api/users/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      authToken = data.token;
+      isAdmin = false;
+      currentUser = data.user;
+      saveSession();
+      showApp();
+    } else {

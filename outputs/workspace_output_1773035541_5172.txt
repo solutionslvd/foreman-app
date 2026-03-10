@@ -1,0 +1,15 @@
+
+🔍 BUG FIX REGRESSION REPORT
+=======================================================
+✅ BUG-NEW-A: Billing status (user)         HTTP 200
+✅ BUG-NEW-A: Billing payments (user)       HTTP 200
+✅ BUG-NEW-D: Ledger P&L (user)             HTTP 200
+✅ BUG-NEW-E: Compliance not_configured     nc=True, score=0
+❌ BUG-NEW-F: Login returns role            role=None
+✅ BUG-018: Admin bcrypt login              token=yes
+✅ BUG-015: Compliance score=0              score=0
+✅ SECURITY: Unauth blocked                 HTTP 401
+=======================================================
+
+❌ SOME FIXES NEED ATTENTION
+Passed: 7/8

@@ -1,0 +1,14 @@
+accounting
+admin-settings
+ai-chat
+billing
+compliance
+dashboard
+documents
+expenses
+invoices
+payroll
+projects
+reports
+time-tracking
+user-management

@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+"""
+Foreman AI - Daily Report Scheduler
+Runs diagnostic at 7:00 AM Mountain Time every day.
+Mountain Time = UTC-7 (MDT) or UTC-6 (MST)
+7:00 AM MDT = 14:00 UTC | 7:00 AM MST = 13:00 UTC
+"""
+
+import asyncio
+import time
+import logging
+from datetime import datetime, timezone, timedelta
+import subprocess
+import sys
+import os
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('/workspace/scheduler.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger("ForemanScheduler")
+
+# Mountain Time offset (MDT = UTC-7, MST = UTC-6)
+# We'll use UTC-7 (MDT) as default - adjust as needed
+MOUNTAIN_OFFSET = timedelta(hours=-7)
+REPORT_HOUR = 7   # 7:00 AM
+REPORT_MINUTE = 0
+
+def get_mountain_time():
+    """Get current Mountain Time."""
+    utc_now = datetime.now(timezone.utc)
+    mt_now = utc_now + MOUNTAIN_OFFSET
+    return mt_now
+
+def seconds_until_next_report():
+    """Calculate seconds until next 7:00 AM Mountain Time."""
+    mt_now = get_mountain_time()
+    
+    # Next 7 AM today
+    next_report = mt_now.replace(hour=REPORT_HOUR, minute=REPORT_MINUTE, second=0, microsecond=0)
+    
+    # If we've already passed 7 AM today, schedule for tomorrow
+    if mt_now >= next_report:
+        next_report += timedelta(days=1)
+    
+    delta = next_report - mt_now
+    return delta.total_seconds(), next_report
+
+def run_diagnostic():
+    """Run the daily diagnostic report."""
+    logger.info("🏗️ Running Foreman AI Daily Diagnostic...")
+    try:
+        result = subprocess.run(
+            [sys.executable, '/workspace/daily_report.py'],
+            capture_output=True,
+            text=True,
+            timeout=120,
+            cwd='/workspace'
+        )
+        if result.returncode == 0:
+            logger.info("✅ Daily diagnostic completed successfully")
+            logger.info(result.stdout[-500:] if len(result.stdout) > 500 else result.stdout)
+        else:
+            logger.error(f"❌ Daily diagnostic failed: {result.stderr[-300:]}")
+    except subprocess.TimeoutExpired:
+        logger.error("❌ Daily diagnostic timed out after 120 seconds")
+    except Exception as e:
+        logger.error(f"❌ Daily diagnostic error: {e}")
+
+async def scheduler_loop():
+    """Main scheduler loop - waits until 7 AM MT then runs report."""
+    logger.info("🕐 Foreman AI Scheduler started")
+    logger.info(f"📅 Reports scheduled daily at {REPORT_HOUR:02d}:{REPORT_MINUTE:02d} AM Mountain Time")
+    
+    while True:
+        secs, next_report = seconds_until_next_report()
+        mt_now = get_mountain_time()
+        
+        logger.info(f"⏰ Current MT: {mt_now.strftime('%Y-%m-%d %H:%M:%S')}")
+        logger.info(f"📋 Next report: {next_report.strftime('%Y-%m-%d %H:%M:%S')} MT ({secs/3600:.1f} hours)")
+        
+        # Sleep until report time (check every 60 seconds to handle drift)
+        sleep_time = min(secs, 60)
+        await asyncio.sleep(sleep_time)
+        
+        # Check if it's time to run
+        secs_remaining, _ = seconds_until_next_report()
+        if secs_remaining > 60:
+            continue  # Not time yet
+        
+        # Run the report
+        logger.info("🚀 7:00 AM MT - Running daily diagnostic report!")
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, run_diagnostic)
+        
+        # Sleep 2 minutes to avoid double-running
+        await asyncio.sleep(120)
+
+if __name__ == "__main__":
+    # Run an immediate diagnostic on startup too
+    logger.info("🏗️ Foreman AI Scheduler initializing...")
+    mt_now = get_mountain_time()
+    logger.info(f"Current Mountain Time: {mt_now.strftime('%Y-%m-%d %H:%M:%S MT')}")
+    
+    secs, next_report = seconds_until_next_report()
+    logger.info(f"Next scheduled report: {next_report.strftime('%Y-%m-%d %H:%M:%S MT')}")
+    logger.info(f"Time until next report: {secs/3600:.1f} hours ({secs/60:.0f} minutes)")
+    
+    asyncio.run(scheduler_loop())

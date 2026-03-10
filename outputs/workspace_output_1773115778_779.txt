@@ -1,0 +1,2 @@
+3913:function saveJournalEntry() {
+4091:function saveAPEntry() {

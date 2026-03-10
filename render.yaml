@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: foreman-app
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: BUSINESS_NAME
+        value: Foreman
+      - key: BUSINESS_TYPE
+        value: General Contractor
+      - key: AI_NAME
+        value: Foreman AI
+      - key: GST_RATE
+        value: "0.05"
+      - key: DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD_HASH
+        value: 400136f398d0be8f9e12dd5878c076787470b0a978f2d146852631bd2c477cfb

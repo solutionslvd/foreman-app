@@ -1,0 +1,1 @@
+        ${p.address ? `<div style=&quot;font-size:12px;color:var(--text-muted);margin-top:.3rem&quot;>📍 ${escapeHtml(p.address || '')}</div>` : ''}

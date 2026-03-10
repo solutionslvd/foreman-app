@@ -1,0 +1,49 @@
+<div id="new-invoice-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:780px;width:95vw">
+    <div class="modal-header">
+      <h3>📄 Invoice Builder</h3>
+      <button class="modal-close" onclick="closeModal('new-invoice-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Bill To (Customer Name) *</label>
+          <input type="text" id="inv-customer" placeholder="Customer or company name">
+        </div>
+        <div class="form-group">
+          <label>Project</label>
+          <select id="inv-project">
+            <option value="">Select project...</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Invoice Date</label>
+          <input type="date" id="inv-date">
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="inv-due-date">
+        </div>
+        <div class="form-group">
+          <label>Payment Terms</label>
+          <select id="inv-terms">
+            <option value="net30">Net 30</option>
+            <option value="net15">Net 15</option>
+            <option value="net7">Net 7</option>
+            <option value="due_on_receipt">Due on Receipt</option>
+            <option value="net60">Net 60</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin:1rem 0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+          <strong style="font-size:.9rem">Line Items</strong>
+          <button class="btn-secondary btn-sm" onclick="addInvoiceLine()" style="font-size:.8rem;padding:.3rem .8rem">+ Add Line</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:.85rem" id="inv-lines-table">
+            <thead>
+              <tr style="background:rgba(255,255,255,.05)">
+                <th style="padding:.5rem .4rem;text-align:left;min-width:180px">Description</th>

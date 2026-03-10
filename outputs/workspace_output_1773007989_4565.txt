@@ -1,0 +1,21 @@
+billing_settings: Dict = {
+    "stripe_publishable_key": os.environ.get("STRIPE_PUBLISHABLE_KEY", ""),
+    "stripe_secret_key": os.environ.get("STRIPE_SECRET_KEY", ""),
+    "currency": "CAD",
+    "tax_rate": 0.05,
+    "trial_days": 14,
+    "plans": {
+        "starter": {"price": 49, "name": "Starter", "users": 1, "features": ["AI Chat", "Invoicing", "Basic Compliance"]},
+        "professional": {"price": 99, "name": "Professional", "users": 3, "features": ["All Starter", "Email AI", "Payroll", "Advanced Reports"]},
+        "business": {"price": 199, "name": "Business", "users": -1, "features": ["All Professional", "White Label", "Priority Support", "API Access"]},
+        "enterprise": {"price": 499, "name": "Enterprise", "users": -1, "features": ["All Business", "Custom Domain", "Dedicated Support", "SLA"]},
+    }
+}
+
+# ─── Models ───────────────────────────────────────────────────────────────────
+
+class CreateSubscriptionRequest(BaseModel):
+    user_email: str
+    plan: str
+    payment_method_id: Optional[str] = None
+    trial: bool = True

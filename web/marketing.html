@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foreman — Marketing Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --primary:#1a237e; --accent:#ff6f00; --success:#2e7d32;
+            --bg:#0d1117; --bg2:#161b22; --bg3:#21262d;
+            --border:#30363d; --text:#e6edf3; --text-muted:#8b949e;
+        }
+        body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); }
+        .header { background:var(--bg2); border-bottom:1px solid var(--border); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+        .header h1 { font-size:1.3rem; color:var(--accent); }
+        .header p { font-size:.85rem; color:var(--text-muted); }
+        .container { max-width:1200px; margin:0 auto; padding:2rem; }
+        .tabs { display:flex; gap:.5rem; margin-bottom:2rem; flex-wrap:wrap; border-bottom:1px solid var(--border); padding-bottom:1rem; }
+        .tab { padding:.5rem 1.2rem; border-radius:8px; border:1px solid var(--border); background:none; color:var(--text-muted); cursor:pointer; font-size:.88rem; transition:all .2s; }
+        .tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+        .section { display:none; }
+        .section.active { display:block; }
+        .card { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+        .card h2 { font-size:1.1rem; color:var(--accent); margin-bottom:1rem; }
+        .card h3 { font-size:.95rem; margin-bottom:.75rem; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+        .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
+        .copy-box { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:1rem; position:relative; margin-bottom:1rem; }
+        .copy-box pre { font-family:'Segoe UI',sans-serif; font-size:.85rem; line-height:1.6; white-space:pre-wrap; color:var(--text); }
+        .copy-btn { position:absolute; top:.5rem; right:.5rem; background:var(--accent); color:#fff; border:none; border-radius:6px; padding:.3rem .7rem; font-size:.75rem; cursor:pointer; }
+        .copy-btn:hover { opacity:.85; }
+        .badge { display:inline-block; padding:.2rem .7rem; border-radius:20px; font-size:.75rem; font-weight:600; margin:.2rem; }
+        .badge-blue { background:rgba(26,35,126,.3); color:#7986cb; }
+        .badge-orange { background:rgba(255,111,0,.2); color:#ffa726; }
+        .badge-green { background:rgba(46,125,50,.2); color:#66bb6a; }
+        .social-card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:1.2rem; }
+        .social-card .platform { font-size:.8rem; color:var(--text-muted); margin-bottom:.5rem; display:flex; align-items:center; gap:.4rem; }
+        .social-card .post { font-size:.88rem; line-height:1.6; }
+        .email-template { background:var(--bg3); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:1rem; }
+        .email-subject { background:rgba(255,111,0,.15); padding:.75rem 1rem; font-size:.88rem; font-weight:600; border-bottom:1px solid var(--border); }
+        .email-body { padding:1rem; font-size:.85rem; line-height:1.7; }
+        .metric-card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:1rem; text-align:center; }
+        .metric-val { font-size:1.8rem; font-weight:700; color:var(--accent); }
+        .metric-label { font-size:.78rem; color:var(--text-muted); margin-top:.3rem; }
+        .checklist { list-style:none; }
+        .checklist li { padding:.4rem 0; font-size:.88rem; display:flex; align-items:flex-start; gap:.6rem; border-bottom:1px solid rgba(255,255,255,.04); }
+        .checklist li::before { content:"☐"; color:var(--accent); flex-shrink:0; }
+        .checklist li.done::before { content:"✅"; }
+        .strategy-step { display:flex; gap:1rem; margin-bottom:1.2rem; }
+        .step-num { width:32px; height:32px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; font-size:.9rem; }
+        .step-body h4 { font-size:.95rem; margin-bottom:.3rem; }
+        .step-body p { font-size:.83rem; color:var(--text-muted); line-height:1.5; }
+        .ad-card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:1.2rem; }
+        .ad-card .ad-type { font-size:.75rem; color:var(--text-muted); margin-bottom:.5rem; }
+        .ad-card .headline { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:.4rem; }
+        .ad-card .body { font-size:.83rem; color:var(--text-muted); line-height:1.5; margin-bottom:.5rem; }
+        .ad-card .cta { font-size:.8rem; color:var(--accent); font-weight:600; }
+        .kpi-table { width:100%; border-collapse:collapse; font-size:.85rem; }
+        .kpi-table th { background:var(--bg3); padding:.6rem 1rem; text-align:left; font-size:.78rem; color:var(--text-muted); border-bottom:1px solid var(--border); }
+        .kpi-table td { padding:.6rem 1rem; border-bottom:1px solid rgba(255,255,255,.04); }
+        .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.6rem 1.2rem; border-radius:8px; border:none; cursor:pointer; font-size:.88rem; font-weight:600; }
+        .btn-primary { background:var(--accent); color:#fff; }
+        .btn-secondary { background:var(--bg3); color:var(--text); border:1px solid var(--border); }
+        @media(max-width:768px) { .grid-2,.grid-3 { grid-template-columns:1fr; } }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+<div class="header">
+    <div>
+        <h1>📣 Foreman Marketing Hub</h1>
+        <p>All marketing assets, copy, strategy, and campaigns in one place</p>
+    </div>
+    <a href="/admin" style="color:var(--text-muted);font-size:.85rem;text-decoration:none"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+</div>
+
+<div class="container">
+<div class="tabs">
+    <button class="tab active" onclick="showTab('strategy',this)">📊 Strategy</button>
+    <button class="tab" onclick="showTab('social',this)">📱 Social Media</button>
+    <button class="tab" onclick="showTab('email',this)">📧 Email Campaigns</button>
+    <button class="tab" onclick="showTab('ads',this)">🎯 Ad Copy</button>
+    <button class="tab" onclick="showTab('appstore',this)">📲 App Store</button>
+    <button class="tab" onclick="showTab('seo',this)">🔍 SEO</button>
+    <button class="tab" onclick="showTab('kpis',this)">📈 KPIs & Goals</button>
+    <button class="tab" onclick="showTab('launch',this)">🚀 Launch Plan</button>
+</div>
+
+<!-- STRATEGY -->
+<div class="section active" id="tab-strategy">
+    <div class="card">
+        <h2>🎯 Marketing Strategy Overview</h2>
+        <div class="grid-3">
+            <div class="metric-card"><div class="metric-val">$49</div><div class="metric-label">Entry Price Point</div></div>
+            <div class="metric-card"><div class="metric-val">~85K</div><div class="metric-label">Alberta Construction Businesses</div></div>
+            <div class="metric-card"><div class="metric-val">$1.2M</div><div class="metric-label">ARR at 200 customers</div></div>
+        </div>
+    </div>
+    <div class="grid-2">
+        <div class="card">
+            <h2>🎯 Target Audience</h2>
+            <h3>Primary: Small-Medium Alberta Contractors</h3>
+            <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem">Owner-operators and small teams (1-15 employees) in Alberta's construction trades who are overwhelmed by admin work.</p>
+            <div style="margin-bottom:.75rem">
+                <strong style="font-size:.85rem">Demographics:</strong>
+                <div style="margin-top:.4rem">
+                    <span class="badge badge-blue">Age 28-55</span>
+                    <span class="badge badge-blue">Male 85%</span>
+                    <span class="badge badge-blue">Edmonton / Calgary</span>
+                    <span class="badge badge-blue">$80K-$500K revenue</span>
+                </div>
+            </div>
+            <div style="margin-bottom:.75rem">
+                <strong style="font-size:.85rem">Pain Points:</strong>
+                <ul style="font-size:.83rem;color:var(--text-muted);margin-top:.4rem;padding-left:1.2rem;line-height:2">
+                    <li>Spending evenings on invoices & paperwork</li>
+                    <li>Missing WCB deadlines and compliance</li>
+                    <li>Losing money on unbilled hours</li>
+                    <li>Chasing unpaid invoices</li>
+                    <li>Payroll errors and CRA penalties</li>
+                </ul>
+            </div>
+            <div>
+                <strong style="font-size:.85rem">Trades to Target:</strong>
+                <div style="margin-top:.4rem">
+                    <span class="badge badge-orange">Framing</span>
+                    <span class="badge badge-orange">Electrical</span>
+                    <span class="badge badge-orange">Plumbing</span>
+                    <span class="badge badge-orange">HVAC</span>
+                    <span class="badge badge-orange">Roofing</span>
+                    <span class="badge badge-orange">Concrete</span>
+                    <span class="badge badge-orange">Renovation</span>
+                    <span class="badge badge-orange">Painting</span>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <h2>💡 Unique Value Proposition</h2>
+            <div class="copy-box">
+                <pre>Foreman is the only business management app built specifically for Alberta construction trades.
+
+Unlike generic tools like QuickBooks or Procore, Foreman knows Alberta's WCB rates, GST rules, CPP/EI calculations, and permit requirements out of the box.
+
+It's like having a bookkeeper, compliance officer, and business manager in your pocket — for less than $2/day.</pre>
+                <button class="copy-btn" onclick="copyText(this)">Copy</button>
+            </div>
+            <h3 style="margin-top:1rem">Competitive Positioning</h3>
+            <table style="width:100%;font-size:.8rem;border-collapse:collapse;margin-top:.5rem">
+                <thead><tr style="background:var(--bg3)"><th style="padding:.4rem .6rem;text-align:left">Feature</th><th style="padding:.4rem .6rem">Foreman</th><th style="padding:.4rem .6rem">QuickBooks</th><th style="padding:.4rem .6rem">Procore</th></tr></thead>
+                <tbody>
+                    <tr><td style="padding:.4rem .6rem">Alberta WCB Built-in</td><td style="padding:.4rem .6rem;text-align:center;color:#66bb6a">✅</td><td style="padding:.4rem .6rem;text-align:center;color:#ef5350">❌</td><td style="padding:.4rem .6rem;text-align:center;color:#ef5350">❌</td></tr>
+                    <tr><td style="padding:.4rem .6rem">AI Chat Assistant</td><td style="padding:.4rem .6rem;text-align:center;color:#66bb6a">✅</td><td style="padding:.4rem .6rem;text-align:center;color:#ef5350">❌</td><td style="padding:.4rem .6rem;text-align:center;color:#ef5350">❌</td></tr>
+                    <tr><td style="padding:.4rem .6rem">Invoice Builder</td><td style="padding:.4rem .6rem;text-align:center;color:#66bb6a">✅</td><td style="padding:.4rem .6rem;text-align:center;color:#66bb6a">✅</td><td style="padding:.4rem .6rem;text-align:center;color:#ffa726">⚠️</td></tr>
+                    <tr><td style="padding:.4rem .6rem">Price/month</td><td style="padding:.4rem .6rem;text-align:center;color:#66bb6a">$49</td><td style="padding:.4rem .6rem;text-align:center;color:#ffa726">$35-$90</td><td style="padding:.4rem .6rem;text-align:center;color:#ef5350">$375+</td></tr>
+                    <tr><td style="padding:.4rem .6rem">Built for Trades</td><td style="padding:.4rem .6rem;text-align:center;color:#66bb6a">✅</td><td style="padding:.4rem .6rem;text-align:center;color:#ef5350">❌</td><td style="padding:.4rem .6rem;text-align:center;color:#ffa726">⚠️</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h2>📣 Marketing Channels (Priority Order)</h2>
+        <div class="grid-3">
+            <div class="strategy-step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                    <h4>Facebook & Instagram Ads</h4>
+                    <p>Target Alberta contractors by job title, interests (construction, tools, trades). $500-$1,000/mo budget. Best ROI for this audience.</p>
+                </div>
+            </div>
+            <div class="strategy-step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <h4>Google Search Ads</h4>
+                    <p>Target "Alberta contractor software", "WCB tracking app", "construction invoice app Canada". High intent buyers.</p>
+                </div>
+            </div>
+            <div class="strategy-step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                    <h4>Alberta Trade Associations</h4>
+                    <p>Partner with CABC, BOMA Alberta, CAGBC. Sponsor newsletters. Attend trade shows (Edmonton Home Show, Calgary Stampede trade events).</p>
+                </div>
+            </div>
+            <div class="strategy-step">
+                <div class="step-num">4</div>
+                <div class="step-body">
+                    <h4>YouTube / TikTok</h4>
+                    <p>Short videos: "How I invoice faster", "WCB explained in 60 seconds". Target Alberta tradespeople. Organic reach is strong.</p>
+                </div>
+            </div>
+            <div class="strategy-step">
+                <div class="step-num">5</div>
+                <div class="step-body">
+                    <h4>Referral Program</h4>
+                    <p>Give existing users 1 month free for each referral. Contractors trust other contractors. Word-of-mouth is powerful in trades.</p>
+                </div>
+            </div>
+            <div class="strategy-step">
+                <div class="step-num">6</div>
+                <div class="step-body">
+                    <h4>SEO Content Marketing</h4>
+                    <p>Blog posts: "Alberta WCB rates 2025", "How to invoice as a contractor in Alberta", "GST for construction businesses". Long-term organic traffic.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SOCIAL MEDIA -->
+<div class="section" id="tab-social">
+    <div class="card">
+        <h2>📱 Social Media Content Calendar</h2>
+        <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1.5rem">Post 3-5x per week across Facebook, Instagram, and LinkedIn. Use these templates and customize with your own photos/videos.</p>
+        <div class="grid-2">
+            <div>
+                <h3 style="margin-bottom:.75rem">Facebook / Instagram Posts</h3>
+                <div class="social-card" style="margin-bottom:1rem">
+                    <div class="platform"><i class="fab fa-facebook" style="color:#1877f2"></i> Facebook / Instagram — Pain Point Post</div>
+                    <div class="copy-box"><pre class="post">🔨 Still doing your invoices at 10pm after a 12-hour day on site?
+
+There's a better way.
+
+Foreman lets Alberta contractors create professional invoices with line items, GST, and payment terms in under 2 minutes — right from your phone.
+
+✅ Auto-calculates GST (5%)
+✅ Add unlimited line items
+✅ Send directly to clients
+✅ Track who's paid and who hasn't
+
+Try it free for 14 days 👇
+foreman-app.onrender.com
+
+#AlbertaContractor #ConstructionBusiness #Trades #Edmonton #Calgary #Foreman</pre><button class="copy-btn" onclick="copyText(this)">Copy</button></div>
+                </div>
+                <div class="social-card" style="margin-bottom:1rem">
+                    <div class="platform"><i class="fab fa-instagram" style="color:#e1306c"></i> Instagram — Feature Spotlight</div>
+                    <div class="copy-box"><pre class="post">Did you know Alberta contractors can get fined thousands for WCB non-compliance? 😬
+
+Foreman tracks your WCB rates, deadlines, and filings automatically.
+
+No more guessing. No more penalties.
+
+Built specifically for Alberta trades. 🏗️
+
+Link in bio → 14-day free trial
+
+#WCB #AlbertaTrades #ContractorLife #ConstructionTech #Foreman</pre><button class="copy-btn" onclick="copyText(this)">Copy</button></div>
+                </div>
+                <div class="social-card" style="margin-bottom:1rem">
+                    <div class="platform"><i class="fab fa-facebook" style="color:#1877f2"></i> Facebook — Social Proof</div>
+                    <div class="copy-box"><pre class="post">💬 "I used to spend Sunday evenings doing invoices. Now it takes me 10 minutes on Friday afternoon."
+— Mike T., Framing Contractor, Edmonton
+
+Foreman is the business management app built for Alberta construction trades.
+
+AI chat, invoicing, WCB compliance, payroll, permits — all in one place.
+
+Starting at $49/month. Less than a tank of gas. ⛽
+
+👉 foreman-app.onrender.com
+
+#AlbertaContractor #SmallBusiness #Trades #Construction</pre><button class="copy-btn" onclick="copyText(this)">Copy</button></div>
+                </div>
+                <div class="social-card">
+                    <div class="platform"><i class="fab fa-instagram" style="color:#e1306c"></i> Instagram — Value Post</div>
+                    <div class="copy-box"><pre class="post">3 things every Alberta contractor should track 📋
+
+1️⃣ WCB premiums (due quarterly — miss it and face penalties)
+2️⃣ GST collected vs. GST paid (net remittance to CRA)
+3️⃣ Unbilled hours (most contractors lose $5K-$20K/year here)
+
+Foreman tracks all 3 automatically.
+
+Free 14-day trial at foreman-app.onrender.com
+
+#ContractorTips #AlbertaBusiness #Trades #WCB #GST</pre><button class="copy-btn" onclick="copyText(this)">Copy</button></div>
+                </div>
+            </div>
+            <div>
+                <h3 style="margin-bottom:.75rem">LinkedIn Posts</h3>
+                <div class="social-card" style="margin-bottom:1rem">
+                    <div class="platform"><i class="fab fa-linkedin" style="color:#0a66c2"></i> LinkedIn — Thought Leadership</div>
+                    <div class="copy-box"><pre class="post">Alberta's construction industry generates $20B+ annually, yet most contractors are still managing their business with spreadsheets and paper invoices.
+
+The problem isn't skill — it's tools.
+
+Generic software like QuickBooks wasn't built for trades. It doesn't know Alberta's WCB rates. It doesn't understand CPP/EI for seasonal workers. It doesn't have GST built into every invoice.
+
+That's why we built Foreman.
+
+An AI-powered business management platform built specifically for Alberta construction trades.
+
+✅ WCB compliance tracking
+✅ GST-aware invoicing with line items
+✅ AI assistant that knows Alberta construction law
+✅ Payroll with CPP/EI calculations
+✅ Permit tracking
+
+If you're a contractor or know one who's drowning in admin work, I'd love to show you what we've built.
+
+14-day free trial: foreman-app.onrender.com
+
+#Construction #Alberta #Trades #SaaS #SmallBusiness</pre><button class="copy-btn" onclick="copyText(this)">Copy</button></div>
+                </div>
+                <div class="social-card" style="margin-bottom:1rem">
+                    <div class="platform"><i class="fab fa-tiktok" style="color:#ff0050"></i> TikTok / Reels Script</div>
+                    <div class="copy-box"><pre class="post">HOOK (0-3s): "Alberta contractors — stop doing this"
+
+PROBLEM (3-10s): Show paper invoices, spreadsheets, late nights
+
+SOLUTION (10-25s): Screen recording of Foreman:
+- Open app
+- New invoice
+- Add line items (labour, materials)
+- GST auto-calculates
+- Send to client in 60 seconds
+
+CTA (25-30s): "14-day free trial — link in bio"
+
+CAPTION:
+Stop spending your evenings on invoices 😤 Foreman does it in 60 seconds. Alberta contractors only 🇨🇦 #ContractorLife #Trades #Alberta #Construction #BusinessTips</pre><button class="copy-btn" onclick="copyText(this)">Copy</button></div>
+                </div>
+                <div class="social-card">
+                    <div class="platform"><i class="fab fa-facebook" style="color:#1877f2"></i> Facebook Group Post (Alberta Contractor Groups)</div>
+                    <div class="copy-box"><pre class="post">Hey everyone — I built something for Alberta contractors and wanted to share it here.
+
+It's called Foreman — a business management app built specifically for Alberta trades.
+
+What it does:
+• Invoice builder with GST and line items
+• WCB compliance tracking
+• AI assistant for construction questions
+• Payroll with CPP/EI
+• Permit tracking
+• Project management
+
+I built it because I was tired of using generic software that didn't understand Alberta's rules.
+
+It's $49/month with a 14-day free trial. No credit card required.
+
+Would love feedback from this group. Link: foreman-app.onrender.com
+
+(Mods — let me know if this isn't allowed, happy to remove)</pre><button class="copy-btn" onclick="copyText(this)">Copy</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <h2>📅 Weekly Content Schedule</h2>
+        <table class="kpi-table">
+            <thead><tr><th>Day</th><th>Platform</th><th>Content Type</th><th>Topic</th></tr></thead>
+            <tbody>
+                <tr><td>Monday</td><td>Facebook + Instagram</td><td>Pain Point Post</td><td>Rotate: invoicing / WCB / payroll / permits</td></tr>
+                <tr><td>Tuesday</td><td>LinkedIn</td><td>Thought Leadership</td><td>Industry insight or tip</td></tr>
+                <tr><td>Wednesday</td><td>Instagram Reels / TikTok</td><td>Video Demo</td><td>Feature walkthrough (60 seconds)</td></tr>
+                <tr><td>Thursday</td><td>Facebook</td><td>Social Proof</td><td>Testimonial or case study</td></tr>
+                <tr><td>Friday</td><td>All Platforms</td><td>Value Post</td><td>"3 tips for Alberta contractors" style</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- EMAIL CAMPAIGNS -->
+<div class="section" id="tab-email">
+    <div class="card">
+        <h2>📧 Email Marketing Campaigns</h2>
+        <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1.5rem">Use these templates in Mailchimp, Klaviyo, or any email platform. Personalize with [FIRST_NAME] and [COMPANY_NAME].</p>
+
+        <h3 style="margin-bottom:.75rem">Welcome Sequence (Automated — 5 emails)</h3>
+        <div class="email-template">
+            <div class="email-subject">Email 1 (Day 0) — Subject: Welcome to Foreman, [FIRST_NAME] 🏗️</div>
+            <div class="email-body">
+Hi [FIRST_NAME],<br><br>
+Welcome to Foreman — the business management app built for Alberta construction trades.<br><br>
+You've got 14 days to explore everything. Here's where to start:<br><br>
+<strong>Step 1:</strong> Set up your business info (Settings → Business)<br>
+<strong>Step 2:</strong> Create your first invoice (Invoices → New Invoice)<br>
+<strong>Step 3:</strong> Ask the AI anything (AI Chat → type your question)<br><br>
+If you have any questions, just reply to this email. I read every one.<br><br>
+Talk soon,<br>
+The Foreman Team<br><br>
+P.S. — Your trial ends in 14 days. No credit card required until then.
+            </div>
+        </div>
+        <div class="email-template">
+            <div class="email-subject">Email 2 (Day 2) — Subject: Did you know Foreman calculates WCB automatically?</div>
+            <div class="email-body">
+Hey [FIRST_NAME],<br><br>
+Quick tip: Foreman automatically calculates your WCB premiums based on Alberta's current rates.<br><br>
+Just go to <strong>Compliance → WCB</strong> and enter your payroll. Foreman does the math.<br><br>
+Alberta WCB rates for construction trades range from 1.2% to 4.8% depending on your classification. Getting this wrong can mean penalties.<br><br>
+Foreman keeps you compliant automatically.<br><br>
+→ <a href="https://foreman-app.onrender.com/app">Try it now</a><br><br>
+The Foreman Team
+            </div>
+        </div>
+        <div class="email-template">
+            <div class="email-subject">Email 3 (Day 5) — Subject: [FIRST_NAME], here's how to invoice in 60 seconds</div>
+            <div class="email-body">
+Hey [FIRST_NAME],<br><br>
+Most contractors tell us invoicing used to take them 30-60 minutes per invoice.<br><br>
+With Foreman's invoice builder, it takes under 2 minutes:<br><br>
+1. Click "New Invoice"<br>
+2. Add your client name<br>
+3. Add line items (labour, materials, equipment)<br>
+4. GST calculates automatically<br>
+5. Hit send<br><br>
+That's it. Your client gets a professional invoice instantly.<br><br>
+→ <a href="https://foreman-app.onrender.com/app">Create an invoice now</a><br><br>
+The Foreman Team
+            </div>
+        </div>
+        <div class="email-template">
+            <div class="email-subject">Email 4 (Day 10) — Subject: 4 days left in your trial — here's what you're getting</div>
+            <div class="email-body">
+Hey [FIRST_NAME],<br><br>
+Your free trial ends in 4 days. Here's what you'll keep access to when you subscribe:<br><br>
+✅ AI Chat — ask anything about Alberta construction, taxes, compliance<br>
+✅ Invoice Builder — unlimited invoices with GST and line items<br>
+✅ WCB Compliance — automatic calculations and deadline tracking<br>
+✅ Payroll Calculator — CPP, EI, income tax for Alberta workers<br>
+✅ Project Management — track jobs, budgets, and timelines<br>
+✅ Permit Tracking — never miss a permit deadline<br><br>
+All of this for $49/month. Less than one hour of your labour rate.<br><br>
+→ <a href="https://foreman-app.onrender.com/app">Subscribe now</a><br><br>
+Questions? Just reply to this email.<br><br>
+The Foreman Team
+            </div>
+        </div>
+        <div class="email-template">
+            <div class="email-subject">Email 5 (Day 14) — Subject: Your trial ends today — don't lose your data</div>
+            <div class="email-body">
+Hey [FIRST_NAME],<br><br>
+Your 14-day free trial ends today.<br><br>
+Subscribe now to keep access to all your invoices, projects, and settings — and keep saving hours every week.<br><br>
+<strong>Starter Plan — $49/month</strong><br>
+Everything you need to run your construction business.<br><br>
+→ <a href="https://foreman-app.onrender.com/app">Subscribe now — $49/month</a><br><br>
+Not ready? Reply and tell me why — I'd love to hear your feedback and may be able to help.<br><br>
+The Foreman Team
+            </div>
+        </div>
+
+        <h3 style="margin-top:1.5rem;margin-bottom:.75rem">Re-engagement Campaign (For inactive users)</h3>
+        <div class="email-template">
+            <div class="email-subject">Subject: [FIRST_NAME], we added something you'll love</div>
+            <div class="email-body">
+Hey [FIRST_NAME],<br><br>
+We've been busy building new features for Foreman. Here's what's new:<br><br>
+🆕 <strong>Invoice Builder with Line Items</strong> — Add unlimited lines with qty, rate, and price. GST toggle per line.<br>
+🆕 <strong>Estimate/Quote Builder</strong> — Create professional quotes and convert them to invoices.<br>
+🆕 <strong>35+ Alberta Trades</strong> — Project types now include every field-level trade in Alberta.<br>
+🆕 <strong>Project Dates</strong> — Track start dates and scheduled finish dates.<br><br>
+Come back and check it out — your account is still active.<br><br>
+→ <a href="https://foreman-app.onrender.com/app">Log in now</a><br><br>
+The Foreman Team
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AD COPY -->
+<div class="section" id="tab-ads">
+    <div class="card">
+        <h2>🎯 Paid Ad Copy</h2>
+        <div class="grid-2">
+            <div>
+                <h3 style="margin-bottom:.75rem">Facebook / Instagram Ads</h3>
+                <div class="ad-card" style="margin-bottom:1rem">
+                    <div class="ad-type">📘 Facebook Ad — Awareness</div>
+                    <div class="headline">Alberta Contractors: Stop Doing Invoices at 10pm</div>
+                    <div class="body">Foreman is the business management app built for Alberta trades. Invoice in 60 seconds, track WCB automatically, and ask our AI anything about construction compliance. 14-day free trial.</div>
+                    <div class="cta">CTA: Start Free Trial →</div>
+                </div>
+                <div class="ad-card" style="margin-bottom:1rem">
+                    <div class="ad-type">📘 Facebook Ad — Pain Point</div>
+                    <div class="headline">WCB Fines Are Expensive. Foreman Isn't.</div>
+                    <div class="body">Alberta contractors face thousands in WCB penalties for missed filings. Foreman tracks your WCB rates, deadlines, and calculations automatically. Starting at $49/month.</div>
+                    <div class="cta">CTA: Try Free for 14 Days →</div>
+                </div>
+                <div class="ad-card" style="margin-bottom:1rem">
+                    <div class="ad-type">📸 Instagram Ad — Feature</div>
+                    <div class="headline">Invoice Builder Built for Trades</div>
+                    <div class="body">Add line items, quantities, rates. GST calculates automatically. Send professional invoices from your phone in under 2 minutes. Alberta contractors only.</div>
+                    <div class="cta">CTA: See How It Works →</div>
+                </div>
+                <div class="ad-card">
+                    <div class="ad-type">📘 Facebook Retargeting Ad</div>
+                    <div class="headline">Still Thinking About It, [FIRST_NAME]?</div>
+                    <div class="body">You visited Foreman but didn't sign up. Here's what you're missing: AI chat, WCB compliance, invoice builder, payroll calculator. All for $49/month. Less than one hour of your time.</div>
+                    <div class="cta">CTA: Start Your Free Trial →</div>
+                </div>
+            </div>
+            <div>
+                <h3 style="margin-bottom:.75rem">Google Search Ads</h3>
+                <div class="ad-card" style="margin-bottom:1rem">
+                    <div class="ad-type">🔍 Google Ad — Keyword: "contractor software Alberta"</div>
+                    <div class="headline">Contractor Software Built for Alberta | Foreman</div>
+                    <div class="body">WCB tracking, GST invoicing, AI assistant. Built for Alberta trades. 14-day free trial. No credit card required. Starting at $49/month.</div>
+                    <div class="cta">foreman-app.onrender.com</div>
+                </div>
+                <div class="ad-card" style="margin-bottom:1rem">
+                    <div class="ad-type">🔍 Google Ad — Keyword: "WCB tracking app"</div>
+                    <div class="headline">WCB Compliance App for Alberta Contractors</div>
+                    <div class="body">Automatically calculate WCB premiums, track deadlines, and stay compliant. Built for Alberta construction trades. Free 14-day trial.</div>
+                    <div class="cta">foreman-app.onrender.com</div>
+                </div>
+                <div class="ad-card" style="margin-bottom:1rem">
+                    <div class="ad-type">🔍 Google Ad — Keyword: "construction invoice app Canada"</div>
+                    <div class="headline">Construction Invoice App with GST | Foreman</div>
+                    <div class="body">Create professional invoices with line items and automatic GST in under 2 minutes. Built for Canadian contractors. Try free for 14 days.</div>
+                    <div class="cta">foreman-app.onrender.com</div>
+                </div>
+                <div class="ad-card">
+                    <div class="ad-type">🔍 Google Ad — Keyword: "QuickBooks alternative for contractors"</div>
+                    <div class="headline">Better Than QuickBooks for Contractors | Foreman</div>
+                    <div class="body">QuickBooks wasn't built for trades. Foreman was. WCB, GST, CPP/EI, permits — all built in for Alberta contractors. $49/month.</div>
+                    <div class="cta">foreman-app.onrender.com</div>
+                </div>
+            </div>
+        </div>
+        <div class="card" style="margin-top:1rem">
+            <h2>💰 Ad Budget Recommendations</h2>
+            <table class="kpi-table">
+                <thead><tr><th>Channel</th><th>Monthly Budget</th><th>Expected Leads</th><th>Expected Signups</th><th>Cost per Signup</th></tr></thead>
+                <tbody>
+                    <tr><td>Facebook/Instagram Ads</td><td>$500</td><td>150-300</td><td>15-30</td><td>$17-$33</td></tr>
+                    <tr><td>Google Search Ads</td><td>$400</td><td>80-150</td><td>10-20</td><td>$20-$40</td></tr>
+                    <tr><td>LinkedIn Ads</td><td>$200</td><td>30-60</td><td>3-8</td><td>$25-$67</td></tr>
+                    <tr><td><strong>Total</strong></td><td><strong>$1,100</strong></td><td><strong>260-510</strong></td><td><strong>28-58</strong></td><td><strong>~$25 avg</strong></td></tr>
+                </tbody>
+            </table>
+            <p style="font-size:.8rem;color:var(--text-muted);margin-top:.75rem">At $49/month average revenue, 28 signups = $1,372 MRR. Payback period: ~1 month. Scale budget as you grow.</p>
+        </div>
+    </div>
+</div>
+
+<!-- APP STORE -->
+<div class="section" id="tab-appstore">
+    <div class="card">
+        <h2>📲 App Store Listings</h2>
+        <div class="grid-2">
+            <div>
+                <h3 style="margin-bottom:.75rem">Apple App Store</h3>
+                <div class="copy-box">
+                    <pre><strong>App Name:</strong> Foreman — Alberta Contractor App
+
+<strong>Subtitle:</strong> WCB, Invoicing & AI Assistant
+
+<strong>Description:</strong>
+Foreman is the all-in-one business management app built specifically for Alberta construction contractors and trades.
+
+WHAT FOREMAN DOES:
+• AI Chat Assistant — Ask anything about Alberta construction, WCB, GST, permits, and compliance
+• Invoice Builder — Create professional invoices with line items, quantities, rates, and automatic GST (5%)
+• Estimate Builder — Generate quotes and convert them to invoices
+• WCB Compliance — Track premiums, deadlines, and filings automatically
+• Payroll Calculator — CPP, EI, and income tax for Alberta workers
+• Project Management — Track jobs with start dates, finish dates, and contract values
+• Permit Tracking — Never miss a permit deadline
+• Safety Checklists — Alberta-compliant safety documentation
+
+BUILT FOR ALBERTA TRADES:
+Framing, Electrical, Plumbing, HVAC, Roofing, Concrete, Masonry, Carpentry, Drywall, Painting, Flooring, Welding, Pipefitting, and 25+ more trades.
+
+WHY FOREMAN?
+Unlike QuickBooks or generic apps, Foreman knows Alberta's WCB rates, GST rules, and construction regulations out of the box. No setup required.
+
+PRICING:
+• 14-day free trial (no credit card required)
+• Starter: $49/month
+• Professional: $99/month
+• Business: $199/month
+
+<strong>Keywords:</strong> contractor, Alberta, WCB, construction, invoice, trades, foreman, GST, payroll, compliance, framing, electrical, plumbing</pre>
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                </div>
+            </div>
+            <div>
+                <h3 style="margin-bottom:.75rem">Google Play Store</h3>
+                <div class="copy-box">
+                    <pre><strong>App Name:</strong> Foreman: Alberta Contractor App
+
+<strong>Short Description:</strong>
+WCB compliance, invoicing, AI assistant & payroll for Alberta construction trades.
+
+<strong>Full Description:</strong>
+Run your Alberta construction business from your phone.
+
+Foreman is the only business management app built specifically for Alberta contractors and trades. It knows Alberta's WCB rates, GST rules, and construction regulations — so you don't have to.
+
+★ FEATURES ★
+
+📄 INVOICE BUILDER
+Create professional invoices with unlimited line items. Add descriptions, quantities, units, and rates. GST (5%) calculates automatically per line. Send to clients instantly.
+
+📋 ESTIMATE BUILDER
+Generate professional quotes and estimates. Convert to invoices with one tap.
+
+🏗️ PROJECT MANAGEMENT
+Track all your jobs with start dates, scheduled finish dates, contract values, and status. Supports 35+ Alberta trades.
+
+🤖 AI ASSISTANT
+Ask Foreman anything: "What's my WCB rate for framing?", "How do I calculate CPP for a new hire?", "What permits do I need for a renovation in Edmonton?"
+
+💰 WCB COMPLIANCE
+Automatic WCB premium calculations based on Alberta's current rates. Track deadlines and filings.
+
+👷 PAYROLL CALCULATOR
+Calculate CPP, EI, and income tax for Alberta workers. Supports hourly, salary, and seasonal workers.
+
+📋 PERMIT TRACKING
+Track building permits, electrical permits, plumbing permits, and more. Get deadline reminders.
+
+✅ SAFETY CHECKLISTS
+Alberta-compliant safety documentation for your job sites.
+
+★ PRICING ★
+14-day free trial — no credit card required
+Starter: $49/month | Professional: $99/month | Business: $199/month
+
+<strong>Tags:</strong> construction, contractor, Alberta, WCB, invoice, trades, payroll, compliance</pre>
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" style="margin-top:1rem">
+            <h2>📲 PWA Deployment (Current)</h2>
+            <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem">Foreman is currently deployed as a Progressive Web App (PWA). Users can install it on their phone from the browser. For native app store listings, follow these steps:</p>
+            <div class="strategy-step">
+                <div class="step-num">1</div>
+                <div class="step-body"><h4>Wrap with Capacitor (iOS/Android)</h4><p>Run: <code style="background:var(--bg3);padding:.1rem .4rem;border-radius:4px">npm install @capacitor/core @capacitor/cli && npx cap init</code> to wrap the web app as a native app.</p></div>
+            </div>
+            <div class="strategy-step">
+                <div class="step-num">2</div>
+                <div class="step-body"><h4>Apple Developer Account</h4><p>$99 USD/year. Required to publish on App Store. Register at developer.apple.com.</p></div>
+            </div>
+            <div class="strategy-step">
+                <div class="step-num">3</div>
+                <div class="step-body"><h4>Google Play Developer Account</h4><p>$25 USD one-time fee. Register at play.google.com/console.</p></div>
+            </div>
+            <div class="strategy-step">
+                <div class="step-num">4</div>
+                <div class="step-body"><h4>App Store Screenshots</h4><p>Create 5-10 screenshots showing key features. Use iPhone 6.7" and Android phone sizes. Tools: Figma, Canva, or AppMockUp.com.</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SEO -->
+<div class="section" id="tab-seo">
+    <div class="card">
+        <h2>🔍 SEO Strategy</h2>
+        <div class="grid-2">
+            <div>
+                <h3 style="margin-bottom:.75rem">Target Keywords</h3>
+                <table class="kpi-table">
+                    <thead><tr><th>Keyword</th><th>Monthly Searches</th><th>Difficulty</th></tr></thead>
+                    <tbody>
+                        <tr><td>contractor software Alberta</td><td>~200</td><td>Low</td></tr>
+                        <tr><td>WCB tracking app Alberta</td><td>~150</td><td>Low</td></tr>
+                        <tr><td>construction invoice app Canada</td><td>~300</td><td>Medium</td></tr>
+                        <tr><td>Alberta contractor app</td><td>~100</td><td>Low</td></tr>
+                        <tr><td>construction business software Canada</td><td>~400</td><td>Medium</td></tr>
+                        <tr><td>WCB calculator Alberta</td><td>~500</td><td>Low</td></tr>
+                        <tr><td>GST invoice template Canada</td><td>~800</td><td>Medium</td></tr>
+                        <tr><td>framing contractor software</td><td>~200</td><td>Low</td></tr>
+                        <tr><td>QuickBooks alternative contractors</td><td>~1,200</td><td>High</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3 style="margin-bottom:.75rem">Blog Post Ideas (High-Value)</h3>
+                <ul class="checklist">
+                    <li>Alberta WCB Rates 2025: Complete Guide for Contractors</li>
+                    <li>How to Invoice as a Contractor in Alberta (with GST)</li>
+                    <li>CPP and EI Rates for Alberta Construction Workers 2025</li>
+                    <li>Building Permit Requirements in Edmonton and Calgary</li>
+                    <li>WCB vs. Private Insurance: What Alberta Contractors Need to Know</li>
+                    <li>How to Calculate GST on Construction Invoices</li>
+                    <li>Alberta Contractor Tax Deductions: Complete List</li>
+                    <li>Best Apps for Construction Contractors in Canada 2025</li>
+                    <li>How to Set Up Payroll for Your First Employee in Alberta</li>
+                    <li>Safety Checklist Requirements for Alberta Job Sites</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card" style="margin-top:1rem">
+            <h2>🔗 Link Building Strategy</h2>
+            <div class="grid-3">
+                <div class="strategy-step">
+                    <div class="step-num">1</div>
+                    <div class="step-body"><h4>Alberta Business Directories</h4><p>List on Alberta.ca business directory, Edmonton Chamber of Commerce, Calgary Chamber of Commerce, CABC member directory.</p></div>
+                </div>
+                <div class="strategy-step">
+                    <div class="step-num">2</div>
+                    <div class="step-body"><h4>Trade Association Partnerships</h4><p>Partner with CABC, BOMA Alberta, CAGBC for newsletter features and website links. Offer member discounts.</p></div>
+                </div>
+                <div class="strategy-step">
+                    <div class="step-num">3</div>
+                    <div class="step-body"><h4>Software Review Sites</h4><p>Submit to G2, Capterra, GetApp, Software Advice. These rank well for "contractor software" searches.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KPIs -->
+<div class="section" id="tab-kpis">
+    <div class="card">
+        <h2>📈 KPIs & Growth Goals</h2>
+        <div class="grid-3" style="margin-bottom:1.5rem">
+            <div class="metric-card"><div class="metric-val">50</div><div class="metric-label">Month 3 Target (Customers)</div></div>
+            <div class="metric-card"><div class="metric-val">200</div><div class="metric-label">Month 12 Target (Customers)</div></div>
+            <div class="metric-card"><div class="metric-val">$1.2M</div><div class="metric-label">Year 1 ARR Target</div></div>
+        </div>
+        <table class="kpi-table">
+            <thead><tr><th>Metric</th><th>Month 1</th><th>Month 3</th><th>Month 6</th><th>Month 12</th></tr></thead>
+            <tbody>
+                <tr><td>Total Customers</td><td>10</td><td>50</td><td>120</td><td>250</td></tr>
+                <tr><td>MRR</td><td>$490</td><td>$2,450</td><td>$7,350</td><td>$15,000</td></tr>
+                <tr><td>ARR</td><td>$5,880</td><td>$29,400</td><td>$88,200</td><td>$180,000</td></tr>
+                <tr><td>Trial Signups/Month</td><td>30</td><td>100</td><td>200</td><td>400</td></tr>
+                <tr><td>Trial → Paid Conversion</td><td>33%</td><td>35%</td><td>40%</td><td>45%</td></tr>
+                <tr><td>Monthly Churn</td><td>5%</td><td>4%</td><td>3%</td><td>2.5%</td></tr>
+                <tr><td>NPS Score</td><td>—</td><td>40+</td><td>50+</td><td>60+</td></tr>
+                <tr><td>CAC (Customer Acquisition Cost)</td><td>$50</td><td>$40</td><td>$30</td><td>$25</td></tr>
+                <tr><td>LTV (Lifetime Value)</td><td>$588</td><td>$700</td><td>$800</td><td>$950</td></tr>
+                <tr><td>LTV:CAC Ratio</td><td>11.8x</td><td>17.5x</td><td>26.7x</td><td>38x</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card">
+        <h2>📊 Marketing Funnel</h2>
+        <div class="grid-3">
+            <div class="metric-card"><div class="metric-val">1,000</div><div class="metric-label">Monthly Website Visitors (Goal)</div></div>
+            <div class="metric-card"><div class="metric-val">10%</div><div class="metric-label">Visitor → Trial Conversion</div></div>
+            <div class="metric-card"><div class="metric-val">40%</div><div class="metric-label">Trial → Paid Conversion</div></div>
+        </div>
+        <div style="margin-top:1rem;font-size:.85rem;color:var(--text-muted)">
+            <strong>Funnel Math:</strong> 1,000 visitors → 100 trials → 40 new customers/month → $1,960 new MRR/month at $49 avg
+        </div>
+    </div>
+</div>
+
+<!-- LAUNCH PLAN -->
+<div class="section" id="tab-launch">
+    <div class="card">
+        <h2>🚀 90-Day Launch Plan</h2>
+        <div class="grid-2">
+            <div>
+                <h3 style="color:var(--accent);margin-bottom:.75rem">Month 1: Foundation</h3>
+                <ul class="checklist">
+                    <li>Set up Facebook Business Page and Instagram</li>
+                    <li>Set up LinkedIn Company Page</li>
+                    <li>Set up Google Business Profile</li>
+                    <li>Create Mailchimp/Klaviyo account and import welcome sequence</li>
+                    <li>Set up Facebook Pixel on landing page</li>
+                    <li>Set up Google Analytics 4</li>
+                    <li>Launch first Facebook/Instagram ad ($500 budget)</li>
+                    <li>Post 3x/week on social media</li>
+                    <li>Submit to G2, Capterra, GetApp</li>
+                    <li>Join 5 Alberta contractor Facebook groups</li>
+                    <li>Set up Stripe for payment processing</li>
+                    <li>Reach out to 10 contractors for beta feedback</li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color:var(--accent);margin-bottom:.75rem">Month 2: Growth</h3>
+                <ul class="checklist">
+                    <li>Scale Facebook ads to $1,000/month</li>
+                    <li>Launch Google Search Ads ($400/month)</li>
+                    <li>Publish first 3 SEO blog posts</li>
+                    <li>Record first TikTok/Reels demo video</li>
+                    <li>Contact CABC about partnership/sponsorship</li>
+                    <li>Launch referral program (1 month free per referral)</li>
+                    <li>Collect 5 testimonials from early users</li>
+                    <li>A/B test landing page headline</li>
+                    <li>Set up retargeting ads</li>
+                    <li>Attend one Alberta trade event or show</li>
+                </ul>
+            </div>
+        </div>
+        <div style="margin-top:1.5rem">
+            <h3 style="color:var(--accent);margin-bottom:.75rem">Month 3: Scale</h3>
+            <div class="grid-3">
+                <ul class="checklist">
+                    <li>Publish 5 more SEO blog posts</li>
+                    <li>Launch YouTube channel with demo videos</li>
+                    <li>Partner with 2 trade associations</li>
+                </ul>
+                <ul class="checklist">
+                    <li>Launch affiliate/partner program</li>
+                    <li>Reach out to construction accountants for referrals</li>
+                    <li>Submit app to Apple App Store (PWA wrapper)</li>
+                </ul>
+                <ul class="checklist">
+                    <li>Submit app to Google Play Store</li>
+                    <li>Run case study with top customer</li>
+                    <li>Review and optimize all ad campaigns</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <h2>🤝 Partnership Opportunities</h2>
+        <table class="kpi-table">
+            <thead><tr><th>Partner Type</th><th>Examples</th><th>Value</th><th>Action</th></tr></thead>
+            <tbody>
+                <tr><td>Trade Associations</td><td>CABC, BOMA Alberta, CAGBC</td><td>Newsletter reach, credibility</td><td>Email partnership proposal</td></tr>
+                <tr><td>Construction Accountants</td><td>Local CPA firms specializing in trades</td><td>Referrals from trusted advisors</td><td>Offer 20% referral commission</td></tr>
+                <tr><td>Lumber/Supply Yards</td><td>Rona, Home Depot Pro, local suppliers</td><td>Point-of-sale promotion</td><td>Flyer/QR code at checkout</td></tr>
+                <tr><td>WCB Consultants</td><td>Independent WCB advisors</td><td>High-intent referrals</td><td>White-label or co-brand option</td></tr>
+                <tr><td>Construction Schools</td><td>NAIT, SAIT, Bow Valley College</td><td>Student/graduate market</td><td>Student discount program</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+function showTab(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    if (btn) btn.classList.add('active');
+}
+function copyText(btn) {
+    const box = btn.closest('.copy-box');
+    const pre = box.querySelector('pre');
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+}
+</script>
+</body>
+</html>

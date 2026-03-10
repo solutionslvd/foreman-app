@@ -1,0 +1,45 @@
+total 36
+drwxr-xr-x  2 root root  4096 Mar  9 05:49 .
+drwxr-xr-x 10 user user  4096 Mar  9 05:49 ..
+-rw-r--r--  1 root root 25736 Mar  9 05:49 health_monitor.py
+---
+total 236
+drwxr-xr-x  4 root root  4096 Mar  9 05:47 .
+drwxr-xr-x 10 user user  4096 Mar  9 05:49 ..
+-rw-r--r--  1 root root   117 Feb 27 06:19 __init__.py
+drwxr-xr-x  2 root root  4096 Mar  9 05:47 __pycache__
+-rw-r--r--  1 root root  5418 Mar  9 05:22 admin_auth.py
+-rw-r--r--  1 root root 18567 Mar  6 04:53 ai_engine.py
+drwxr-xr-x  3 root root  4096 Mar  9 05:47 api
+-rw-r--r--  1 root root 27654 Mar  9 05:21 compliance_engine.py
+-rw-r--r--  1 root root  5548 Feb 27 17:48 config.py
+-rw-r--r--  1 root root  1067 Mar  6 03:19 create_test_user.py
+-rw-r--r--  1 root root 20173 Feb 28 04:11 email_ai.py
+-rw-r--r--  1 root root 29588 Feb 28 06:49 financial_ledger.py
+-rw-r--r--  1 root root 20919 Feb 27 17:31 financial_system.py
+-rw-r--r--  1 root root 19684 Mar  8 22:14 main.py
+-rw-r--r--  1 root root 12585 Mar  9 05:23 nda_generator.py
+-rw-r--r--  1 root root  6907 Mar  8 22:12 persistence.py
+-rw-r--r--  1 root root  7044 Feb 28 06:48 roles.py
+-rw-r--r--  1 root root 11474 Mar  8 22:13 settings_manager.py
+-rw-r--r--  1 root root  6037 Mar  9 05:41 user_system.py
+---
+total 824
+drwxr-xr-x  3 root root   4096 Mar  6 05:03 .
+drwxr-xr-x 10 user user   4096 Mar  9 05:49 ..
+-rw-r--r--  1 root root  93032 Mar  5 10:43 admin.html
+-rw-r--r--  1 root root  73162 Mar  6 04:59 app.css
+-rw-r--r--  1 root root 162595 Mar  9 05:24 app.html
+-rw-r--r--  1 root root 219632 Mar  9 05:26 app.js
+-rw-r--r--  1 root root  15599 Mar  6 05:01 client-view.html
+drwxr-xr-x  2 root root   4096 Feb 28 06:59 icons
+-rw-r--r--  1 root root  34106 Feb 27 06:14 index.html
+-rw-r--r--  1 root root  21591 Feb 27 17:35 index_blank.html
+-rw-r--r--  1 root root  65172 Mar  6 10:44 landing.html
+-rw-r--r--  1 root root   2492 Feb 28 07:11 manifest.json
+-rw-r--r--  1 root root  50401 Mar  5 10:42 marketing.html
+-rw-r--r--  1 root root  11290 Mar  6 05:02 privacy.html
+-rw-r--r--  1 root root  14655 Feb 27 06:17 script.js
+-rw-r--r--  1 root root  22285 Feb 27 17:36 styles.css
+-rw-r--r--  1 root root   6714 Feb 28 07:11 sw.js
+-rw-r--r--  1 root root  15377 Mar  6 05:03 terms.html

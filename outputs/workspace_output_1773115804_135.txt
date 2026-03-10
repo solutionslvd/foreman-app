@@ -1,0 +1,26 @@
+    });
+
+    // Load billing status for admin overview
+    if (isAdmin) {
+      try {
+        const billingStatus = await apiGet('/api/billing/status');
+        console.log('Billing status loaded:', billingStatus);
+      } catch(e) {
+        console.log('Could not load admin billing status');
+      }
+    }
+  } catch(e) {
+    console.log('Could not load billing data:', e);
+  }
+}
+
+function renderProjects(filter = 'all') {
+  const container = document.getElementById('projects-list');
+  let projects = store.projects || [];
+  if (filter !== 'all') projects = projects.filter(p => p.status === filter);
+
+  if (!projects.length) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🏗️</div>
+      <h3>No Projects</h3>
+      <p>${filter === 'all' ? 'Create your first project' : `No ${filter} projects`}</p>

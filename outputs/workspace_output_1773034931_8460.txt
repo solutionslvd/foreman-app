@@ -1,0 +1,41 @@
+
+class UpdatePlanRequest(BaseModel):
+    name: Optional[str] = None
+    price: Optional[float] = None
+    users: Optional[int] = None
+    features: Optional[List[str]] = None
+    active: Optional[bool] = None
+
+# ─── Auth Helper ──────────────────────────────────────────────────────────────
+
+def require_admin(authorization: Optional[str] = None) -> Dict:
+    from app.admin_auth import verify_admin_token
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Authorization header required")
+    token = authorization.replace("Bearer ", "").strip()
+    session = verify_admin_token(token)
+    if not session:
+        raise HTTPException(status_code=401, detail="Invalid or expired admin token")
+    return session
+
+# ─── Public Endpoints ─────────────────────────────────────────────────────────
+
+@router.get("/plans")
+async def get_plans():
+    """Get all available subscription plans"""
+    return {"plans": billing_settings["plans"], "currency": billing_settings["currency"]}
+
+@router.get("/stripe-key")
+async def get_stripe_key():
+    """Get Stripe publishable key for frontend"""
+    return {"publishable_key": billing_settings["stripe_publishable_key"]}
+
+# ─── User Billing Endpoints ───────────────────────────────────────────────────
+
+@router.get("/subscription/{user_email}")
+async def get_subscription(user_email: str):
+    """Get subscription for a user"""
+    sub = subscriptions_db.get(user_email)
+    if not sub:
+        return {"subscription": None, "status": "none"}
+    return {"subscription": sub}

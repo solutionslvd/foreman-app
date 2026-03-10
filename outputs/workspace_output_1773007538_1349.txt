@@ -1,0 +1,41 @@
+=== FIXED PROJECT CREATION ===
+{
+    "success": true,
+    "project": {
+        "id": "2224f2f3",
+        "name": "Test Framing Job",
+        "client_name": "Bob Johnson",
+        "client_email": "bob@test.com",
+        "client_phone": "780-555-1111",
+        "client_address": "123 Main St Edmonton AB",
+        "project_address": "456 Build Ave Edmonton AB",
+        "project_type": "residential_framing",
+        "description": "Full house framing",
+        "start_date": "2026-03-01",
+        "scheduled_finish_date": "2026-06-01",
+        "contract_value": 45000.0,
+        "status": "active",
+        "notes": null,
+        "invoices": [],
+        "expenses": [],
+        "created_at": "2026-03-08T22:05:38.740447",
+        "updated_at": "2026-03-08T22:05:38.740455"
+    }
+}
+Project ID: 
+=== FIXED CHAT TEST ===
+{
+    "response": "I'm your **Foreman AI Assistant** \u2014 here to help you run your construction business smarter.\n\nI can help with:\n\ud83d\udcca **Your business data** \u2014 invoices, projects, expenses, payroll\n\ud83d\udccb **Alberta regulations** \u2014 WCB, OHS, permits, building code\n\ud83d\udcb0 **Tax & accounting** \u2014 GST, CRA, deductions, catch-up\n\ud83d\udcdd **Documents** \u2014 contracts, quotes, change orders\n\ud83c\udfd7\ufe0f **Project management** \u2014 scope of work, scheduling, client communication\n\n**To unlock full AI responses**, add an OpenAI or Anthropic API key in your environment variables (`OPENAI_API_KEY` or `ANTHROPIC_API_KEY`).\n\nWhat can I help you with today?",
+    "suggestions": [
+        "\ud83d\udcb3 Payroll deductions due by the 15th"
+    ],
+    "actions": [
+        {
+            "action": "open_projects",
+            "label": "\ud83d\udccb View Projects",
+            "page": "projects"
+        }
+    ],
+    "confidence": 0.7,
+    "timestamp": "2026-03-08T22:05:38.792594"
+}

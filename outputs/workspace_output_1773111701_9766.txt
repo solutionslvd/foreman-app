@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foreman — Construction Business Management for Alberta Contractors</title>
+    <meta name="description" content="The only AI assistant built exclusively for Alberta construction businesses. Manage finances, compliance, projects, and emails automatically. Starting at $49/month.">
+    <meta name="keywords" content="Alberta construction AI, construction management software, WCB compliance, construction invoicing, framing contractor software">
+    <meta property="og:title" content="Foreman - AI for Construction Businesses">
+    <meta property="og:description" content="Auto-reply to leads, track compliance, manage finances. 🇨🇦 Built for Alberta contractors.">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --primary:#1a237e;--primary-light:#283593;--accent:#ff6f00;
+            --accent-light:#ffa000;--text:#1a1a2e;--text-light:#555;
+            --bg:#fff;--bg2:#f8f9ff;--border:#e0e0e0;
+            --success:#2e7d32;--card-shadow:0 4px 24px rgba(0,0,0,0.08);
+        }
+        html{scroll-behavior:smooth}
+        body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.6}
+
+        /* ── NAV ── */
+        nav{
+            position:fixed;top:0;left:0;right:0;z-index:1000;
+            background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);
+            border-bottom:1px solid var(--border);
+            padding:0 2rem;height:70px;

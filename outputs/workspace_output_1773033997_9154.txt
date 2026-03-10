@@ -1,0 +1,260 @@
+"""
+Compliance API endpoints
+"""
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict, Any
+from datetime import date, datetime
+import logging
+
+from ..compliance_engine import (
+    compliance_engine,
+    PermitType,
+    InspectionType
+)
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter()
+
+
+class WCBRegistration(BaseModel):
+    account_number: str
+    business_type: str = "construction_general"
+    number_of_workers: int = 1
+
+
+class PermitCreate(BaseModel):
+    permit_type: str
+    permit_number: str
+    project_address: str
+    issue_date: date
+    expiry_date: Optional[date] = None
+    issuing_authority: str = "City of Calgary"
+
+
+class InspectionRecord(BaseModel):
+    permit_id: int
+    inspection_type: str
+    inspection_date: date
+    inspector_name: str
+    result: str = "passed"
+    findings: Optional[str] = None
+    corrections_required: bool = False
+
+
+class SafetyIncident(BaseModel):
+    incident_date: date
+    incident_type: str
+    description: str
+    location: str
+    severity: str = "minor"
+    injuries: Optional[List[str]] = None
+    witnesses: Optional[List[str]] = None
+    immediate_actions_taken: Optional[str] = None
+
+
+class TrainingRecord(BaseModel):
+    employee_name: str
+    training_type: str
+    training_date: date
+    expiry_date: Optional[date] = None
+    certificate_number: Optional[str] = None
+    training_provider: str = "Internal"
+
+
+@router.post("/wcb/register")
+async def register_wcb(registration: WCBRegistration):
+    """Register WCB account"""
+    try:
+        result = compliance_engine.register_wcb_account(
+            account_number=registration.account_number,
+            business_type=registration.business_type,
+            number_of_workers=registration.number_of_workers
+        )
+        return {"status": "success", "wcb_record": result}
+    except Exception as e:
+        logger.error(f"Error registering WCB: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/permits")
+async def create_permit(permit: PermitCreate):
+    """Create a new permit"""
+    try:
+        result = compliance_engine.add_permit(
+            permit_type=PermitType(permit.permit_type),
+            permit_number=permit.permit_number,
+            project_address=permit.project_address,
+            issue_date=permit.issue_date,
+            expiry_date=permit.expiry_date,
+            issuing_authority=permit.issuing_authority
+        )
+        return {"status": "success", "permit": result}
+    except Exception as e:
+        logger.error(f"Error creating permit: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/inspections")
+async def record_inspection(inspection: InspectionRecord):
+    """Record a construction inspection"""
+    try:
+        result = compliance_engine.record_inspection(
+            permit_id=inspection.permit_id,
+            inspection_type=inspection.inspection_type,
+            inspection_date=inspection.inspection_date,
+            inspector_name=inspection.inspector_name,
+            result=inspection.result,
+            findings=inspection.findings,
+            corrections_required=inspection.corrections_required
+        )
+        return {"status": "success", "inspection": result}
+    except Exception as e:
+        logger.error(f"Error recording inspection: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/incidents")
+async def record_incident(incident: SafetyIncident):
+    """Record a workplace safety incident"""
+    try:
+        result = compliance_engine.record_safety_incident(
+            incident_date=incident.incident_date,
+            incident_type=incident.incident_type,
+            description=incident.description,
+            location=incident.location,
+            severity=incident.severity,
+            injuries=incident.injuries,
+            witnesses=incident.witnesses,
+            immediate_actions_taken=incident.immediate_actions_taken
+        )
+        return {"status": "success", "incident": result}
+    except Exception as e:
+        logger.error(f"Error recording incident: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/training")
+async def add_training(training: TrainingRecord):
+    """Add employee training record"""
+    try:
+        result = compliance_engine.add_training_record(
+            employee_name=training.employee_name,
+            training_type=training.training_type,
+            training_date=training.training_date,
+            expiry_date=training.expiry_date,
+            certificate_number=training.certificate_number,
+            training_provider=training.training_provider
+        )
+        return {"status": "success", "training": result}
+    except Exception as e:
+        logger.error(f"Error adding training: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/status")
+async def get_compliance_status():
+    """Get overall compliance status"""
+    try:
+        status = compliance_engine.get_compliance_status()
+        return status
+    except Exception as e:
+        logger.error(f"Error getting compliance status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/safety-checklist")
+async def get_safety_checklist():
+    """Generate weekly safety checklist"""
+    try:
+        checklist = compliance_engine.generate_safety_checklist()
+        return checklist
+    except Exception as e:
+        logger.error(f"Error generating safety checklist: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/wcb")
+async def get_wcb_status():
+    """Get WCB account status"""
+    try:
+        if not compliance_engine.wcb_records:
+            return {"status": "not_registered", "message": "WCB account not registered"}
+        return compliance_engine.wcb_records
+    except Exception as e:
+        logger.error(f"Error getting WCB status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/permits")
+async def list_permits(
+    skip: int = 0,
+    limit: int = 100,
+    status: Optional[str] = None
+):
+    """List permits with optional filtering"""
+    try:
+        permits = compliance_engine.permits
+        
+        if status:
+            permits = [p for p in permits if p["status"] == status]
+        
+        return {
+            "permits": permits[skip:skip + limit],
+            "total": len(permits),
+            "skip": skip,
+            "limit": limit
+        }
+    except Exception as e:
+        logger.error(f"Error listing permits: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/incidents")
+async def list_incidents(
+    skip: int = 0,
+    limit: int = 100,
+    status: Optional[str] = None
+):
+    """List safety incidents with optional filtering"""
+    try:
+        incidents = compliance_engine.safety_records
+        
+        if status:
+            incidents = [inc for inc in incidents if inc["status"] == status]
+        
+        return {
+            "incidents": incidents[skip:skip + limit],
+            "total": len(incidents),
+            "skip": skip,
+            "limit": limit
+        }
+    except Exception as e:
+        logger.error(f"Error listing incidents: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/training")
+async def list_training(
+    skip: int = 0,
+    limit: int = 100,
+    employee_name: Optional[str] = None
+):
+    """List training records with optional filtering"""
+    try:
+        training = compliance_engine.training_records
+        
+        if employee_name:
+            training = [t for t in training if t["employee_name"] == employee_name]
+        
+        return {
+            "training_records": training[skip:skip + limit],
+            "total": len(training),
+            "skip": skip,
+            "limit": limit
+        }
+    except Exception as e:
+        logger.error(f"Error listing training: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

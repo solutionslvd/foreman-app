@@ -1,0 +1,16 @@
+=== REGRESSION TEST SUITE ===
+✅ TEST 1: Health Check
+    "status": "healthy",
+✅ TEST 2: Auth System
+Token obtained: AXncrkUJ3kbV2K69E512...
+✅ TEST 3: BUG-004 - Projects require auth
+Unauthenticated response: {"detail":"Authentication required"}
+✅ TEST 4: BUG-004 - Projects work with auth
+{
+    "projects": [],
+    "total": 0
+}
+✅ TEST 5: BUG-007 - Invoice due_date auto-calculated
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+NameError: name 'due_date' is not defined

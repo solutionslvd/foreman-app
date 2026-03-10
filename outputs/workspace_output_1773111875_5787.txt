@@ -1,0 +1,67 @@
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 24.0 -> 26.0.1
+[notice] To update, run: pip install --upgrade pip
+================================================================================
+LANDING PAGE - NAVIGATION ELEMENT ANALYSIS
+================================================================================
+
+Total LINKS FOUND: 35
+--------------------------------------------------------------------------------
+
+[INTERNAL LINKS] (starting with /):
+  [OK] /admin                              -> 200 (Admin)
+  [OK] /admin                              -> 200 (Admin)
+  [OK] /app                                -> 200 (Dashboard)
+  [OK] /admin                              -> 200 (Admin Panel)
+  [OK] /privacy                            -> 200 (Privacy Policy)
+  [OK] /terms                              -> 200 (Terms of Service)
+  [OK] /privacy#cookies                    -> 200 (Cookie Policy)
+  [FAIL] mailto:legal@foremanapp.ca          -> ? (Legal Inquiries)
+  [FAIL] mailto:support@foremanapp.ca        -> ? (Contact Support)
+  [OK] /api/docs                           -> 200 (API Docs)
+  [FAIL] mailto:hello@foremanapp.ca          -> ? (Get in Touch)
+  [OK] /app                                -> 200 (Launch App)
+  [OK] /privacy                            -> 200 (Privacy)
+  [OK] /terms                              -> 200 (Terms)
+
+[EXTERNAL LINKS]:
+
+[HASH LINKS] (same-page anchors):
+  [OK] #features            -> #features             (Features) TARGET FOUND
+  [OK] #email-ai            -> #email-ai             (Email AI) TARGET FOUND
+  [OK] #pricing             -> #pricing              (Pricing) TARGET FOUND
+  [OK] #how-it-works        -> #how-it-works         (How It Works) TARGET FOUND
+  [OK] #testimonials        -> #testimonials         (Reviews) TARGET FOUND
+  [OK] #features            -> #features             (Features) TARGET FOUND
+  [OK] #email-ai            -> #email-ai             (Email AI) TARGET FOUND
+  [OK] #pricing             -> #pricing              (Pricing) TARGET FOUND
+  [OK] #how-it-works        -> #how-it-works         (How It Works) TARGET FOUND
+  [OK] #testimonials        -> #testimonials         (Reviews) TARGET FOUND
+  [OK] #features            -> #features             (See How It Works) TARGET FOUND
+  [OK] #features            -> #features             (Features) TARGET FOUND
+  [OK] #pricing             -> #pricing              (Pricing) TARGET FOUND
+  [OK] #how-it-works        -> #how-it-works         (How It Works) TARGET FOUND
+
+[JAVASCRIPT/ACTION LINKS]:
+  [JS] ForemanAI for Construction     onclick=''
+  [JS] Sign In                        onclick='openLogin()'
+  [JS] Start Free Trial               onclick='openSignup()'
+  [JS] Sign In                        onclick='closeMobileMenu();openLogin()'
+  [JS] Start Free Trial               onclick='closeMobileMenu();openSignup()'
+  [JS] Start Free 14-Day Trial        onclick='openSignup()'
+  [JS] Start Your Free 14-Day Trial   onclick='openSignup()'
+
+
+BUTTONS FOUND: 10
+--------------------------------------------------------------------------------
+  [BTN] [no text]                      onclick='toggleMobileMenu()'
+  [BTN] Get Started                    onclick='openSignup('starter')'
+  [BTN] Start Free Trial               onclick='openSignup('professional')'
+  [BTN] Contact Sales                  onclick='openSignup('business')'
+  [BTN] ×                              onclick='closeModal('signupModal')'
+  [BTN] Create Free Account            onclick=''
+  [BTN] Sign In Instead                onclick='closeModal('signupModal');openLogin()'
+  [BTN] ×                              onclick='closeModal('loginModal')'
+  [BTN] Sign In                        onclick=''
+  [BTN] Create Free Account            onclick='closeModal('loginModal');openSignup()'

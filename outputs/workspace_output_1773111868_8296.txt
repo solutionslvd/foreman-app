@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/workspace/audit_navigation.py", line 4, in <module>
+    from bs4 import BeautifulSoup
+ModuleNotFoundError: No module named 'bs4'

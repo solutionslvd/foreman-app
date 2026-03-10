@@ -1,0 +1,13 @@
+[OK] refreshDashboard
+[OK] openInvoiceModal
+[OK] openModal
+[OK] navigateTo
+[OK] clearChat
+[OK] showAIContext
+[OK] sendQuickPrompt
+[OK] toggleVoice
+[OK] sendMessage
+[OK] filterProjects
+[OK] openEstimateModal
+[OK] showInvTab
+[OK] showExpenseTab

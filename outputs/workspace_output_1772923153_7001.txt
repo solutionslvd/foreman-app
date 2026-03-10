@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#FF6B35">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Foreman">
+<meta name="description" content="AI-powered construction management for Alberta contractors">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+<title>Foreman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/app.css">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body class="dark-theme">
+
+<!-- ═══════════════════════════════════════════════════════
+     AUTH SCREEN
+═══════════════════════════════════════════════════════ -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="logo-icon">🏗️</div>
+      <h1 class="auth-title">Foreman</h1>
+      <p class="auth-subtitle">Alberta Construction Assistant</p>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login-form" class="auth-form active">
+      <h2>Welcome Back</h2>
+      <div class="form-group">
+        <label>Email or Username</label>
+        <input type="text" id="login-email" placeholder="admin or your@email.com" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-with-icon">
+          <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password">
+          <button class="toggle-pw" onclick="togglePassword('login-password')">👁</button>
+        </div>
+      </div>
+      <div id="login-error" class="error-msg hidden"></div>
+      <button class="btn-primary btn-full" onclick="handleLogin()">
+        <span>Sign In</span>
+      </button>
+      <p class="auth-switch">Don't have an account? <a href="#" onclick="showForm('register-form')">Sign Up</a></p>
+      <p class="auth-switch"><a href="#" onclick="showForm('admin-login-form')">Admin Login →</a></p>
+      <div style="margin-top:16px;padding:12px;background:#dbeafe;border-radius:8px;font-size:0.8rem;color:#1e40af;text-align:center">
+        <strong>Demo Account:</strong><br>test@foreman.ca &bull; Test1234!
+      </div>
+    </div>
+
+    <!-- Register Form -->
+    <div id="register-form" class="auth-form">
+      <h2>Create Account</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" placeholder="John Smith">
+        </div>
+        <div class="form-group">
+          <label>Business Name</label>
+          <input type="text" id="reg-business" placeholder="Smith Framing Ltd.">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="john@smithframing.ca">
+      </div>
+      <div class="form-group">
+        <label>Trade</label>
+        <select id="reg-trade">
+          <option value="framing">Framing</option>
+          <option value="carpentry">Carpentry</option>
+          <option value="general_contracting">General Contracting</option>
+          <option value="renovation">Renovation</option>
+          <option value="roofing">Roofing</option>
+          <option value="electrical">Electrical</option>
+          <option value="plumbing">Plumbing</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="reg-phone" placeholder="(780) 555-0100">
+      </div>
+      <div class="form-group">
+        <label>Plan</label>
+        <select id="reg-plan">
+          <option value="starter">Starter - $49/mo (1 user)</option>
+          <option value="professional">Professional - $149/mo (5 users)</option>
+          <option value="business">Business - $299/mo (15 users)</option>
+        </select>
+      </div>
+      <div class="form-group">

@@ -1,0 +1,6 @@
+419:@app.get("/privacy", response_class=HTMLResponse, include_in_schema=False)
+420:async def serve_privacy():
+421:    html_path = os.path.join(web_dir, "privacy.html")
+428:@app.get("/terms", response_class=HTMLResponse, include_in_schema=False)
+429:async def serve_terms():
+430:    html_path = os.path.join(web_dir, "terms.html")

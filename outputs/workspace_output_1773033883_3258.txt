@@ -1,0 +1,3 @@
+421:function navigateTo(page) {
+4557:      ${actions.map(a => `<button class="btn-secondary btn-sm" onclick="navigateTo('${a.page || ''}')" style="font-size:0.8rem;padding:4px 10px">${a.label}</button>`).join('')}
+5002:  navigateTo('ai-chat');

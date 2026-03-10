@@ -1,0 +1,20 @@
+"""
+Billing & Payment System
+Handles subscriptions, payments, invoices for the platform itself
+"""
+from fastapi import APIRouter, HTTPException, Header
+from pydantic import BaseModel
+from typing import Optional, Dict, List, Any
+from datetime import datetime, timedelta
+from decimal import Decimal
+import logging
+import uuid
+import os
+
+logger = logging.getLogger(__name__)
+router = APIRouter()
+
+# ─── In-Memory Billing Store ──────────────────────────────────────────────────
+subscriptions_db: Dict[str, Dict] = {}
+payments_db: List[Dict] = []
+billing_settings: Dict = {

@@ -1,0 +1,161 @@
+{
+  "branding": {
+    "app_name": "BuildAI Alberta",
+    "tagline": "Your AI-Powered Construction Assistant",
+    "logo_url": "",
+    "primary_color": "#FF6B35",
+    "secondary_color": "#1a1a2e",
+    "accent_color": "#4CAF50",
+    "font_family": "Inter",
+    "dark_mode_default": true
+  },
+  "business": {
+    "business_name": "Your Construction Business",
+    "business_type": "general_contracting",
+    "trade_specialization": "framing",
+    "address": "",
+    "city": "Edmonton",
+    "province": "Alberta",
+    "postal_code": "",
+    "phone": "",
+    "email": "",
+    "website": "",
+    "business_number": "",
+    "wcb_account": "",
+    "gst_number": "",
+    "logo_url": ""
+  },
+  "ai": {
+    "assistant_name": "BuildAI",
+    "personality": "professional",
+    "trade_focus": "framing",
+    "language": "en",
+    "voice_enabled": true,
+    "proactive_suggestions": true,
+    "greeting_message": "Hi! I'm your construction AI assistant. How can I help you today?",
+    "specializations": [
+      "framing",
+      "carpentry",
+      "general_contracting"
+    ],
+    "knowledge_level": "expert"
+  },
+  "financial": {
+    "gst_rate": 0.05,
+    "invoice_prefix": "INV",
+    "invoice_next_number": 1001,
+    "payment_terms": "Net 30",
+    "late_fee_percentage": 2.0,
+    "currency": "CAD",
+    "fiscal_year_start": "01-01",
+    "wcb_rate_framing": 3.2,
+    "wcb_rate_carpentry": 2.8,
+    "wcb_rate_general": 2.5,
+    "cpp_rate": 0.0595,
+    "ei_rate": 0.0163,
+    "default_labour_rate": 65.0,
+    "default_markup_percentage": 20.0,
+    "budget_warning_threshold": 80.0
+  },
+  "compliance": {
+    "safety_inspection_frequency": "weekly",
+    "required_training": [
+      "WHMIS",
+      "Fall Protection",
+      "First Aid"
+    ],
+    "permit_reminder_days": [
+      30,
+      14,
+      7
+    ],
+    "wcb_reminder_days": [
+      14,
+      7,
+      3
+    ],
+    "incident_reporting_required": true,
+    "toolbox_talk_frequency": "weekly",
+    "ppe_requirements": [
+      "Hard Hat",
+      "Safety Vest",
+      "Steel Toe Boots",
+      "Safety Glasses"
+    ]
+  },
+  "notifications": {
+    "email_enabled": false,
+    "sms_enabled": false,
+    "push_enabled": true,
+    "notification_email": "",
+    "gst_reminder_days": [
+      7,
+      3,
+      1
+    ],
+    "payroll_reminder_days": [
+      3,
+      1
+    ],
+    "invoice_overdue_days": 30,
+    "daily_summary": true,
+    "weekly_report": true
+  },
+  "subscription": {
+    "plan": "starter",
+    "max_users": 1,
+    "max_projects": 5,
+    "max_transactions": 100,
+    "features": [
+      "ai_chat",
+      "invoicing",
+      "basic_compliance"
+    ]
+  },
+  "user_defaults": {
+    "theme": "dark",
+    "language": "en",
+    "timezone": "America/Edmonton",
+    "date_format": "YYYY-MM-DD",
+    "currency_display": "CAD",
+    "notifications_push": true,
+    "notifications_email": true,
+    "dashboard_widgets": [
+      "revenue",
+      "projects",
+      "compliance",
+      "ai_chat"
+    ],
+    "default_view": "dashboard"
+  },
+  "integrations": {
+    "quickbooks_enabled": false,
+    "quickbooks_realm_id": "",
+    "google_drive_enabled": false,
+    "google_drive_folder_id": "",
+    "email_provider": "none",
+    "email_address": "",
+    "stripe_enabled": false,
+    "stripe_publishable_key": ""
+  },
+  "system": {
+    "maintenance_mode": false,
+    "allow_registration": true,
+    "require_nda": true,
+    "session_timeout_hours": 8,
+    "max_file_size_mb": 10,
+    "allowed_file_types": [
+      "pdf",
+      "jpg",
+      "jpeg",
+      "png",
+      "doc",
+      "docx",
+      "xls",
+      "xlsx"
+    ],
+    "debug_mode": false,
+    "version": "2.0.0",
+    "last_updated": "2026-03-08T22:04:00.082635"
+  }
+}

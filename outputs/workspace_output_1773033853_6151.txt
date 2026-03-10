@@ -1,0 +1,44 @@
+// AI CHAT
+// ═══════════════════════════════════════════════════════════
+
+function showTyping() {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-message ai';
+  div.id = 'typing-indicator';
+  div.innerHTML = `
+    <div class="msg-avatar">🤖</div>
+    <div class="msg-bubble">
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+function clearChat() {
+  const container = document.getElementById('chat-messages');
+  const greeting = container.querySelector('.chat-message.ai');
+  container.innerHTML = '';
+  if (greeting) container.appendChild(greeting);
+}
+
+function sendQuickPrompt(prompt) {
+  document.getElementById('chat-input').value = prompt;
+  sendMessage();
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }

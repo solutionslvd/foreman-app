@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foreman — Construction Business Management for Alberta Contractors</title>
+    <meta name="description" content="The only AI assistant built exclusively for Alberta construction businesses. Manage finances, compliance, projects, and emails automatically. Starting at $49/month.">
+    <meta name="keywords" content="Alberta construction AI, construction management software, WCB compliance, construction invoicing, framing contractor software">
+    <meta property="og:title" content="Foreman - AI for Construction Businesses">
+    <meta property="og:description" content="Auto-reply to leads, track compliance, manage finances. 🇨🇦 Built for Alberta contractors.">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --primary:#1a237e;--primary-light:#283593;--accent:#ff6f00;
+            --accent-light:#ffa000;--text:#1a1a2e;--text-light:#555;
+            --bg:#fff;--bg2:#f8f9ff;--border:#e0e0e0;
+            --success:#2e7d32;--card-shadow:0 4px 24px rgba(0,0,0,0.08);
+        }
+        html{scroll-behavior:smooth}
+        body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.6}
+
+        /* ── NAV ── */
+        nav{
+            position:fixed;top:0;left:0;right:0;z-index:1000;
+            background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);
+            border-bottom:1px solid var(--border);
+            padding:0 2rem;height:70px;
+            display:flex;align-items:center;justify-content:space-between;
+        }
+        .nav-brand{display:flex;align-items:center;gap:0.75rem;text-decoration:none}
+        .nav-brand i{font-size:1.75rem;color:var(--accent)}
+        .nav-brand span{font-size:1.25rem;font-weight:800;color:var(--primary)}
+        .nav-brand small{display:block;font-size:0.7rem;color:var(--text-light);font-weight:400}
+        .nav-links{display:flex;align-items:center;gap:2rem}
+        .nav-links a{text-decoration:none;color:var(--text-light);font-weight:500;transition:color 0.2s}
+        .nav-links a:hover{color:var(--accent)}
+        .nav-cta{display:flex;gap:0.75rem}
+        .btn{padding:0.6rem 1.4rem;border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer;border:none;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem}
+        .btn-outline{border:2px solid var(--primary);color:var(--primary);background:transparent}
+        .btn-outline:hover{background:var(--primary);color:#fff}
+        .btn-primary{background:var(--accent);color:#fff}
+        .btn-primary:hover{background:var(--accent-light);transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,111,0,0.3)}
+        .btn-lg{padding:0.9rem 2rem;font-size:1rem;border-radius:10px}
+        .btn-xl{padding:1.1rem 2.5rem;font-size:1.1rem;border-radius:12px}
+        .hamburger{display:none;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text)}
+
+        /* ── HERO ── */
+        .hero{
+            min-height:100vh;padding:120px 2rem 80px;
+            background:linear-gradient(135deg,#f8f9ff 0%,#e8eaf6 50%,#fff3e0 100%);
+            display:flex;align-items:center;
+        }
+        .hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+        .hero-badge{
+            display:inline-flex;align-items:center;gap:0.5rem;
+            background:rgba(255,111,0,0.1);border:1px solid rgba(255,111,0,0.3);
+            color:var(--accent);padding:0.4rem 1rem;border-radius:20px;
+            font-size:0.85rem;font-weight:600;margin-bottom:1.5rem;
+        }
+        .hero h1{font-size:3.2rem;font-weight:900;line-height:1.15;color:var(--primary);margin-bottom:1.5rem}
+        .hero h1 span{color:var(--accent)}
+        .hero p{font-size:1.15rem;color:var(--text-light);margin-bottom:2rem;max-width:520px}
+        .hero-cta{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem}
+        .hero-trust{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+        .trust-item{display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:var(--text-light)}
+        .trust-item i{color:var(--success)}
+        .hero-visual{position:relative}
+        .hero-card{
+            background:#fff;border-radius:16px;padding:1.5rem;
+            box-shadow:var(--card-shadow);border:1px solid var(--border);
+            margin-bottom:1rem;
+        }
+        .hero-card-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem}
+        .hero-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+        .icon-orange{background:rgba(255,111,0,0.1);color:var(--accent)}
+        .icon-blue{background:rgba(26,35,126,0.1);color:var(--primary)}
+        .icon-green{background:rgba(46,125,50,0.1);color:var(--success)}
+        .hero-card h4{font-size:0.9rem;font-weight:700;color:var(--text)}
+        .hero-card p{font-size:0.8rem;color:var(--text-light)}
+        .email-preview{background:#f8f9ff;border-radius:8px;padding:0.75rem;font-size:0.8rem}
+        .email-from{color:var(--text-light);margin-bottom:0.25rem}
+        .email-subject{font-weight:600;color:var(--text);margin-bottom:0.5rem}
+        .email-badge{display:inline-block;padding:0.2rem 0.6rem;border-radius:4px;font-size:0.7rem;font-weight:700}
+        .badge-urgent{background:#ffebee;color:#c62828}
+        .badge-lead{background:#e8f5e9;color:#2e7d32}
+        .badge-quote{background:#fff3e0;color:#e65100}
+        .ai-reply{background:#e8f5e9;border-radius:8px;padding:0.75rem;font-size:0.8rem;margin-top:0.5rem}
+        .ai-reply-label{font-size:0.7rem;color:var(--success);font-weight:700;margin-bottom:0.25rem}
+        .stat-row{display:flex;gap:1rem}
+        .mini-stat{flex:1;text-align:center;padding:0.75rem;background:#f8f9ff;border-radius:8px}
+        .mini-stat-val{font-size:1.25rem;font-weight:800;color:var(--accent)}
+        .mini-stat-label{font-size:0.7rem;color:var(--text-light)}
+        .floating-badge{
+            position:absolute;background:#fff;border-radius:12px;padding:0.6rem 1rem;
+            box-shadow:0 8px 24px rgba(0,0,0,0.12);border:1px solid var(--border);
+            font-size:0.8rem;font-weight:600;display:flex;align-items:center;gap:0.5rem;
+        }
+        .fb-top{top:-20px;right:20px}
+        .fb-bottom{bottom:-10px;left:10px}
+
+        /* ── SECTIONS ── */
+        section{padding:80px 2rem}
+        .container{max-width:1200px;margin:0 auto}
+        .section-label{
+            display:inline-block;background:rgba(255,111,0,0.1);color:var(--accent);
+            padding:0.3rem 1rem;border-radius:20px;font-size:0.8rem;font-weight:700;
+            text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1rem;
+        }
+        .section-title{font-size:2.5rem;font-weight:800;color:var(--primary);margin-bottom:1rem;line-height:1.2}
+        .section-subtitle{font-size:1.1rem;color:var(--text-light);max-width:600px;margin:0 auto 3rem}
+        .text-center{text-align:center}
+
+        /* ── PAIN POINTS ── */
+        .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+        .pain-card{
+            background:#fff;border:1px solid var(--border);border-radius:16px;
+            padding:1.75rem;transition:all 0.3s;
+        }
+        .pain-card:hover{transform:translateY(-4px);box-shadow:var(--card-shadow);border-color:var(--accent)}
+        .pain-icon{font-size:2rem;margin-bottom:1rem}
+        .pain-card h3{font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:0.5rem}
+        .pain-card p{font-size:0.9rem;color:var(--text-light)}
+        .pain-solution{
+            margin-top:0.75rem;padding:0.5rem 0.75rem;background:#e8f5e9;
+            border-radius:6px;font-size:0.8rem;color:var(--success);font-weight:600;
+        }
+
+        /* ── FEATURES ── */
+        .features-bg{background:var(--bg2)}
+        .features-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:2rem}
+        .feature-card{
+            background:#fff;border-radius:16px;padding:2rem;
+            border:1px solid var(--border);transition:all 0.3s;
+        }
+        .feature-card:hover{box-shadow:var(--card-shadow);border-color:var(--primary)}
+        .feature-icon{
+            width:56px;height:56px;border-radius:14px;
+            display:flex;align-items:center;justify-content:center;
+            font-size:1.5rem;margin-bottom:1.25rem;
+        }
+        .feature-card h3{font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:0.75rem}
+        .feature-card p{color:var(--text-light);font-size:0.95rem;margin-bottom:1rem}
+        .feature-list{list-style:none}
+        .feature-list li{
+            padding:0.3rem 0;font-size:0.875rem;color:var(--text-light);
+            display:flex;align-items:center;gap:0.5rem;
+        }
+        .feature-list li i{color:var(--success);font-size:0.8rem}
+
+        /* ── EMAIL SECTION ── */
+        .email-section{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);color:#fff}
+        .email-section .section-title{color:#fff}
+        .email-section .section-subtitle{color:rgba(255,255,255,0.8)}
+        .email-demo{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+        .email-demo-card{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:16px;padding:1.5rem}
+        .email-demo-card h4{color:#fff;margin-bottom:1rem;font-size:1rem}
+        .email-item{
+            background:rgba(255,255,255,0.1);border-radius:10px;padding:1rem;
+            margin-bottom:0.75rem;border-left:3px solid;
+        }
+        .email-item.urgent{border-color:#ef5350}
+        .email-item.high{border-color:#ffa726}
+        .email-item.medium{border-color:#42a5f5}
+        .email-item.low{border-color:#66bb6a}
+        .email-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem}
+        .email-item-from{font-size:0.8rem;color:rgba(255,255,255,0.7)}
+        .email-item-subject{font-size:0.9rem;font-weight:600;color:#fff;margin-bottom:0.25rem}
+        .email-item-preview{font-size:0.8rem;color:rgba(255,255,255,0.6)}
+        .priority-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+        .dot-urgent{background:#ef5350}
+        .dot-high{background:#ffa726}
+        .dot-medium{background:#42a5f5}
+        .dot-low{background:#66bb6a}
+        .reply-preview{background:rgba(255,255,255,0.05);border-radius:10px;padding:1rem;font-size:0.8rem;color:rgba(255,255,255,0.8);line-height:1.6}
+        .reply-label{font-size:0.7rem;color:#66bb6a;font-weight:700;margin-bottom:0.5rem;text-transform:uppercase}
+
+        /* ── PRICING ── */
+        .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:1000px;margin:0 auto}
+        .pricing-card{
+            background:#fff;border:2px solid var(--border);border-radius:20px;
+            padding:2rem;text-align:center;transition:all 0.3s;position:relative;
+        }
+        .pricing-card:hover{transform:translateY(-4px);box-shadow:var(--card-shadow)}
+        .pricing-card.popular{border-color:var(--accent);transform:scale(1.05)}
+        .popular-badge{
+            position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+            background:var(--accent);color:#fff;padding:0.3rem 1.25rem;
+            border-radius:20px;font-size:0.8rem;font-weight:700;white-space:nowrap;
+        }
+        .pricing-name{font-size:1.1rem;font-weight:700;color:var(--text-light);margin-bottom:0.5rem}
+        .pricing-price{font-size:3rem;font-weight:900;color:var(--primary);line-height:1}
+        .pricing-price span{font-size:1rem;font-weight:400;color:var(--text-light)}
+        .pricing-desc{font-size:0.875rem;color:var(--text-light);margin:0.75rem 0 1.5rem}
+        .pricing-features{list-style:none;text-align:left;margin-bottom:2rem}
+        .pricing-features li{
+            padding:0.4rem 0;font-size:0.875rem;color:var(--text-light);
+            display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid #f5f5f5;
+        }
+        .pricing-features li i{color:var(--success)}
+        .pricing-features li.disabled{color:#bbb}
+        .pricing-features li.disabled i{color:#bbb}
+        .pricing-cta{width:100%;padding:0.875rem;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;border:none;transition:all 0.2s}
+        .cta-primary{background:var(--accent);color:#fff}
+        .cta-primary:hover{background:var(--accent-light)}
+        .cta-outline{background:transparent;border:2px solid var(--primary);color:var(--primary)}
+        .cta-outline:hover{background:var(--primary);color:#fff}
+
+        /* ── TESTIMONIALS ── */
+        .testimonials-bg{background:var(--bg2)}
+        .testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+        .testimonial-card{
+            background:#fff;border-radius:16px;padding:1.75rem;
+            border:1px solid var(--border);box-shadow:var(--card-shadow);
+        }
+        .stars{color:#ffa726;margin-bottom:1rem;font-size:1.1rem}
+        .testimonial-text{font-size:0.95rem;color:var(--text-light);margin-bottom:1.25rem;font-style:italic;line-height:1.7}
+        .testimonial-author{display:flex;align-items:center;gap:0.75rem}
+        .author-avatar{
+            width:44px;height:44px;border-radius:50%;
+            background:var(--primary);color:#fff;
+            display:flex;align-items:center;justify-content:center;
+            font-weight:700;font-size:1rem;
+        }
+        .author-name{font-weight:700;font-size:0.9rem;color:var(--text)}
+        .author-title{font-size:0.8rem;color:var(--text-light)}
+
+        /* ── HOW IT WORKS ── */
+        .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;position:relative}
+        .steps-grid::before{
+            content:'';position:absolute;top:40px;left:12.5%;right:12.5%;
+            height:2px;background:linear-gradient(90deg,var(--accent),var(--primary));
+            z-index:0;
+        }
+        .step-card{text-align:center;position:relative;z-index:1}
+        .step-number{
+            width:80px;height:80px;border-radius:50%;
+            background:linear-gradient(135deg,var(--accent),var(--primary));
+            color:#fff;font-size:1.75rem;font-weight:900;
+            display:flex;align-items:center;justify-content:center;
+            margin:0 auto 1.25rem;box-shadow:0 4px 16px rgba(255,111,0,0.3);
+        }
+        .step-card h3{font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:0.5rem}
+        .step-card p{font-size:0.875rem;color:var(--text-light)}
+
+        /* ── CTA SECTION ── */
+        .cta-section{
+            background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);
+            color:#fff;text-align:center;
+        }
+        .cta-section h2{font-size:2.5rem;font-weight:900;margin-bottom:1rem}
+        .cta-section p{font-size:1.1rem;opacity:0.9;margin-bottom:2rem}
+        .cta-section .btn-primary{background:#fff;color:var(--accent);font-size:1.1rem;padding:1rem 2.5rem}
+        .cta-section .btn-primary:hover{background:#fff3e0}
+
+        /* ── FOOTER ── */
+        footer{background:var(--primary);color:rgba(255,255,255,0.8);padding:3rem 2rem 1.5rem}
+        .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;max-width:1200px;margin:0 auto 2rem}
+        .footer-brand i{font-size:2rem;color:var(--accent);margin-bottom:0.75rem;display:block}
+        .footer-brand h3{color:#fff;font-size:1.25rem;margin-bottom:0.5rem}
+        .footer-brand p{font-size:0.875rem;line-height:1.6}
+        .footer-col h4{color:#fff;font-size:0.9rem;font-weight:700;margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.05em}
+        .footer-col a{display:block;color:rgba(255,255,255,0.7);text-decoration:none;font-size:0.875rem;margin-bottom:0.5rem;transition:color 0.2s}
+        .footer-col a:hover{color:#fff}
+        .footer-bottom{border-top:1px solid rgba(255,255,255,0.1);padding-top:1.5rem;text-align:center;font-size:0.8rem;max-width:1200px;margin:0 auto}
+
+        /* ── MODAL ── */
+        .modal-overlay{
+            position:fixed;inset:0;background:rgba(0,0,0,0.5);
+            z-index:2000;display:none;align-items:center;justify-content:center;padding:1rem;
+        }
+        .modal-overlay.open{display:flex}
+        .modal{
+            background:#fff;border-radius:20px;padding:2.5rem;
+            max-width:500px;width:100%;max-height:90vh;overflow-y:auto;
+            box-shadow:0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal h2{font-size:1.5rem;font-weight:800;color:var(--primary);margin-bottom:0.5rem}
+        .modal p{color:var(--text-light);margin-bottom:1.5rem;font-size:0.9rem}
+        .form-group{margin-bottom:1rem}
+        .form-group label{display:block;font-size:0.875rem;font-weight:600;color:var(--text);margin-bottom:0.4rem}
+        .form-group input,.form-group select{
+            width:100%;padding:0.75rem 1rem;border:1.5px solid var(--border);
+            border-radius:8px;font-size:0.95rem;color:var(--text);transition:border-color 0.2s;
+        }
+        .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--accent)}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        .modal-close{
+            position:absolute;top:1rem;right:1rem;background:none;border:none;
+            font-size:1.5rem;cursor:pointer;color:var(--text-light);
+        }
+        .modal-error{background:#ffebee;border:1px solid #ef9a9a;color:#c62828;padding:0.75rem;border-radius:8px;margin-bottom:1rem;font-size:0.875rem;display:none}
+        .modal-success{background:#e8f5e9;border:1px solid #a5d6a7;color:#2e7d32;padding:0.75rem;border-radius:8px;margin-bottom:1rem;font-size:0.875rem;display:none}
+        .divider{text-align:center;color:var(--text-light);font-size:0.875rem;margin:1rem 0;position:relative}
+        .divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border)}
+        .divider::before{left:0}.divider::after{right:0}
+
+        /* ── MOBILE MENU ── */
+        .mobile-menu{
+            display:none;position:fixed;top:70px;left:0;right:0;z-index:999;
+            background:#fff;border-bottom:2px solid var(--border);
+            padding:1rem 1.5rem 1.5rem;
+            box-shadow:0 8px 24px rgba(0,0,0,0.12);
+            flex-direction:column;gap:0;
+        }
+        .mobile-menu.open{display:flex}
+        .mobile-menu a{
+            display:block;padding:0.85rem 0;
+            color:var(--text);font-weight:600;font-size:1rem;
+            text-decoration:none;border-bottom:1px solid var(--border);
+            transition:color 0.2s;
+        }
+        .mobile-menu a:last-of-type{border-bottom:none}
+        .mobile-menu a:hover{color:var(--accent)}
+        .mobile-menu-cta{
+            display:flex;flex-direction:column;gap:0.75rem;
+            margin-top:1rem;padding-top:1rem;border-top:2px solid var(--border);
+        }
+        .mobile-menu-cta .btn{
+            width:100%;justify-content:center;
+            padding:0.85rem 1rem;font-size:1rem;
+        }
+
+        /* ── RESPONSIVE 1024px ── */
+        @media(max-width:1024px){
+            .hero-inner{grid-template-columns:1fr;gap:2rem}
+            .hero-visual{display:none}
+            .pain-grid{grid-template-columns:repeat(2,1fr)}
+            .features-grid{grid-template-columns:repeat(2,1fr)}
+            .pricing-grid{grid-template-columns:1fr;max-width:420px}
+            .pricing-card.popular{transform:none}
+            .testimonials-grid{grid-template-columns:1fr}
+            .steps-grid{grid-template-columns:repeat(2,1fr)}
+            .steps-grid::before{display:none}
+            .footer-grid{grid-template-columns:1fr 1fr}
+            .email-demo{grid-template-columns:1fr}
+        }
+
+        /* ── RESPONSIVE 768px (tablets & large phones) ── */
+        @media(max-width:768px){
+            /* Nav */
+            .nav-links,.nav-cta{display:none}
+            .hamburger{display:flex;align-items:center;justify-content:center;
+                width:44px;height:44px;border-radius:8px;
+                background:rgba(26,35,126,0.06);
+            }
+
+            /* Hero */
+            .hero{padding:100px 1.25rem 60px}
+            .hero h1{font-size:2rem;line-height:1.2}
+            .hero p{font-size:1rem}
+            .hero-cta{flex-direction:column;gap:0.75rem}
+            .hero-cta .btn{width:100%;justify-content:center;text-align:center}
+            .hero-trust{flex-direction:column;gap:0.5rem;align-items:flex-start}
+
+            /* Sections */
+            section{padding:56px 1.25rem}
+            .section-title{font-size:1.75rem}
+            .section-subtitle{font-size:0.95rem;margin-bottom:2rem}
+
+            /* Grids */
+            .pain-grid{grid-template-columns:1fr}
+            .features-grid{grid-template-columns:1fr}
+            .steps-grid{grid-template-columns:1fr}
+            .testimonials-grid{grid-template-columns:1fr}
+            .footer-grid{grid-template-columns:1fr}
+            .email-demo{grid-template-columns:1fr}
+
+            /* Pricing */
+            .pricing-grid{grid-template-columns:1fr;max-width:100%}
+            .pricing-card.popular{transform:none;border-width:3px}
+            .pricing-card{padding:1.5rem}
+
+            /* Footer */
+            footer{padding:2.5rem 1.25rem 1.5rem}
+            .footer-bottom{font-size:0.75rem}
+
+            /* CTA section */
+            .cta-section h2{font-size:1.75rem}
+            .cta-section p{font-size:0.95rem}
+            .cta-section .btn-primary{width:100%;justify-content:center;font-size:1rem;padding:0.9rem 1.5rem}
+
+            /* Buttons */
+            .btn-xl{padding:0.9rem 1.5rem;font-size:1rem}
+            .btn-lg{padding:0.75rem 1.25rem;font-size:0.95rem}
+
+            /* Modal */
+            .modal{padding:1.75rem 1.25rem;border-radius:16px}
+            .modal h2{font-size:1.3rem}
+            .form-row{grid-template-columns:1fr}
+        }
+
+        /* ── RESPONSIVE 480px (small phones) ── */
+        @media(max-width:480px){
+            nav{padding:0 1rem}
+            .nav-brand span{font-size:1.1rem}
+            .nav-brand small{display:none}
+
+            .hero{padding:90px 1rem 50px}
+            .hero h1{font-size:1.75rem}
+            .hero-badge{font-size:0.78rem;padding:0.35rem 0.85rem}
+
+            section{padding:48px 1rem}
+            .section-title{font-size:1.5rem}
+
+            .pain-card,.feature-card,.testimonial-card{padding:1.25rem}
+            .step-number{width:64px;height:64px;font-size:1.4rem}
+
+            .pricing-price{font-size:2.5rem}
+
+            .email-demo-card{padding:1rem}
+            .reply-preview{font-size:0.75rem}
+
+            .modal{padding:1.5rem 1rem}
+            .modal-close{top:0.75rem;right:0.75rem}
+        }
+
+        /* ── TOUCH TARGETS ── */
+        @media(hover:none),(pointer:coarse){
+            .btn{min-height:44px}
+            .nav-links a{min-height:44px;display:flex;align-items:center}
+            .pricing-cta{min-height:48px}
+            .modal-close{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+            .footer-col a{padding:0.35rem 0;min-height:36px;display:flex;align-items:center}
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAVIGATION ── -->
+<nav>
+    <a href="#" class="nav-brand">
+        <i class="fas fa-hard-hat"></i>
+        <div>
+            <span>Foreman</span>
+            <small>AI for Construction</small>
+        </div>
+    </a>
+    <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#email-ai">Email AI</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#testimonials">Reviews</a>
+    </div>
+    <div class="nav-cta">
+        <a href="/admin" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
+            <i class="fas fa-shield-alt"></i> Admin
+        </a>
+        <a href="#" class="btn btn-outline" onclick="openLogin()">Sign In</a>
+        <a href="#" class="btn btn-primary" onclick="openSignup()">
+            <i class="fas fa-rocket"></i> Start Free Trial
+        </a>
+    </div>
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Menu" aria-expanded="false">
+        <i class="fas fa-bars" id="hamburgerIcon"></i>
+    </button>
+</nav>
+
+<!-- ── MOBILE MENU ── -->
+<div class="mobile-menu" id="mobileMenu" role="navigation" aria-label="Mobile navigation">
+    <a href="#features" onclick="closeMobileMenu()">Features</a>
+    <a href="#email-ai" onclick="closeMobileMenu()">Email AI</a>
+    <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
+    <a href="#how-it-works" onclick="closeMobileMenu()">How It Works</a>
+    <a href="#testimonials" onclick="closeMobileMenu()">Reviews</a>
+    <div class="mobile-menu-cta">
+        <a href="/admin" class="btn btn-outline">
+            <i class="fas fa-shield-alt"></i> Admin
+        </a>
+        <a href="#" class="btn btn-outline" onclick="closeMobileMenu();openLogin()">Sign In</a>
+        <a href="#" class="btn btn-primary" onclick="closeMobileMenu();openSignup()">
+            <i class="fas fa-rocket"></i> Start Free Trial
+        </a>
+    </div>
+</div>
+
+<!-- ── HERO ── -->
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-map-marker-alt"></i>
+                Built exclusively for Alberta Construction
+            </div>
+            <h1>The AI Assistant That <span>Runs Your Business</span> While You Build</h1>
+            <p>Auto-reply to leads, track WCB compliance, manage finances, and organize documents — all powered by AI built specifically for Alberta contractors.</p>
+            <div class="hero-cta">
+                <a href="#" class="btn btn-primary btn-xl" onclick="openSignup()">
+                    <i class="fas fa-rocket"></i> Start Free 14-Day Trial
+                </a>
+                <a href="#features" class="btn btn-outline btn-xl">
+                    <i class="fas fa-play-circle"></i> See How It Works
+                </a>
+            </div>
+            <div class="hero-trust">
+                <div class="trust-item"><i class="fas fa-check-circle"></i> No credit card required</div>
+                <div class="trust-item"><i class="fas fa-check-circle"></i> Setup in 5 minutes</div>
+                <div class="trust-item"><i class="fas fa-check-circle"></i> Cancel anytime</div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div style="position:relative">
+                <div class="floating-badge fb-top">
+                    <i class="fas fa-robot" style="color:var(--accent)"></i>
+                    AI replied to 3 leads today
+                </div>
+                <div class="hero-card">
+                    <div class="hero-card-header">
+                        <div class="hero-card-icon icon-orange"><i class="fas fa-envelope"></i></div>
+                        <div>
+                            <h4>New Lead Detected</h4>
+                            <p>Auto-reply sent in 30 seconds</p>
+                        </div>
+                    </div>
+                    <div class="email-preview">
+                        <div class="email-from">From: mike.johnson@gmail.com</div>
+                        <div class="email-subject">Need framing quote for new home</div>
+                        <span class="email-badge badge-urgent">🔴 Urgent</span>
+                        <span class="email-badge badge-lead" style="margin-left:0.5rem">🎯 New Lead</span>
+                    </div>
+                    <div class="ai-reply">
+                        <div class="ai-reply-label">✅ AI Auto-Reply Sent</div>
+                        Hi Mike! Thank you for reaching out to [Your Business]! I've received your framing inquiry and will send a detailed quote within 48 hours...
+                    </div>
+                </div>
+                <div class="hero-card">
+                    <div class="hero-card-header">
+                        <div class="hero-card-icon icon-blue"><i class="fas fa-chart-line"></i></div>
+                        <div>
+                            <h4>This Month's Overview</h4>
+                            <p>Live financial tracking</p>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="mini-stat"><div class="mini-stat-val">$0</div><div class="mini-stat-label">Income</div></div>
+                        <div class="mini-stat"><div class="mini-stat-val">100%</div><div class="mini-stat-label">Compliance</div></div>
+                        <div class="mini-stat"><div class="mini-stat-val">0</div><div class="mini-stat-label">Projects</div></div>
+                    </div>
+                </div>
+                <div class="floating-badge fb-bottom">
+                    <i class="fas fa-shield-alt" style="color:var(--success)"></i>
+                    WCB & OHS Compliant
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── PAIN POINTS ── -->
+<section style="background:var(--bg2)">
+    <div class="container">
+        <div class="text-center">
+            <div class="section-label">The Problem</div>
+            <h2 class="section-title">Running a Construction Business is Overwhelming</h2>
+            <p class="section-subtitle">You didn't start a business to do paperwork. But admin tasks are eating your time and costing you money.</p>
+        </div>
+        <div class="pain-grid">
+            <div class="pain-card">
+                <div class="pain-icon">📧</div>
+                <h3>Missing Leads</h3>
+                <p>Potential clients email you but you're on the job site. By the time you reply, they've hired someone else.</p>
+                <div class="pain-solution">✅ AI replies to leads in under 60 seconds</div>
+            </div>
+            <div class="pain-card">
+                <div class="pain-icon">📋</div>
+                <h3>WCB & Compliance Stress</h3>
+                <p>Keeping up with WCB premiums, OHS requirements, and building permits is a full-time job on its own.</p>
+                <div class="pain-solution">✅ Automated compliance tracking & reminders</div>
+            </div>
+            <div class="pain-card">
+                <div class="pain-icon">💰</div>
+                <h3>Financial Chaos</h3>
+                <p>Invoices piling up, expenses not tracked, GST remittance missed. Tax season is a nightmare.</p>
+                <div class="pain-solution">✅ Automatic invoicing, expense tracking & GST</div>
+            </div>
+            <div class="pain-card">
+                <div class="pain-icon">📁</div>
+                <h3>Document Disaster</h3>
+                <p>Permits, contracts, photos scattered across email, phone, and paper. Can't find anything when you need it.</p>
+                <div class="pain-solution">✅ Auto-saves all files to organized Google Drive</div>
+            </div>
+            <div class="pain-card">
+                <div class="pain-icon">🧾</div>
+                <h3>Tax Catch-Up Panic</h3>
+                <p>Behind on filings? Missing records? The CRA penalties are adding up and you don't know where to start.</p>
+                <div class="pain-solution">✅ AI guides you through catch-up with priority plan</div>
+            </div>
+            <div class="pain-card">
+                <div class="pain-icon">🏗️</div>
+                <h3>Project Coordination</h3>
+                <p>Juggling multiple projects, subcontractors, and clients without a system leads to costly mistakes.</p>
+                <div class="pain-solution">✅ AI-powered project tracking & scheduling</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section id="features">
+    <div class="container">
+        <div class="text-center">
+            <div class="section-label">Features</div>
+            <h2 class="section-title">Everything You Need, Nothing You Don't</h2>
+            <p class="section-subtitle">Built by someone with 7 years in Alberta construction. Every feature solves a real problem.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon icon-orange"><i class="fas fa-robot"></i></div>
+                <h3>AI Construction Assistant</h3>
+                <p>Ask anything about your business — taxes, compliance, project management — and get instant, Alberta-specific answers.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Voice commands for job site use</li>
+                    <li><i class="fas fa-check"></i> Trade-specific knowledge (framing, carpentry, GC)</li>
+                    <li><i class="fas fa-check"></i> Flexible tax guidance for grey areas</li>
+                    <li><i class="fas fa-check"></i> Catch-up assistance for late filings</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon icon-blue"><i class="fas fa-envelope-open-text"></i></div>
+                <h3>Email AI & Lead Management</h3>
+                <p>Never miss a lead again. AI reads, categorizes, and replies to emails automatically while you're on the job.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Auto-reply to new leads in seconds</li>
+                    <li><i class="fas fa-check"></i> Priority categorization (Urgent/High/Medium/Low)</li>
+                    <li><i class="fas fa-check"></i> Automated follow-up sequences</li>
+                    <li><i class="fas fa-check"></i> Project detail questionnaires</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon icon-green"><i class="fas fa-dollar-sign"></i></div>
+                <h3>Financial Management</h3>
+                <p>Complete financial tracking built for construction — invoicing, expenses, payroll, and GST all in one place.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Professional invoice generation with GST</li>
+                    <li><i class="fas fa-check"></i> Automatic expense categorization</li>
+                    <li><i class="fas fa-check"></i> Payroll with WCB, CPP & EI calculations</li>
+                    <li><i class="fas fa-check"></i> Tax summaries and CRA remittance</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(156,39,176,0.1);color:#7b1fa2"><i class="fas fa-shield-alt"></i></div>
+                <h3>Alberta Compliance Engine</h3>
+                <p>Stay compliant with Alberta's construction regulations automatically. Never miss a deadline or inspection.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> WCB Alberta tracking & reminders</li>
+                    <li><i class="fas fa-check"></i> OHS safety inspection scheduling</li>
+                    <li><i class="fas fa-check"></i> Building permit management</li>
+                    <li><i class="fas fa-check"></i> Training record tracking</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(0,150,136,0.1);color:#00796b"><i class="fab fa-google-drive"></i></div>
+                <h3>Google Drive Integration</h3>
+                <p>All your business documents automatically organized in Google Drive. Email attachments saved instantly.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Auto-save email attachments</li>
+                    <li><i class="fas fa-check"></i> Organized folder structure</li>
+                    <li><i class="fas fa-check"></i> Document categorization by type</li>
+                    <li><i class="fas fa-check"></i> Access from anywhere</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(255,87,34,0.1);color:#e64a19"><i class="fas fa-project-diagram"></i></div>
+                <h3>Project Management</h3>
+                <p>Track all your projects, budgets, and timelines in one place. Share live progress with clients via a unique link.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Scope of work checklists</li>
+                    <li><i class="fas fa-check"></i> Client-facing progress links</li>
+                    <li><i class="fas fa-check"></i> Budget & timeline tracking</li>
+                    <li><i class="fas fa-check"></i> Expected finish date alerts</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(13,110,253,0.1);color:#0d6efd"><i class="fas fa-folder-open"></i></div>
+                <h3>Documents & Blueprints</h3>
+                <p>Upload and organize blueprints, contracts, permits, and site photos. Share documents directly with clients through project links.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Blueprint & DWG file support</li>
+                    <li><i class="fas fa-check"></i> Contracts & permit storage</li>
+                    <li><i class="fas fa-check"></i> Client-visible document sharing</li>
+                    <li><i class="fas fa-check"></i> AI document analysis</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── EMAIL AI SECTION ── -->
+<section id="email-ai" class="email-section">
+    <div class="container">
+        <div class="text-center">
+            <div class="section-label" style="background:rgba(255,255,255,0.2);color:#fff">Email AI</div>
+            <h2 class="section-title">Your AI Replies to Leads While You Work</h2>
+            <p class="section-subtitle">Every email is read, categorized by priority, and answered automatically — in your voice, with your business info.</p>
+        </div>
+        <div class="email-demo">
+            <div class="email-demo-card">
+                <h4>📥 Incoming Emails — Auto-Categorized</h4>
+                <div class="email-item urgent">
+                    <div class="email-item-header">
+                        <span class="email-item-from">sarah.m@gmail.com</span>
+                        <span><span class="priority-dot dot-urgent"></span> Urgent</span>
+                    </div>
+                    <div class="email-item-subject">Need framing done ASAP — moving in 3 weeks</div>
+                    <div class="email-item-preview">🎯 New Lead • 📎 2 attachments → saved to Google Drive</div>
+                </div>
+                <div class="email-item high">
+                    <div class="email-item-header">
+                        <span class="email-item-from">bob.contractor@outlook.com</span>
+                        <span><span class="priority-dot dot-high"></span> High</span>
+                    </div>
+                    <div class="email-item-subject">Quote request for basement renovation</div>
+                    <div class="email-item-preview">💰 Quote Request • Follow-up scheduled in 48hrs</div>
+                </div>
+                <div class="email-item medium">
+                    <div class="email-item-header">
+                        <span class="email-item-from">city.permits@calgary.ca</span>
+                        <span><span class="priority-dot dot-medium"></span> Medium</span>
+                    </div>
+                    <div class="email-item-subject">Building permit approved — 123 Main St</div>
+                    <div class="email-item-preview">📋 Compliance • PDF saved to Compliance folder</div>
+                </div>
+                <div class="email-item low">
+                    <div class="email-item-header">
+                        <span class="email-item-from">newsletter@supplier.com</span>
+                        <span><span class="priority-dot dot-low"></span> Low</span>
+                    </div>
+                    <div class="email-item-subject">Monthly lumber pricing update</div>
+                    <div class="email-item-preview">📧 General • No action required</div>
+                </div>
+            </div>
+            <div class="email-demo-card">
+                <h4>🤖 AI Auto-Reply — Sent in 30 Seconds</h4>
+                <div class="reply-preview">
+                    <div class="reply-label">✅ Sent to sarah.m@gmail.com</div>
+                    <strong>Subject:</strong> Re: Need framing done ASAP — Thank you for reaching out!<br><br>
+                    Hi Sarah!<br><br>
+                    Thank you for reaching out to [Your Business]! We're excited to hear about your project.<br><br>
+                    I've received your message and will personally review the details. Here's what happens next:<br><br>
+                    ✅ Within 24 hours: I'll review your project requirements<br>
+                    ✅ Within 48 hours: I'll send you a detailed quote<br>
+                    ✅ Site Visit: We'll walk through the project at no charge<br><br>
+                    To prepare the most accurate quote, could you answer a few questions?<br>
+                    1. What is the approximate size of the project?<br>
+                    2. What is your ideal start date?<br>
+                    3. Do you have any plans or drawings?<br><br>
+                    Looking forward to working with you!<br><br>
+                    <strong>[Your Name]</strong><br>
+                    [Your Business] | [Your Phone]
+                </div>
+                <div style="margin-top:1rem;padding:0.75rem;background:rgba(255,255,255,0.1);border-radius:8px;font-size:0.8rem;color:rgba(255,255,255,0.8)">
+                    <strong style="color:#66bb6a">📁 Files Auto-Saved to Google Drive:</strong><br>
+                    • project_plans.pdf → Projects/PDFs<br>
+                    • site_photo.jpg → Projects/Photos
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section id="how-it-works">
+    <div class="container">
+        <div class="text-center">
+            <div class="section-label">How It Works</div>
+            <h2 class="section-title">Up and Running in Minutes</h2>
+            <p class="section-subtitle">No technical knowledge required. If you can use a smartphone, you can use Foreman.</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Create Your Account</h3>
+                <p>Sign up with your business info. Takes less than 2 minutes.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Connect Your Email & Drive</h3>
+                <p>Grant permission to your email and Google Drive. We handle the rest.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Customize Your AI</h3>
+                <p>Set your trade, business info, and reply templates. AI learns your style.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3>Watch It Work</h3>
+                <p>AI handles leads, compliance, and documents while you focus on building.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section id="testimonials" class="testimonials-bg">
+    <div class="container">
+        <div class="text-center">
+            <div class="section-label">Reviews</div>
+            <h2 class="section-title">Alberta Contractors Love Foreman</h2>
+            <p class="section-subtitle">Real results from real construction businesses across Alberta.</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="testimonial-text">"I was missing leads constantly because I couldn't reply fast enough. Now the AI replies within a minute and I've booked 3 new projects this month that I would have lost before."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">MJ</div>
+                    <div>
+                        <div class="author-name">Mike Johnson</div>
+                        <div class="author-title">Framing Contractor, Calgary</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="testimonial-text">"WCB compliance used to stress me out every quarter. Now I get reminders automatically and everything is tracked. I haven't missed a deadline since I started using this."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">SR</div>
+                    <div>
+                        <div class="author-name">Sarah Reynolds</div>
+                        <div class="author-title">General Contractor, Edmonton</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="testimonial-text">"The Google Drive integration is incredible. Every permit, photo, and contract from emails gets saved automatically. My accountant loves me now because everything is organized."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">DT</div>
+                    <div>
+                        <div class="author-name">Dave Thompson</div>
+                        <div class="author-title">Carpentry Contractor, Red Deer</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── PRICING ── -->
+<section id="pricing">
+    <div class="container">
+        <div class="text-center">
+            <div class="section-label">Pricing</div>
+            <h2 class="section-title">Simple, Affordable Pricing</h2>
+            <p class="section-subtitle">No hidden fees. No long-term contracts. Cancel anytime. Way cheaper than Procore or Buildertrend.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="pricing-name">Starter</div>
+                <div class="pricing-price">$49<span>/month</span></div>
+                <div class="pricing-desc">Perfect for solo contractors just getting started</div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> 1 user account</li>
+                    <li><i class="fas fa-check"></i> AI assistant (text)</li>
+                    <li><i class="fas fa-check"></i> 5 active projects</li>
+                    <li><i class="fas fa-check"></i> 100 transactions/month</li>
+                    <li><i class="fas fa-check"></i> Basic compliance tracking</li>
+                    <li><i class="fas fa-check"></i> Invoice generation</li>
+                    <li class="disabled"><i class="fas fa-times"></i> Email AI</li>
+                    <li class="disabled"><i class="fas fa-times"></i> Google Drive</li>
+                    <li class="disabled"><i class="fas fa-times"></i> Voice commands</li>
+                </ul>
+                <button class="pricing-cta cta-outline" onclick="openSignup('starter')">Get Started</button>
+            </div>
+            <div class="pricing-card popular">
+                <div class="popular-badge">⭐ Most Popular</div>
+                <div class="pricing-name">Professional</div>
+                <div class="pricing-price">$149<span>/month</span></div>
+                <div class="pricing-desc">For growing construction businesses</div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> 5 user accounts</li>
+                    <li><i class="fas fa-check"></i> AI assistant (voice + text)</li>
+                    <li><i class="fas fa-check"></i> Unlimited projects</li>
+                    <li><i class="fas fa-check"></i> 500 transactions/month</li>
+                    <li><i class="fas fa-check"></i> Full compliance tracking</li>
+                    <li><i class="fas fa-check"></i> Email AI & auto-replies</li>
+                    <li><i class="fas fa-check"></i> Google Drive integration</li>
+                    <li><i class="fas fa-check"></i> Follow-up sequences</li>
+                    <li class="disabled"><i class="fas fa-times"></i> Dedicated account manager</li>
+                </ul>
+                <button class="pricing-cta cta-primary" onclick="openSignup('professional')">Start Free Trial</button>
+            </div>
+            <div class="pricing-card">
+                <div class="pricing-name">Business</div>
+                <div class="pricing-price">$299<span>/month</span></div>
+                <div class="pricing-desc">For established construction companies</div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> 15 user accounts</li>
+                    <li><i class="fas fa-check"></i> Everything in Professional</li>
+                    <li><i class="fas fa-check"></i> Unlimited transactions</li>
+                    <li><i class="fas fa-check"></i> Advanced AI customization</li>
+                    <li><i class="fas fa-check"></i> Priority support</li>
+                    <li><i class="fas fa-check"></i> Dedicated account manager</li>
+                    <li><i class="fas fa-check"></i> Custom integrations</li>
+                    <li><i class="fas fa-check"></i> White-label option</li>
+                    <li><i class="fas fa-check"></i> API access</li>
+                </ul>
+                <button class="pricing-cta cta-outline" onclick="openSignup('business')">Contact Sales</button>
+            </div>
+        </div>
+        <p style="text-align:center;margin-top:2rem;color:var(--text-light);font-size:0.875rem">
+            <i class="fas fa-lock"></i> All plans include 14-day free trial • No credit card required • Cancel anytime
+        </p>
+    </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready to Transform Your Construction Business?</h2>
+        <p>Join Alberta contractors who are saving 10+ hours per week with Foreman</p>
+        <a href="#" class="btn btn-primary btn-xl" onclick="openSignup()">
+            <i class="fas fa-rocket"></i> Start Your Free 14-Day Trial
+        </a>
+        <p style="margin-top:1rem;font-size:0.875rem;opacity:0.8">No credit card required • Setup in 5 minutes • Cancel anytime</p>
+    </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <i class="fas fa-hard-hat"></i>
+            <h3>Foreman</h3>
+            <p>The only AI assistant built exclusively for Alberta construction businesses. Manage finances, compliance, and leads automatically.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Product</h4>
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="/app">Dashboard</a>
+            <a href="/admin">Admin Panel</a>
+        </div>
+        <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+            <a href="/privacy#cookies">Cookie Policy</a>
+            <a href="mailto:legal@foremanapp.ca">Legal Inquiries</a>
+        </div>
+        <div class="footer-col">
+            <h4>Support</h4>
+            <a href="mailto:support@foremanapp.ca">Contact Support</a>
+            <a href="/api/docs">API Docs</a>
+            <a href="mailto:hello@foremanapp.ca">Get in Touch</a>
+            <a href="/app">Launch App</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2025 Foreman. All rights reserved. 🇨🇦 Built for Alberta construction businesses. 🇨🇦 &nbsp;|&nbsp; <a href="/privacy" style="color:rgba(255,255,255,0.6);text-decoration:none">Privacy</a> &nbsp;|&nbsp; <a href="/terms" style="color:rgba(255,255,255,0.6);text-decoration:none">Terms</a></p>
+    </div>
+</footer>
+
+<!-- ── SIGNUP MODAL ── -->
+<div class="modal-overlay" id="signupModal">
+    <div class="modal" style="position:relative">
+        <button class="modal-close" onclick="closeModal('signupModal')">×</button>
+        <h2>🚀 Start Your Free Trial</h2>
+        <p>14 days free. No credit card required. Setup in 5 minutes.</p>
+        <div class="modal-error" id="signupError"></div>
+        <div class="modal-success" id="signupSuccess"></div>
+        <form id="signupForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Your Name *</label>
+                    <input type="text" id="reg-name" placeholder="John Smith" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="reg-phone" placeholder="(403) 555-1234">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email Address *</label>
+                <input type="email" id="reg-email" placeholder="john@yourcompany.ca" required>
+            </div>
+            <div class="form-group">
+                <label>Password * (min 8 characters)</label>
+                <input type="password" id="reg-password" placeholder="Create a password" required>
+            </div>
+            <div class="form-group">
+                <label>Business Name *</label>
+                <input type="text" id="reg-business" placeholder="ABC Construction Ltd." required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Trade / Specialty *</label>
+                    <select id="reg-trade" required>
+                        <option value="">Select your trade</option>
+                        <option value="framing">Framing</option>
+                        <option value="carpentry">Carpentry</option>
+                        <option value="general_contracting">General Contracting</option>
+                        <option value="electrical">Electrical</option>
+                        <option value="plumbing">Plumbing</option>
+                        <option value="roofing">Roofing</option>
+                        <option value="concrete">Concrete</option>
+                        <option value="drywall">Drywall</option>
+                        <option value="painting">Painting</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Plan</label>
+                    <select id="reg-plan">
+                        <option value="starter">Starter - $49/mo</option>
+                        <option value="professional" selected>Professional - $149/mo</option>
+                        <option value="business">Business - $299/mo</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:0.875rem;font-size:1rem;margin-top:0.5rem" id="signupBtn">
+                <i class="fas fa-rocket"></i> Create Free Account
+            </button>
+        </form>
+        <div class="divider">already have an account?</div>
+        <button class="btn btn-outline" style="width:100%" onclick="closeModal('signupModal');openLogin()">Sign In Instead</button>
+    </div>
+</div>
+
+<!-- ── LOGIN MODAL ── -->
+<div class="modal-overlay" id="loginModal">
+    <div class="modal" style="position:relative">
+        <button class="modal-close" onclick="closeModal('loginModal')">×</button>
+        <h2>👋 Welcome Back</h2>
+        <p>Sign in to your Foreman account</p>
+        <div class="modal-error" id="loginError"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="login-email" placeholder="your@email.com" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="Your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:0.875rem;font-size:1rem" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+        </form>
+        <div class="divider">don't have an account?</div>
+        <button class="btn btn-outline" style="width:100%" onclick="closeModal('loginModal');openSignup()">Create Free Account</button>
+    </div>
+</div>
+
+<script>
+// ── MODALS ──
+function openSignup(plan) {
+    closeMobileMenu();
+    if (plan) document.getElementById('reg-plan').value = plan;
+    document.getElementById('signupModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function openLogin() {
+    closeMobileMenu();
+    document.getElementById('loginModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    // Restore scroll if no other modals are open
+    const anyOpen = document.querySelectorAll('.modal-overlay.open').length > 0;
+    if (!anyOpen) document.body.style.overflow = '';
+}
+function showNDA() {
+    window.open('/api/users/nda', '_blank');
+}
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const btn = document.getElementById('hamburgerBtn');
+    const icon = document.getElementById('hamburgerIcon');
+    const isOpen = menu.classList.contains('open');
+    if (isOpen) {
+        menu.classList.remove('open');
+        icon.className = 'fas fa-bars';
+        btn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+    } else {
+        menu.classList.add('open');
+        icon.className = 'fas fa-times';
+        btn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+    }
+}
+function closeMobileMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const btn = document.getElementById('hamburgerBtn');
+    const icon = document.getElementById('hamburgerIcon');
+    menu.classList.remove('open');
+    icon.className = 'fas fa-bars';
+    btn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+}
+// Close mobile menu on outside click
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('mobileMenu');
+    const btn = document.getElementById('hamburgerBtn');
+    if (menu && menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+        closeMobileMenu();
+    }
+});
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.classList.remove('open');
+    });
+});
+
+// ── SIGNUP ──
+document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('signupBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+    btn.disabled = true;
+
+    const errEl = document.getElementById('signupError');
+    const sucEl = document.getElementById('signupSuccess');
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
+
+    try {
+        const res = await fetch('/api/users/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value,
+                business_name: document.getElementById('reg-business').value,
+                trade: document.getElementById('reg-trade').value,
+                contact_name: document.getElementById('reg-name').value,
+                phone: document.getElementById('reg-phone').value,
+                plan: document.getElementById('reg-plan').value
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Registration failed');
+
+        sucEl.textContent = '✅ Account created! Redirecting to your dashboard...';
+        sucEl.style.display = 'block';
+
+        // Auto-login
+        const loginRes = await fetch('/api/users/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value
+            })
+        });
+        const loginData = await loginRes.json();
+        if (loginData.token) {
+            localStorage.setItem('userToken', loginData.token);
+            localStorage.setItem('userData', JSON.stringify(loginData.user));
+            setTimeout(() => window.location.href = '/app', 1500);
+        }
+    } catch (err) {
+        errEl.textContent = '❌ ' + err.message;
+        errEl.style.display = 'block';
+    } finally {
+        btn.innerHTML = '<i class="fas fa-rocket"></i> Create Free Account';
+        btn.disabled = false;
+    }
+});
+
+// ── LOGIN ──
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+    btn.disabled = true;
+
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+
+    try {
+        const res = await fetch('/api/users/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: document.getElementById('login-email').value,
+                password: document.getElementById('login-password').value
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Login failed');
+
+        localStorage.setItem('userToken', data.token);
+        localStorage.setItem('userData', JSON.stringify(data.user));
+        window.location.href = '/app';
+    } catch (err) {
+        errEl.textContent = '❌ ' + err.message;
+        errEl.style.display = 'block';
+    } finally {
+        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+        btn.disabled = false;
+    }
+});
+
+// ── SSE Keep-Alive (keeps server awake even on landing page) ──
+(function() {
+    if (typeof EventSource === 'undefined') return;
+    let sse = null;
+    let retryTimer = null;
+    function connectSSE() {
+        try {
+            if (sse) { sse.close(); sse = null; }
+            sse = new EventSource('/api/stream');
+            sse.onerror = function() {
+                sse.close(); sse = null;
+                retryTimer = setTimeout(connectSSE, 45000);
+            };
+        } catch(e) {
+            retryTimer = setTimeout(connectSSE, 60000);
+        }
+    }
+    connectSSE();
+})();
+
+// ── SMOOTH SCROLL ──
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+        const href = a.getAttribute('href');
+        if (href === '#') return;
+        e.preventDefault();
+        document.querySelector(href)?.scrollIntoView({behavior:'smooth'});
+    });
+});
+
+// ── NAV SCROLL EFFECT ──
+window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    nav.style.boxShadow = window.scrollY > 20 ? '0 2px 20px rgba(0,0,0,0.1)' : 'none';
+});
+</script>
+</body>
+</html>

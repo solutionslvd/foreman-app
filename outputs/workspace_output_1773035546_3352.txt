@@ -1,0 +1,2 @@
+Status: 200
+Response: {'success': True, 'token': 'Z5MQQgtgfjVhOtsNxMI4jRfr8cVlzJaxI9whmdqc6NYI6BJKZPkGaH0r4IXoWr34s0rKH7KbmtAkk9N6Un4gMw', 'expires_at': '2026-03-10T05:52:26.690741', 'user': {'id': 'f1647d5854c8a8bc', 'email': 'test@foreman.ca', 'business_name': 'Test Construction Ltd.', 'trade': 'Framing', 'contact_name': 'Test User', 'plan': 'pro', 'role': 'user', 'nda_accepted': False, 'email_access_granted': False, 'gdrive_access_granted': False}}

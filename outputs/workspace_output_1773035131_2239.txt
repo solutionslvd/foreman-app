@@ -1,0 +1,67 @@
+User token: ✅
+Admin token: ✅
+User role in login: user
+
+── CORE AUTH ──────────────────────────────────────────
+✅ Health                              HTTP 200   0ms  status=healthy
+✅ Users/me                            HTTP 200   1ms  status=active
+✅ Users/me role field                 HTTP 200   0ms  status=active
+✅ Admin/dashboard                     HTTP 200   0ms  
+
+── PROJECTS ───────────────────────────────────────────
+✅ Projects/list                       HTTP 200   1ms  total=0
+✅ Projects/invoices                   HTTP 200   0ms  total=0
+✅ Projects/estimates                  HTTP 200   0ms  total=0
+✅ Projects/overview                   HTTP 200   0ms  
+
+── FINANCIAL ──────────────────────────────────────────
+✅ Financial/summary                   HTTP 200   0ms  
+✅ Financial/invoices                  HTTP 200   0ms  total=0
+✅ Financial/transactions              HTTP 200   0ms  total=0
+✅ Financial/tax2025                   HTTP 200   0ms  
+
+── LEDGER (BUG-NEW-D fix) ─────────────────────────────
+✅ Ledger/accounts                     HTTP 200   1ms  
+✅ Ledger/transactions                 HTTP 200   0ms  total=0
+✅ Ledger/dashboard                    HTTP 200   0ms  
+✅ Ledger/P&L (was 403)                HTTP 200   0ms  
+✅ Ledger/AR-aging (was 403)           HTTP 200   0ms  
+⚠️ Ledger/GST (was 403)                HTTP 422   0ms  [{'type': 'missing', 'loc': ['query', 'from_date'], 'msg': '
+⚠️ Ledger/cashflow (was 403)           HTTP 422   0ms  [{'type': 'missing', 'loc': ['query', 'from_date'], 'msg': '
+✅ Ledger/balance (was 403)            HTTP 200   0ms  
+
+── COMPLIANCE (BUG-NEW-E fix) ─────────────────────────
+✅ Compliance/status                   HTTP 200   0ms  overall_status=not_configured
+✅ Compliance/summary                  HTTP 200   0ms  overall_status=not_configured
+✅ Compliance/WCB                      HTTP 200   0ms  status=not_registered
+✅ Compliance/permits                  HTTP 200   0ms  total=0
+✅ Compliance/training                 HTTP 200   0ms  total=0
+✅ Compliance/incidents                HTTP 200   0ms  total=0
+✅ Compliance/checklist                HTTP 200   0ms  
+
+── BILLING (BUG-NEW-A fix) ────────────────────────────
+✅ Billing/plans                       HTTP 200   0ms  
+❌ Billing/status (new)                HTTP 500   3ms  {}
+❌ Billing/payments (was 401)          HTTP 500   1ms  {}
+❌ Billing/payments admin              HTTP 500   1ms  {}
+✅ Billing/stripe-key                  HTTP 200   0ms  
+
+── SETTINGS ───────────────────────────────────────────
+✅ Settings/public                     HTTP 200   0ms  
+✅ Settings/user-prefs                 HTTP 200   0ms  
+✅ Settings/admin-all                  HTTP 200   0ms  
+
+── EMAIL & MISC ───────────────────────────────────────
+✅ Email/inbox                         HTTP 200   0ms  total=0
+✅ Email/stats                         HTTP 200   0ms  
+✅ Chat/suggestions                    HTTP 200   0ms  
+✅ Dropdowns                           HTTP 200   1ms  
+
+============================================================
+TOTAL: 39 | ✅ PASS: 34 | ❌ FAIL: 5 | Rate: 87.2%
+
+── SPECIFIC FIX VERIFICATION ──────────────────────────
+BUG-NEW-F (role field): ✅ role=user
+BUG-NEW-E (per-user compliance): ✅ not_configured=True, score=0
+BUG-NEW-A (billing/payments user): ❌ HTTP 500
+BUG-NEW-D (ledger P&L user access): ✅ HTTP 200

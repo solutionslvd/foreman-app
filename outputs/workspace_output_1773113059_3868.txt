@@ -1,0 +1,3 @@
+2823:    const comp = settings.compliance || {};
+2933:  const res = await apiPut('/api/settings/admin/compliance', data);
+4631:    appendMessage('I\'m here to help! For Alberta construction questions, compliance, invoicing, and more — just ask.', 'ai');

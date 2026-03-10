@@ -1,0 +1,25 @@
+=== AUTH SYSTEM TESTS ===
+--- Register new user ---
+{
+    "success": true,
+    "message": "Account created successfully",
+    "user_id": "1a8c8113b315c793",
+    "next_step": "Please review and accept the NDA to activate all features"
+}
+--- Login test user ---
+{
+    "success": true,
+    "token": "7M0OcTH0gQ4gGHW_Cd549k0DfzZ2HOdisqJZxTufC8DDSQd3ECUZWW7cACSlQYL3TeuYB4b3i2ANkqOWc3zswA",
+    "expires_at": "2026-03-09T22:04:43.223219",
+    "user": {
+        "id": "c6136ae38c34fe19",
+        "email": "test@foreman.ca",
+        "business_name": "Test Construction Ltd.",
+        "trade": "Framing",
+        "contact_name": "Test User",
+        "plan": "pro",
+        "nda_accepted": false,
+        "email_access_granted": false,
+        "gdrive_access_granted": false
+    }
+}
