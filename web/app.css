@@ -2664,3 +2664,1230 @@ img { max-width: 100%; }
     font-size: 0.78rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROJECT MANAGEMENT SYSTEM - Modern UI with All Recommended Improvements
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Project Management Container ─────────────────────────────────────────── */
+.pm-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.pm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.pm-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text, #1f2937);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pm-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Project Views Tabs ───────────────────────────────────────────────────── */
+.pm-views {
+  display: flex;
+  gap: 4px;
+  background: var(--card, #f3f4f6);
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.pm-view-tab {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #6b7280);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pm-view-tab:hover {
+  background: var(--bg, #ffffff);
+  color: var(--text, #1f2937);
+}
+
+.pm-view-tab.active {
+  background: var(--primary, #3b82f6);
+  color: white;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* ── Kanban Board ────────────────────────────────────────────────────────── */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  min-height: 500px;
+}
+
+.kanban-column {
+  background: var(--card, #f9fafb);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.kanban-column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid var(--border, #e5e7eb);
+}
+
+.kanban-column-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text, #1f2937);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kanban-column-count {
+  background: var(--primary-light, #dbeafe);
+  color: var(--primary, #3b82f6);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.kanban-cards {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 4px;
+}
+
+.kanban-card {
+  background: var(--bg, #ffffff);
+  border-radius: 10px;
+  padding: 14px;
+  cursor: grab;
+  border: 1px solid var(--border, #e5e7eb);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.kanban-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.kanban-card.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.kanban-card-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  color: var(--text, #1f2937);
+}
+
+.kanban-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.kanban-card-tag {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.tag-high { background: #fee2e2; color: #dc2626; }
+.tag-medium { background: #fef3c7; color: #d97706; }
+.tag-low { background: #d1fae5; color: #059669; }
+.tag-feature { background: #dbeafe; color: #2563eb; }
+.tag-bug { background: #fce7f3; color: #db2777; }
+.tag-task { background: #e0e7ff; color: #4f46e5; }
+
+.kanban-card-assignees {
+  display: flex;
+  margin-top: 10px;
+}
+
+.kanban-card-assignee {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary, #3b82f6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: -6px;
+  border: 2px solid var(--bg, #ffffff);
+}
+
+.kanban-card-assignee:first-child {
+  margin-left: 0;
+}
+
+.kanban-add-card {
+  margin-top: 12px;
+  padding: 12px;
+  border: 2px dashed var(--border, #d1d5db);
+  border-radius: 8px;
+  text-align: center;
+  color: var(--text-muted, #6b7280);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.kanban-add-card:hover {
+  border-color: var(--primary, #3b82f6);
+  color: var(--primary, #3b82f6);
+  background: var(--primary-light, #eff6ff);
+}
+
+/* ── Gantt Chart ─────────────────────────────────────────────────────────── */
+.gantt-container {
+  background: var(--bg, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--border, #e5e7eb);
+  overflow: hidden;
+}
+
+.gantt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--card, #f9fafb);
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.gantt-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.gantt-zoom-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border, #d1d5db);
+  background: var(--bg, #ffffff);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.gantt-zoom-btn:hover, .gantt-zoom-btn.active {
+  background: var(--primary, #3b82f6);
+  color: white;
+  border-color: var(--primary, #3b82f6);
+}
+
+.gantt-body {
+  display: flex;
+  min-height: 500px;
+}
+
+.gantt-sidebar {
+  width: 280px;
+  min-width: 280px;
+  border-right: 1px solid var(--border, #e5e7eb);
+  overflow-y: auto;
+}
+
+.gantt-sidebar-header {
+  position: sticky;
+  top: 0;
+  background: var(--card, #f9fafb);
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  display: flex;
+  gap: 16px;
+}
+
+.gantt-task-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border, #f3f4f6);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.gantt-task-row:hover {
+  background: var(--primary-light, #eff6ff);
+}
+
+.gantt-task-name {
+  flex: 1;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: var(--indent, 0px);
+}
+
+.gantt-task-duration {
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.gantt-timeline {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.gantt-timeline-header {
+  display: flex;
+  position: sticky;
+  top: 0;
+  background: var(--card, #f9fafb);
+  z-index: 10;
+}
+
+.gantt-timeline-month {
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  border-right: 1px solid var(--border, #e5e7eb);
+  text-align: center;
+  background: var(--card, #f9fafb);
+}
+
+.gantt-timeline-days {
+  display: flex;
+}
+
+.gantt-timeline-day {
+  min-width: 32px;
+  padding: 4px 0;
+  font-size: 0.7rem;
+  text-align: center;
+  border-right: 1px solid var(--border, #f3f4f6);
+  color: var(--text-muted, #6b7280);
+}
+
+.gantt-timeline-day.weekend {
+  background: var(--card, #f9fafb);
+}
+
+.gantt-timeline-day.today {
+  background: var(--primary-light, #dbeafe);
+  color: var(--primary, #3b82f6);
+  font-weight: 600;
+}
+
+.gantt-bars-container {
+  position: relative;
+}
+
+.gantt-grid-row {
+  height: 42px;
+  border-bottom: 1px solid var(--border, #f3f4f6);
+  display: flex;
+}
+
+.gantt-grid-cell {
+  min-width: 32px;
+  border-right: 1px solid var(--border, #f3f4f6);
+}
+
+.gantt-grid-cell.weekend {
+  background: var(--card, #f9fafb);
+}
+
+.gantt-bar {
+  position: absolute;
+  height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 0.7rem;
+  color: white;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: transform 0.1s;
+}
+
+.gantt-bar:hover {
+  transform: scaleY(1.1);
+  z-index: 10;
+}
+
+.gantt-bar.task { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.gantt-bar.milestone { 
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-radius: 2px;
+  transform: rotate(0deg);
+}
+.gantt-bar.progress { background: linear-gradient(135deg, #10b981, #059669); }
+.gantt-bar.critical { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.gantt-bar.complete { background: linear-gradient(135deg, #6b7280, #4b5563); }
+
+.gantt-bar-progress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px 0 0 4px;
+}
+
+.gantt-dependency-line {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* ── Dashboard Widgets ───────────────────────────────────────────────────── */
+.pm-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.pm-widget {
+  background: var(--bg, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--border, #e5e7eb);
+  padding: 20px;
+}
+
+.pm-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.pm-widget-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text, #1f2937);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pm-widget-body {
+  min-height: 100px;
+}
+
+/* Health Indicators */
+.health-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.health-indicator.healthy {
+  background: #d1fae5;
+}
+
+.health-indicator.warning {
+  background: #fef3c7;
+}
+
+.health-indicator.critical {
+  background: #fee2e2;
+}
+
+.health-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.health-dot.healthy { background: #10b981; }
+.health-dot.warning { background: #f59e0b; }
+.health-dot.critical { background: #ef4444; }
+
+/* Stats Cards */
+.pm-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.pm-stat-card {
+  background: var(--bg, #ffffff);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border, #e5e7eb);
+  text-align: center;
+}
+
+.pm-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary, #3b82f6);
+  line-height: 1.2;
+}
+
+.pm-stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted, #6b7280);
+  margin-top: 4px;
+}
+
+.pm-stat-change {
+  font-size: 0.75rem;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.pm-stat-change.up { color: #10b981; }
+.pm-stat-change.down { color: #ef4444; }
+
+/* ── Risk Management ─────────────────────────────────────────────────────── */
+.risk-matrix {
+  display: grid;
+  grid-template-columns: 40px repeat(5, 1fr);
+  gap: 2px;
+  background: var(--border, #e5e7eb);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 2px;
+}
+
+.risk-matrix-cell {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: transform 0.15s;
+}
+
+.risk-matrix-cell:hover {
+  transform: scale(1.05);
+}
+
+.risk-low { background: #d1fae5; color: #065f46; }
+.risk-medium { background: #fef3c7; color: #92400e; }
+.risk-high { background: #fee2e2; color: #991b1b; }
+.risk-critical { background: #dc2626; color: white; }
+
+.risk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.risk-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--card, #f9fafb);
+  border-radius: 8px;
+  border-left: 4px solid var(--risk-color, #f59e0b);
+}
+
+.risk-score {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.risk-details {
+  flex: 1;
+}
+
+.risk-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.risk-description {
+  font-size: 0.8rem;
+  color: var(--text-muted, #6b7280);
+}
+
+/* ── Issue Tracking ──────────────────────────────────────────────────────── */
+.issue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.issue-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg, #ffffff);
+  border-radius: 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  transition: box-shadow 0.2s;
+}
+
+.issue-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.issue-priority {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--priority-color, #6b7280);
+}
+
+.issue-priority.high { background: #ef4444; }
+.issue-priority.medium { background: #f59e0b; }
+.issue-priority.low { background: #10b981; }
+
+.issue-content {
+  flex: 1;
+}
+
+.issue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.issue-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.issue-id {
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+  background: var(--card, #f3f4f6);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.issue-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--text-muted, #6b7280);
+}
+
+/* ── Resource Management ─────────────────────────────────────────────────── */
+.resource-panel {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  min-height: 500px;
+}
+
+.resource-list {
+  background: var(--bg, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--border, #e5e7eb);
+  overflow: hidden;
+}
+
+.resource-list-header {
+  padding: 14px 16px;
+  background: var(--card, #f9fafb);
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border, #f3f4f6);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.resource-item:hover {
+  background: var(--primary-light, #eff6ff);
+}
+
+.resource-item.selected {
+  background: var(--primary-light, #dbeafe);
+}
+
+.resource-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary, #3b82f6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.resource-info {
+  flex: 1;
+}
+
+.resource-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.resource-role {
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.resource-utilization {
+  width: 50px;
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.resource-chart {
+  background: var(--bg, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--border, #e5e7eb);
+  padding: 20px;
+}
+
+.utilization-bar {
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 20px 0;
+}
+
+.utilization-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.utilization-fill {
+  width: 100%;
+  max-width: 60px;
+  border-radius: 6px 6px 0 0;
+  transition: height 0.3s ease;
+}
+
+.utilization-fill.under { background: #d1fae5; }
+.utilization-fill.optimal { background: #3b82f6; }
+.utilization-fill.over { background: #fee2e2; }
+
+.utilization-label {
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+/* ── Activity Feed & Comments ────────────────────────────────────────────── */
+.activity-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--card, #f9fafb);
+  border-radius: 8px;
+}
+
+.activity-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary, #3b82f6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.activity-author {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.activity-time {
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.activity-text {
+  font-size: 0.85rem;
+  color: var(--text, #1f2937);
+}
+
+.activity-text .mention {
+  background: var(--primary-light, #dbeafe);
+  color: var(--primary, #2563eb);
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Comments Section */
+.comments-section {
+  border-top: 1px solid var(--border, #e5e7eb);
+  padding-top: 16px;
+  margin-top: 16px;
+}
+
+.comment-input-wrapper {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.comment-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid var(--border, #d1d5db);
+  border-radius: 24px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: var(--primary, #3b82f6);
+}
+
+.comment-submit {
+  padding: 10px 20px;
+  background: var(--primary, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.comment-submit:hover {
+  background: var(--primary-dark, #2563eb);
+}
+
+/* ── Client Portal ───────────────────────────────────────────────────────── */
+.client-portal {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.client-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.client-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.client-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--primary, #3b82f6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.client-progress {
+  background: var(--bg, #ffffff);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.progress-ring {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 16px;
+}
+
+.progress-ring-circle {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.progress-ring-bg {
+  stroke: var(--border, #e5e7eb);
+}
+
+.progress-ring-fill {
+  stroke: var(--primary, #3b82f6);
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-value {
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 1.2rem;
+  font-weight: 700;
+  fill: var(--text, #1f2937);
+}
+
+/* ── Notifications Center ───────────────────────────────────────────────── */
+.notification-center {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 360px;
+  max-height: 480px;
+  background: var(--bg, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(120%);
+  transition: transform 0.3s ease;
+}
+
+.notification-center.open {
+  transform: translateY(0);
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.notification-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.notification-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.notification-item:hover {
+  background: var(--card, #f9fafb);
+}
+
+.notification-item.unread {
+  background: var(--primary-light, #eff6ff);
+}
+
+.notification-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-icon.info { background: #dbeafe; }
+.notification-icon.warning { background: #fef3c7; }
+.notification-icon.success { background: #d1fae5; }
+.notification-icon.error { background: #fee2e2; }
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+
+.notification-message {
+  font-size: 0.8rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.notification-time {
+  font-size: 0.7rem;
+  color: var(--text-muted, #9ca3af);
+  margin-top: 4px;
+}
+
+/* ── Audit Trail ─────────────────────────────────────────────────────────── */
+.audit-log {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.8rem;
+  background: var(--card, #1f2937);
+  color: #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.audit-entry {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.audit-timestamp {
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.audit-user {
+  color: #60a5fa;
+}
+
+.audit-action {
+  color: #34d399;
+}
+
+.audit-details {
+  color: #fbbf24;
+}
+
+/* ── AI Assistant Panel ──────────────────────────────────────────────────── */
+.ai-insights {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.ai-insight-card {
+  background: var(--bg, #ffffff);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+  border-left: 4px solid var(--primary, #3b82f6);
+}
+
+.ai-insight-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-insight-text {
+  font-size: 0.85rem;
+  color: var(--text-muted, #6b7280);
+  line-height: 1.5;
+}
+
+.ai-prediction {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--card, #f9fafb);
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.ai-prediction-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.ai-prediction-indicator.positive { background: #10b981; }
+.ai-prediction-indicator.negative { background: #ef4444; }
+.ai-prediction-indicator.neutral { background: #f59e0b; }
+
+/* ── Responsive Design ───────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .resource-panel {
+    grid-template-columns: 1fr;
+  }
+  
+  .gantt-sidebar {
+    display: none;
+  }
+  
+  .pm-dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .pm-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .pm-actions {
+    justify-content: center;
+  }
+  
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
+  
+  .pm-views {
+    overflow-x: auto;
+  }
+  
+  .notification-center {
+    left: 10px;
+    right: 10px;
+    width: auto;
+  }
+}
+
+/* ── Dark Theme Support ──────────────────────────────────────────────────── */
+.dark-theme .pm-widget,
+.dark-theme .kanban-card,
+.dark-theme .gantt-container,
+.dark-theme .issue-item,
+.dark-theme .resource-list,
+.dark-theme .resource-chart,
+.dark-theme .notification-center {
+  background: var(--card, #1f2937);
+  border-color: var(--border, #374151);
+}
+
+.dark-theme .kanban-column,
+.dark-theme .gantt-sidebar,
+.dark-theme .activity-item {
+  background: var(--card, #111827);
+}
+
+.dark-theme .gantt-timeline-day,
+.dark-theme .gantt-grid-cell {
+  border-color: var(--border, #374151);
+}
+
+.dark-theme .risk-matrix {
+  background: var(--border, #374151);
+}
+
+.dark-theme .audit-log {
+  background: #111827;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pm-widget,
+.kanban-card,
+.issue-item {
+  animation: slideIn 0.3s ease-out;
+}
+
+.health-dot.critical {
+  animation: pulse 2s infinite;
+}

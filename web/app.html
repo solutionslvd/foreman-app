@@ -196,6 +196,9 @@
         <a class="nav-item" data-page="projects" onclick="navigateTo('projects')">
           <span class="nav-icon">🏗️</span><span>Projects</span>
         </a>
+        <a class="nav-item" data-page="pm-dashboard" onclick="navigateTo('pm-dashboard')">
+          <span class="nav-icon">📊</span><span>Project Management</span>
+        </a>
       </div>
 
       <div class="nav-section">
@@ -439,6 +442,280 @@
     </div>
 
     <!-- ── INVOICES ───────────────────────────────────────── -->
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         PROJECT MANAGEMENT DASHBOARD - Advanced PM Features
+    ═══════════════════════════════════════════════════════════════════════════ -->
+    <div id="page-pm-dashboard" class="page">
+      <div class="page-header">
+        <h1 class="page-title">📊 Project Management</h1>
+        <div class="page-actions">
+          <button class="btn-secondary btn-sm" onclick="switchPMView('board')">📋 Board</button>
+          <button class="btn-secondary btn-sm" onclick="switchPMView('gantt')">📅 Gantt</button>
+          <button class="btn-secondary btn-sm" onclick="switchPMView('list')">📑 List</button>
+          <button class="btn-primary btn-sm" onclick="openModal('pm-new-task-modal')">+ New Task</button>
+        </div>
+      </div>
+
+      <!-- PM Dashboard Tabs -->
+      <div class="pm-tabs">
+        <button class="pm-tab active" data-tab="overview" onclick="switchPMTab('overview')">Overview</button>
+        <button class="pm-tab" data-tab="tasks" onclick="switchPMTab('tasks')">Tasks</button>
+        <button class="pm-tab" data-tab="schedule" onclick="switchPMTab('schedule')">Schedule</button>
+        <button class="pm-tab" data-tab="resources" onclick="switchPMTab('resources')">Resources</button>
+        <button class="pm-tab" data-tab="risks" onclick="switchPMTab('risks')">Risks</button>
+        <button class="pm-tab" data-tab="issues" onclick="switchPMTab('issues')">Issues</button>
+        <button class="pm-tab" data-tab="reports" onclick="switchPMTab('reports')">Reports</button>
+        <button class="pm-tab" data-tab="client" onclick="switchPMTab('client')">Client Portal</button>
+      </div>
+
+      <!-- PM Overview Tab -->
+      <div id="pm-tab-overview" class="pm-tab-content active">
+        <div class="pm-dashboard-grid">
+          <div class="pm-widget health-score">
+            <div class="pm-widget-header">
+              <h3>Project Health</h3>
+              <span class="pm-widget-badge healthy">On Track</span>
+            </div>
+            <div class="health-score-display">
+              <div class="health-ring">
+                <svg viewBox="0 0 36 36">
+                  <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path class="ring-fill good" stroke-dasharray="78, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+                <div class="health-value">78%</div>
+              </div>
+              <div class="health-breakdown">
+                <div class="health-item"><span class="health-label">Schedule</span><div class="mini-bar"><div class="mini-fill" style="width:85%"></div></div><span class="health-pct">85%</span></div>
+                <div class="health-item"><span class="health-label">Budget</span><div class="mini-bar"><div class="mini-fill good" style="width:92%"></div></div><span class="health-pct">92%</span></div>
+                <div class="health-item"><span class="health-label">Quality</span><div class="mini-bar"><div class="mini-fill good" style="width:88%"></div></div><span class="health-pct">88%</span></div>
+                <div class="health-item"><span class="health-label">Resources</span><div class="mini-bar"><div class="mini-fill warning" style="width:65%"></div></div><span class="health-pct">65%</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pm-widget">
+            <div class="pm-widget-header"><h3>📅 Schedule Performance</h3></div>
+            <div class="schedule-stats">
+              <div class="stat-item"><div class="stat-value">24</div><div class="stat-label">Completed</div></div>
+              <div class="stat-item"><div class="stat-value">12</div><div class="stat-label">In Progress</div></div>
+              <div class="stat-item warning"><div class="stat-value">3</div><div class="stat-label">Overdue</div></div>
+              <div class="stat-item"><div class="stat-value">8</div><div class="stat-label">Upcoming</div></div>
+            </div>
+          </div>
+
+          <div class="pm-widget">
+            <div class="pm-widget-header"><h3>💰 Budget Status</h3><span class="budget-total">$245,000</span></div>
+            <div class="budget-breakdown">
+              <div class="budget-item"><span class="budget-label">Labor</span><div class="budget-bar"><div class="budget-fill" style="width:72%"></div></div><span class="budget-value">$72K / $100K</span></div>
+              <div class="budget-item"><span class="budget-label">Materials</span><div class="budget-bar"><div class="budget-fill" style="width:58%"></div></div><span class="budget-value">$43.5K / $75K</span></div>
+              <div class="budget-item"><span class="budget-label">Equipment</span><div class="budget-bar"><div class="budget-fill warning" style="width:85%"></div></div><span class="budget-value">$25.5K / $30K</span></div>
+            </div>
+          </div>
+
+          <div class="pm-widget">
+            <div class="pm-widget-header"><h3>⚠️ Risk Overview</h3></div>
+            <div class="risk-summary">
+              <div class="risk-stat critical"><span class="risk-count">2</span><span class="risk-label">Critical</span></div>
+              <div class="risk-stat high"><span class="risk-count">5</span><span class="risk-label">High</span></div>
+              <div class="risk-stat medium"><span class="risk-count">8</span><span class="risk-label">Medium</span></div>
+              <div class="risk-stat low"><span class="risk-count">12</span><span class="risk-label">Low</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity & Notifications -->
+        <div class="pm-two-col">
+          <div class="pm-widget activity-feed-widget">
+            <div class="pm-widget-header"><h3>📝 Recent Activity</h3></div>
+            <div class="activity-feed" id="pm-activity-feed">
+              <div class="activity-item">
+                <div class="activity-avatar">JD</div>
+                <div class="activity-content">
+                  <div class="activity-text"><strong>John Doe</strong> completed task <em>Framing inspection</em></div>
+                  <div class="activity-time">2 hours ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-avatar">SM</div>
+                <div class="activity-content">
+                  <div class="activity-text"><strong>Sarah Miller</strong> uploaded <em>Safety_report.pdf</em></div>
+                  <div class="activity-time">4 hours ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="pm-widget notifications-widget">
+            <div class="pm-widget-header"><h3>🔔 Notifications</h3><span class="notification-badge">5</span></div>
+            <div class="notification-list" id="pm-notifications">
+              <div class="notification-item unread">
+                <span class="notif-icon">⚠️</span>
+                <div class="notif-content">
+                  <div class="notif-text">Task "Electrical rough-in" is overdue</div>
+                  <div class="notif-time">1 hour ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Insights -->
+        <div class="pm-widget ai-insights-panel">
+          <div class="pm-widget-header"><h3>🤖 AI Insights</h3><span class="ai-badge">Powered by Foreman AI</span></div>
+          <div class="ai-insights-grid">
+            <div class="ai-insight schedule">
+              <div class="insight-icon">📅</div>
+              <div class="insight-content">
+                <div class="insight-title">Schedule Risk Detected</div>
+                <div class="insight-text">Project may be 5-7 days behind schedule. Consider adding resources to electrical work.</div>
+              </div>
+            </div>
+            <div class="ai-insight resource">
+              <div class="insight-icon">👥</div>
+              <div class="insight-content">
+                <div class="insight-title">Resource Optimization</div>
+                <div class="insight-text">Plumbing team has 40% availability next week. Consider advancing bathroom rough-in tasks.</div>
+              </div>
+            </div>
+            <div class="ai-insight budget">
+              <div class="insight-icon">💰</div>
+              <div class="insight-content">
+                <div class="insight-title">Budget Forecast</div>
+                <div class="insight-text">Projected to be 3% under budget at current spending rate.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PM Tasks Tab (Kanban) -->
+      <div id="pm-tab-tasks" class="pm-tab-content">
+        <div class="pm-toolbar">
+          <input type="text" placeholder="Search tasks..." id="pm-task-search" class="pm-search-input">
+          <select id="pm-assignee-filter"><option value="">All Assignees</option></select>
+          <button class="btn-primary btn-sm" onclick="openModal('pm-new-task-modal')">+ Add Task</button>
+        </div>
+        <div class="kanban-board" id="pm-kanban-board">
+          <div class="kanban-column" data-status="todo">
+            <div class="kanban-header"><h4>📋 To Do</h4><span class="kanban-count">4</span></div>
+            <div class="kanban-cards" id="kanban-todo"></div>
+          </div>
+          <div class="kanban-column" data-status="inprogress">
+            <div class="kanban-header"><h4>🔄 In Progress</h4><span class="kanban-count">3</span></div>
+            <div class="kanban-cards" id="kanban-inprogress"></div>
+          </div>
+          <div class="kanban-column" data-status="review">
+            <div class="kanban-header"><h4>👀 Review</h4><span class="kanban-count">2</span></div>
+            <div class="kanban-cards" id="kanban-review"></div>
+          </div>
+          <div class="kanban-column" data-status="done">
+            <div class="kanban-header"><h4>✅ Done</h4><span class="kanban-count">8</span></div>
+            <div class="kanban-cards" id="kanban-done"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PM Schedule Tab (Gantt) -->
+      <div id="pm-tab-schedule" class="pm-tab-content">
+        <div class="pm-toolbar">
+          <button class="btn-secondary btn-sm" onclick="ganttToday()">Today</button>
+          <button class="btn-primary btn-sm" onclick="openModal('pm-new-milestone-modal')">+ Add Milestone</button>
+        </div>
+        <div class="gantt-container">
+          <div class="gantt-sidebar">
+            <div class="gantt-header"><span>Task Name</span></div>
+            <div class="gantt-task-list" id="gantt-tasks"></div>
+          </div>
+          <div class="gantt-chart-area">
+            <div class="gantt-timeline" id="gantt-timeline"></div>
+            <div class="gantt-bars-container" id="gantt-bars"></div>
+            <div class="gantt-today-line" id="gantt-today-line"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PM Resources Tab -->
+      <div id="pm-tab-resources" class="pm-tab-content">
+        <div class="pm-toolbar">
+          <select id="pm-resource-project"><option value="all">All Projects</option></select>
+          <button class="btn-primary btn-sm" onclick="openModal('pm-assign-resource-modal')">+ Assign Resource</button>
+        </div>
+        <div class="resource-dashboard">
+          <div class="resource-section"><h3>👥 Team Utilization</h3><div class="team-grid" id="pm-team-grid"></div></div>
+          <div class="resource-section"><h3>🔧 Equipment</h3><div class="equipment-grid" id="pm-equipment-grid"></div></div>
+          <div class="resource-section"><h3>📊 Capacity Planning</h3><div class="capacity-chart" id="pm-capacity-chart"></div></div>
+        </div>
+      </div>
+
+      <!-- PM Risks Tab -->
+      <div id="pm-tab-risks" class="pm-tab-content">
+        <div class="pm-toolbar">
+          <button class="btn-primary btn-sm" onclick="openModal('pm-new-risk-modal')">+ Add Risk</button>
+        </div>
+        <div class="risk-matrix-container">
+          <div class="risk-matrix" id="pm-risk-matrix"></div>
+        </div>
+        <div class="risk-register">
+          <h3>📋 Risk Register</h3>
+          <table class="risk-table" id="pm-risk-table">
+            <thead><tr><th>ID</th><th>Description</th><th>Category</th><th>Impact</th><th>Likelihood</th><th>Score</th><th>Owner</th><th>Status</th></tr></thead>
+            <tbody id="risk-register-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PM Issues Tab -->
+      <div id="pm-tab-issues" class="pm-tab-content">
+        <div class="pm-toolbar">
+          <select id="pm-issue-status"><option value="all">All Statuses</option></select>
+          <button class="btn-primary btn-sm" onclick="openModal('pm-new-issue-modal')">+ Log Issue</button>
+        </div>
+        <div class="issues-dashboard">
+          <div class="issue-stats" id="pm-issue-stats"></div>
+          <div class="issue-list-container">
+            <h3>🔧 Issue Log</h3>
+            <div class="issue-list" id="pm-issue-list"></div>
+          </div>
+          <div class="change-requests-section">
+            <h3>📝 Change Requests</h3>
+            <div class="change-request-list" id="pm-change-requests"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PM Reports Tab -->
+      <div id="pm-tab-reports" class="pm-tab-content">
+        <div class="pm-toolbar">
+          <select id="pm-report-type"><option value="summary">Executive Summary</option></select>
+          <button class="btn-secondary btn-sm" onclick="generatePMReport()">Generate</button>
+          <button class="btn-secondary btn-sm" onclick="exportPMReport()">Export PDF</button>
+        </div>
+        <div class="reports-container" id="pm-reports-container"></div>
+        <div class="audit-log-section">
+          <h3>📜 Audit Trail</h3>
+          <div class="audit-log" id="pm-audit-log"></div>
+        </div>
+      </div>
+
+      <!-- PM Client Portal Tab -->
+      <div id="pm-tab-client" class="pm-tab-content">
+        <div class="pm-toolbar">
+          <button class="btn-secondary btn-sm" onclick="shareClientPortal()">Share Portal Link</button>
+          <button class="btn-primary btn-sm" onclick="openModal('pm-client-update-modal')">+ Post Update</button>
+        </div>
+        <div class="client-portal-container" id="pm-client-portal">
+          <div class="client-portal-header">
+            <div class="client-project-info"><h2>Project Progress Portal</h2></div>
+          </div>
+          <div class="client-dashboard">
+            <div class="client-widget progress-overview"><h3>📊 Progress</h3><div id="client-progress-ring"></div></div>
+            <div class="client-widget recent-updates"><h3>📰 Updates</h3><div id="client-updates-list"></div></div>
+            <div class="client-widget messages"><h3>💬 Messages</h3><div id="client-messages-list"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="page-invoices" class="page">
       <div class="page-header">
         <h1 class="page-title">Invoices &amp; Estimates</h1>

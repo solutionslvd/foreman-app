@@ -5211,3 +5211,966 @@ function shareDocumentToChat(docId) {
     }
   }, 300);
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PROJECT MANAGEMENT SYSTEM - Advanced PM Features for The Foreman
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// PM Data Store Extensions
+store.pmTasks = store.pmTasks || [];
+store.pmRisks = store.pmRisks || [];
+store.pmIssues = store.pmIssues || [];
+store.pmResources = store.pmResources || [];
+store.pmActivities = store.pmActivities || [];
+store.pmMilestones = store.pmMilestones || [];
+store.pmChangeRequests = store.pmChangeRequests || [];
+store.pmClientUpdates = store.pmClientUpdates || [];
+store.pmCurrentView = 'board';
+store.pmCurrentTab = 'overview';
+
+// Sample PM Data for Demo
+const samplePMTasks = [
+  { id: 1, title: 'Electrical rough-in', description: 'Complete electrical rough-in for main floor', status: 'todo', priority: 'critical', assignee: 'JD', assigneeName: 'John Doe', dueDate: '2024-12-15', category: 'electrical', progress: 0 },
+  { id: 2, title: 'Plumbing layout', description: 'Design and mark plumbing routes', status: 'todo', priority: 'high', assignee: 'SM', assigneeName: 'Sarah Miller', dueDate: '2024-12-18', category: 'plumbing', progress: 0 },
+  { id: 3, title: 'HVAC ductwork', description: 'Install main HVAC ducts', status: 'inprogress', priority: 'medium', assignee: 'MJ', assigneeName: 'Mike Johnson', dueDate: '2024-12-20', category: 'hvac', progress: 60 },
+  { id: 4, title: 'Insulation installation', description: 'Install insulation in exterior walls', status: 'inprogress', priority: 'high', assignee: 'SM', assigneeName: 'Sarah Miller', dueDate: '2024-12-22', category: 'insulation', progress: 35 },
+  { id: 5, title: 'Framing inspection', description: 'City inspection for framing work', status: 'review', priority: 'medium', assignee: 'JD', assigneeName: 'John Doe', dueDate: '2024-12-16', category: 'inspection', progress: 90, comments: 3 },
+  { id: 6, title: 'Foundation work', description: 'Complete foundation and slab pour', status: 'done', priority: 'low', assignee: 'JD', assigneeName: 'John Doe', completedDate: '2024-12-10', category: 'foundation', progress: 100 },
+  { id: 7, title: 'Framing - main floor', description: 'Frame exterior and interior walls', status: 'done', priority: 'medium', assignee: 'SM', assigneeName: 'Sarah Miller', completedDate: '2024-12-12', category: 'framing', progress: 100 }
+];
+
+const samplePMRisks = [
+  { id: 'R001', description: 'Steel beam delivery delay', category: 'Supply Chain', impact: 'high', likelihood: 'high', score: 9, mitigation: 'Pre-order materials, identify backup supplier', owner: 'John D.', status: 'active' },
+  { id: 'R002', description: 'Subcontractor availability - Electrical', category: 'Resource', impact: 'high', likelihood: 'medium', score: 6, mitigation: 'Book subcontractor early, have backup', owner: 'Sarah M.', status: 'monitoring' },
+  { id: 'R003', description: 'Weather delays - Snow/Freezing', category: 'Environmental', impact: 'medium', likelihood: 'high', score: 6, mitigation: 'Build weather buffer into schedule', owner: 'Mike J.', status: 'monitoring' },
+  { id: 'R004', description: 'Permit approval delays', category: 'Regulatory', impact: 'medium', likelihood: 'medium', score: 4, mitigation: 'Submit early, follow up weekly', owner: 'John D.', status: 'mitigated' }
+];
+
+const samplePMIssues = [
+  { id: 'I001', title: 'Foundation crack discovered during inspection', description: 'A 2-foot crack was found in the foundation wall during the framing inspection.', priority: 'critical', status: 'open', reporter: 'John D.', assignee: 'Sarah M.', date: '2024-12-14', comments: 4, attachments: 2 },
+  { id: 'I002', title: 'HVAC ductwork doesn\'t match plans', description: 'Installed ductwork routing conflicts with planned plumbing lines.', priority: 'high', status: 'in-progress', reporter: 'Mike J.', assignee: 'Amy J.', date: '2024-12-13', comments: 7, attachments: 3 },
+  { id: 'I003', title: 'Missing insulation in north wall', description: 'Found gap in insulation installation. Has been corrected.', priority: 'medium', status: 'resolved', reporter: 'Sarah M.', assignee: 'John D.', date: '2024-12-10', resolvedDate: '2024-12-12' }
+];
+
+const samplePMResources = [
+  { id: 1, name: 'John Doe', initials: 'JD', role: 'Lead Carpenter', type: 'labor', utilization: 85, tasks: 4 },
+  { id: 2, name: 'Sarah Miller', initials: 'SM', role: 'Electrician', type: 'labor', utilization: 60, tasks: 3 },
+  { id: 3, name: 'Mike Johnson', initials: 'MJ', role: 'Plumber', type: 'labor', utilization: 40, tasks: 2 },
+  { id: 4, name: 'Amy Jackson', initials: 'AJ', role: 'HVAC Tech', type: 'labor', utilization: 95, tasks: 5 },
+  { id: 5, name: 'Skid Steer', icon: '🚜', type: 'equipment', status: 'available', project: '' },
+  { id: 6, name: 'Scaffolding Set', icon: '🏗️', type: 'equipment', status: 'in-use', project: '123 Main St' },
+  { id: 7, name: 'Compressor', icon: '🔩', type: 'equipment', status: 'in-use', project: '123 Main St' },
+  { id: 8, name: 'Generator', icon: '⚡', type: 'equipment', status: 'maintenance', project: 'In shop' }
+];
+
+// Initialize PM data if empty
+if (store.pmTasks.length === 0) {
+  store.pmTasks = samplePMTasks;
+  store.pmRisks = samplePMRisks;
+  store.pmIssues = samplePMIssues;
+  store.pmResources = samplePMResources;
+  saveStore();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PM TAB NAVIGATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function switchPMTab(tab) {
+  store.pmCurrentTab = tab;
+  
+  // Update tab buttons
+  document.querySelectorAll('.pm-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+  
+  // Update tab content
+  document.querySelectorAll('.pm-tab-content').forEach(content => {
+    content.classList.toggle('active', content.id === `pm-tab-${tab}`);
+  });
+  
+  // Render content based on tab
+  switch(tab) {
+    case 'tasks': renderKanbanBoard(); break;
+    case 'schedule': renderGanttChart(); break;
+    case 'resources': renderResourcesTab(); break;
+    case 'risks': renderRisksTab(); break;
+    case 'issues': renderIssuesTab(); break;
+    case 'reports': renderReportsTab(); break;
+    case 'client': renderClientPortal(); break;
+  }
+}
+
+function switchPMView(view) {
+  store.pmCurrentView = view;
+  if (view === 'gantt') {
+    switchPMTab('schedule');
+  } else if (view === 'board') {
+    switchPMTab('tasks');
+  } else {
+    switchPMTab('tasks');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// KANBAN BOARD
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderKanbanBoard() {
+  const tasks = store.pmTasks || [];
+  const statuses = ['todo', 'inprogress', 'review', 'done'];
+  const statusLabels = { todo: '📋 To Do', inprogress: '🔄 In Progress', review: '👀 Review', done: '✅ Done' };
+  
+  statuses.forEach(status => {
+    const container = document.getElementById(`kanban-${status}`);
+    const statusTasks = tasks.filter(t => t.status === status);
+    
+    if (container) {
+      if (statusTasks.length === 0) {
+        container.innerHTML = '<div class="kanban-empty">No tasks</div>';
+      } else {
+        container.innerHTML = statusTasks.map(task => renderKanbanCard(task)).join('');
+      }
+      
+      // Update count
+      const countEl = document.getElementById(`${status}-count`);
+      if (countEl) countEl.textContent = statusTasks.length;
+    }
+  });
+  
+  // Setup drag and drop
+  setupKanbanDragDrop();
+}
+
+function renderKanbanCard(task) {
+  const priorityColors = { critical: '#ef4444', high: '#f97316', medium: '#eab308', low: '#22c55e' };
+  const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'done';
+  
+  return `
+    <div class="kanban-card" draggable="true" data-task-id="${task.id}" onclick="openTaskDetail(${task.id})">
+      <div class="card-priority ${task.priority}" style="border-left-color: ${priorityColors[task.priority]}"></div>
+      <h5 class="card-title">${task.title}</h5>
+      <p class="card-desc">${task.description || ''}</p>
+      ${task.status !== 'todo' && task.status !== 'done' ? `
+        <div class="card-progress">
+          <div class="progress-bar"><div class="progress-fill" style="width: ${task.progress || 0}%"></div></div>
+          <span class="progress-text">${task.progress || 0}%</span>
+        </div>
+      ` : ''}
+      <div class="card-meta">
+        <span class="card-due ${isOverdue ? 'overdue' : ''}">${task.status === 'done' ? '✓ Completed ' + (task.completedDate || '') : 'Due: ' + (task.dueDate || 'TBD')}</span>
+        ${task.assignee ? `<div class="card-avatars"><span class="avatar" title="${task.assigneeName}">${task.assignee}</span></div>` : ''}
+      </div>
+      <div class="card-tags">
+        <span class="tag ${task.category}">${task.category || 'task'}</span>
+        ${task.priority === 'critical' ? '<span class="tag priority-critical">Critical</span>' : ''}
+      </div>
+      ${task.comments ? `<div class="card-comments"><span>💬 ${task.comments}</span></div>` : ''}
+    </div>
+  `;
+}
+
+function setupKanbanDragDrop() {
+  const cards = document.querySelectorAll('.kanban-card');
+  const columns = document.querySelectorAll('.kanban-cards');
+  
+  cards.forEach(card => {
+    card.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', card.dataset.taskId);
+      card.classList.add('dragging');
+    });
+    
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+    });
+  });
+  
+  columns.forEach(column => {
+    column.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      column.classList.add('drag-over');
+    });
+    
+    column.addEventListener('dragleave', () => {
+      column.classList.remove('drag-over');
+    });
+    
+    column.addEventListener('drop', (e) => {
+      e.preventDefault();
+      column.classList.remove('drag-over');
+      
+      const taskId = parseInt(e.dataTransfer.getData('text/plain'));
+      const newStatus = column.closest('.kanban-column').dataset.status;
+      
+      moveTaskToStatus(taskId, newStatus);
+    });
+  });
+}
+
+function moveTaskToStatus(taskId, newStatus) {
+  const tasks = store.pmTasks || [];
+  const task = tasks.find(t => t.id === taskId);
+  
+  if (task) {
+    const oldStatus = task.status;
+    task.status = newStatus;
+    
+    if (newStatus === 'done') {
+      task.progress = 100;
+      task.completedDate = new Date().toISOString().split('T')[0];
+    }
+    
+    saveStore();
+    renderKanbanBoard();
+    addPMActivity(`Task "${task.title}" moved from ${oldStatus} to ${newStatus}`);
+  }
+}
+
+function openTaskDetail(taskId) {
+  const task = (store.pmTasks || []).find(t => t.id === taskId);
+  if (!task) return;
+  
+  // Create modal content
+  const modalHtml = `
+    <div id="pm-task-detail-modal" class="modal-overlay" onclick="if(event.target===this)closeModal('pm-task-detail-modal')">
+      <div class="modal" style="max-width:600px">
+        <div class="modal-header">
+          <h3>${task.title}</h3>
+          <button class="modal-close" onclick="closeModal('pm-task-detail-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="task-detail-section">
+            <label>Description</label>
+            <p>${task.description || 'No description'}</p>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Status</label>
+              <select id="task-detail-status">
+                <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>To Do</option>
+                <option value="inprogress" ${task.status === 'inprogress' ? 'selected' : ''}>In Progress</option>
+                <option value="review" ${task.status === 'review' ? 'selected' : ''}>Review</option>
+                <option value="done" ${task.status === 'done' ? 'selected' : ''}>Done</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Priority</label>
+              <select id="task-detail-priority">
+                <option value="critical" ${task.priority === 'critical' ? 'selected' : ''}>Critical</option>
+                <option value="high" ${task.priority === 'high' ? 'selected' : ''}>High</option>
+                <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Due Date</label>
+              <input type="date" id="task-detail-due" value="${task.dueDate || ''}">
+            </div>
+            <div class="form-group">
+              <label>Progress</label>
+              <input type="range" id="task-detail-progress" min="0" max="100" value="${task.progress || 0}">
+              <span id="progress-label">${task.progress || 0}%</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" onclick="closeModal('pm-task-detail-modal')">Cancel</button>
+          <button class="btn-danger" onclick="deleteTask(${task.id})">Delete</button>
+          <button class="btn-primary" onclick="saveTaskDetail(${task.id})">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Remove existing modal if any
+  const existing = document.getElementById('pm-task-detail-modal');
+  if (existing) existing.remove();
+  
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  
+  // Setup progress slider
+  const progressSlider = document.getElementById('task-detail-progress');
+  const progressLabel = document.getElementById('progress-label');
+  if (progressSlider && progressLabel) {
+    progressSlider.addEventListener('input', () => {
+      progressLabel.textContent = progressSlider.value + '%';
+    });
+  }
+}
+
+function saveTaskDetail(taskId) {
+  const tasks = store.pmTasks || [];
+  const task = tasks.find(t => t.id === taskId);
+  
+  if (task) {
+    task.status = document.getElementById('task-detail-status').value;
+    task.priority = document.getElementById('task-detail-priority').value;
+    task.dueDate = document.getElementById('task-detail-due').value;
+    task.progress = parseInt(document.getElementById('task-detail-progress').value);
+    
+    if (task.status === 'done') {
+      task.completedDate = new Date().toISOString().split('T')[0];
+    }
+    
+    saveStore();
+    closeModal('pm-task-detail-modal');
+    renderKanbanBoard();
+    addPMActivity(`Task "${task.title}" updated`);
+  }
+}
+
+function deleteTask(taskId) {
+  if (!confirm('Are you sure you want to delete this task?')) return;
+  
+  store.pmTasks = (store.pmTasks || []).filter(t => t.id !== taskId);
+  saveStore();
+  closeModal('pm-task-detail-modal');
+  renderKanbanBoard();
+}
+
+function filterPMTasks() {
+  const search = (document.getElementById('pm-task-search')?.value || '').toLowerCase();
+  const assignee = document.getElementById('pm-assignee-filter')?.value || '';
+  const priority = document.getElementById('pm-priority-filter')?.value || '';
+  
+  const tasks = (store.pmTasks || []).filter(task => {
+    const matchesSearch = !search || task.title.toLowerCase().includes(search) || (task.description || '').toLowerCase().includes(search);
+    const matchesAssignee = !assignee || task.assignee === assignee;
+    const matchesPriority = !priority || task.priority === priority;
+    return matchesSearch && matchesAssignee && matchesPriority;
+  });
+  
+  // Re-render with filtered tasks
+  const statuses = ['todo', 'inprogress', 'review', 'done'];
+  statuses.forEach(status => {
+    const container = document.getElementById(`kanban-${status}`);
+    const statusTasks = tasks.filter(t => t.status === status);
+    
+    if (container) {
+      container.innerHTML = statusTasks.length > 0 
+        ? statusTasks.map(renderKanbanCard).join('')
+        : '<div class="kanban-empty">No matching tasks</div>';
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GANTT CHART
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderGanttChart() {
+  const tasks = store.pmTasks || [];
+  const milestones = store.pmMilestones || [];
+  
+  // Generate Gantt timeline
+  const timelineContainer = document.getElementById('gantt-timeline');
+  if (timelineContainer) {
+    const today = new Date();
+    const startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 30);
+    const endDate = new Date(today);
+    endDate.setDate(endDate.getDate() + 60);
+    
+    // Generate weeks
+    let weeksHtml = '<div class="gantt-weeks">';
+    let current = new Date(startDate);
+    while (current <= endDate) {
+      weeksHtml += `<div class="gantt-week">W${Math.ceil(current.getDate() / 7)}</div>`;
+      current.setDate(current.getDate() + 7);
+    }
+    weeksHtml += '</div>';
+    
+    timelineContainer.innerHTML = `
+      <div class="gantt-months">
+        <div class="gantt-month">${today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+      </div>
+      ${weeksHtml}
+    `;
+  }
+  
+  // Generate task list
+  const taskListContainer = document.getElementById('gantt-tasks');
+  if (taskListContainer) {
+    let html = '';
+    tasks.forEach(task => {
+      const icon = getCategoryIcon(task.category);
+      html += `
+        <div class="gantt-task-item ${task.category}" onclick="openTaskDetail(${task.id})">
+          <span class="task-indent ${task.status === 'done' ? 'completed' : ''}"></span>
+          <span class="task-name">${icon} ${task.title}</span>
+        </div>
+      `;
+    });
+    taskListContainer.innerHTML = html;
+  }
+  
+  // Generate bars
+  const barsContainer = document.getElementById('gantt-bars');
+  if (barsContainer) {
+    const today = new Date();
+    let html = '';
+    
+    tasks.forEach(task => {
+      if (task.dueDate) {
+        const dueDate = new Date(task.dueDate);
+        const startDate = task.startDate ? new Date(task.startDate) : new Date(dueDate);
+        startDate.setDate(startDate.getDate() - 7); // Assume 7 day duration
+        
+        const totalDays = 90; // 3 month window
+        const startOffset = Math.max(0, Math.floor((startDate - new Date()) / (1000 * 60 * 60 * 24) / totalDays * 100) + 50);
+        const width = Math.min(30, Math.ceil(7 / totalDays * 100));
+        
+        html += `
+          <div class="gantt-row">
+            <div class="gantt-bar category-${task.category}" style="left: ${startOffset}%; width: ${width}%;" 
+                 title="${task.title} - Due: ${task.dueDate}">
+              ${width > 10 ? `<span class="bar-label">${task.progress || 0}%</span>` : ''}
+            </div>
+          </div>
+        `;
+      }
+    });
+    
+    barsContainer.innerHTML = html;
+  }
+  
+  // Set today line position
+  const todayLine = document.getElementById('gantt-today-line');
+  if (todayLine) {
+    todayLine.style.left = '50%';
+  }
+}
+
+function getCategoryIcon(category) {
+  const icons = {
+    'electrical': '⚡',
+    'plumbing': '🔧',
+    'hvac': '❄️',
+    'framing': '🪵',
+    'foundation': '🏗️',
+    'insulation': '🧱',
+    'inspection': '📋',
+    'siteprep': '🚜'
+  };
+  return icons[category] || '📝';
+}
+
+function ganttZoomIn() {
+  console.log('Gantt zoom in');
+}
+
+function ganttZoomOut() {
+  console.log('Gantt zoom out');
+}
+
+function ganttToday() {
+  const todayLine = document.getElementById('gantt-today-line');
+  if (todayLine) {
+    todayLine.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RESOURCES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderResourcesTab() {
+  const resources = store.pmResources || [];
+  const labor = resources.filter(r => r.type === 'labor');
+  const equipment = resources.filter(r => r.type === 'equipment');
+  
+  // Render team
+  const teamGrid = document.getElementById('pm-team-grid');
+  if (teamGrid) {
+    teamGrid.innerHTML = labor.map(person => `
+      <div class="team-card">
+        <div class="team-avatar">${person.initials}</div>
+        <div class="team-info">
+          <h4>${person.name}</h4>
+          <span class="team-role">${person.role}</span>
+        </div>
+        <div class="utilization-bar">
+          <div class="util-fill ${person.utilization > 90 ? 'warning' : person.utilization > 70 ? 'high' : 'medium'}" 
+               style="width: ${person.utilization}%"></div>
+        </div>
+        <span class="util-label">${person.utilization}% allocated ${person.utilization > 90 ? '⚠️' : ''}</span>
+        <div class="team-tasks"><span class="task-count">${person.tasks} active tasks</span></div>
+      </div>
+    `).join('');
+  }
+  
+  // Render equipment
+  const equipmentGrid = document.getElementById('pm-equipment-grid');
+  if (equipmentGrid) {
+    equipmentGrid.innerHTML = equipment.map(item => `
+      <div class="equipment-card">
+        <div class="equip-icon">${item.icon}</div>
+        <div class="equip-info">
+          <h4>${item.name}</h4>
+          <span class="equip-status ${item.status}">${formatStatus(item.status)}</span>
+        </div>
+        <div class="equip-project">${item.project || 'Not assigned'}</div>
+      </div>
+    `).join('');
+  }
+  
+  // Render capacity chart
+  renderCapacityChart();
+}
+
+function renderCapacityChart() {
+  const capacityChart = document.getElementById('pm-capacity-chart');
+  if (!capacityChart) return;
+  
+  const weeks = ['Dec 16-20', 'Dec 23-27', 'Dec 30-Jan 3', 'Jan 6-10'];
+  const hours = [180, 160, 220, 190];
+  const available = 200;
+  
+  capacityChart.innerHTML = `
+    <div class="capacity-header">
+      <span>Week</span><span>Labor Hours</span><span>Available</span><span>Variance</span>
+    </div>
+    ${weeks.map((week, i) => {
+      const hoursVal = hours[i];
+      const variance = available - hoursVal;
+      const isOver = hoursVal > available;
+      return `
+        <div class="capacity-row ${isOver ? 'warning' : ''}">
+          <span>${week}</span>
+          <div class="capacity-bar-container">
+            <div class="capacity-bar ${isOver ? 'over' : ''}" style="width: ${Math.min(hoursVal, 220)}px;">${hoursVal}h</div>
+          </div>
+          <span>${available}h</span>
+          <span class="variance ${variance >= 0 ? 'positive' : 'negative'}">${variance >= 0 ? '+' : ''}${variance}h</span>
+        </div>
+      `;
+    }).join('')}
+  `;
+}
+
+function formatStatus(status) {
+  const labels = {
+    'available': 'Available',
+    'in-use': 'In Use',
+    'maintenance': 'Maintenance'
+  };
+  return labels[status] || status;
+}
+
+function filterResources() {
+  renderResourcesTab();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RISKS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderRisksTab() {
+  renderRiskMatrix();
+  renderRiskRegister();
+}
+
+function renderRiskMatrix() {
+  const matrix = document.getElementById('pm-risk-matrix');
+  if (!matrix) return;
+  
+  const risks = store.pmRisks || [];
+  
+  // Count risks in each cell
+  const matrixData = {
+    'high-high': [], 'high-medium': [], 'high-low': [],
+    'medium-high': [], 'medium-medium': [], 'medium-low': [],
+    'low-high': [], 'low-medium': [], 'low-low': []
+  };
+  
+  risks.forEach(risk => {
+    const key = `${risk.impact}-${risk.likelihood}`;
+    if (matrixData[key]) matrixData[key].push(risk);
+  });
+  
+  matrix.innerHTML = `
+    <div class="matrix-y-axis"><span>High</span><span>Impact</span><span>Low</span></div>
+    <div class="matrix-grid">
+      ${['high', 'medium', 'low'].map(impact => 
+        ['low', 'medium', 'high'].map(likelihood => {
+          const key = `${impact}-${likelihood}`;
+          const count = matrixData[key]?.length || 0;
+          const severity = getSeverityClass(impact, likelihood);
+          return `<div class="matrix-cell ${severity}" onclick="showRisksInCell('${impact}', '${likelihood}')">
+            <span class="cell-count">${count || ''}</span>
+          </div>`;
+        }).join('')
+      ).join('')}
+    </div>
+    <div class="matrix-x-axis"><span>Low</span><span>Likelihood</span><span>High</span></div>
+  `;
+}
+
+function getSeverityClass(impact, likelihood) {
+  const score = getRiskScore(impact, likelihood);
+  if (score >= 9) return 'critical';
+  if (score >= 6) return 'high';
+  if (score >= 4) return 'medium';
+  return 'low';
+}
+
+function getRiskScore(impact, likelihood) {
+  const impactScores = { 'high': 3, 'medium': 2, 'low': 1 };
+  const likelihoodScores = { 'high': 3, 'medium': 2, 'low': 1 };
+  return (impactScores[impact] || 1) * (likelihoodScores[likelihood] || 1);
+}
+
+function renderRiskRegister() {
+  const tbody = document.getElementById('risk-register-body');
+  if (!tbody) return;
+  
+  const risks = store.pmRisks || [];
+  
+  tbody.innerHTML = risks.map(risk => `
+    <tr class="risk-row ${getSeverityClass(risk.impact, risk.likelihood)}" onclick="openRiskDetail('${risk.id}')">
+      <td>${risk.id}</td>
+      <td>${risk.description}</td>
+      <td>${risk.category}</td>
+      <td class="impact-${risk.impact}">${capitalize(risk.impact)}</td>
+      <td class="likelihood-${risk.likelihood}">${capitalize(risk.likelihood)}</td>
+      <td class="score-${getSeverityClass(risk.impact, risk.likelihood)}">${risk.score}</td>
+      <td>${risk.mitigation || '-'}</td>
+      <td>${risk.owner}</td>
+      <td><span class="status-badge ${risk.status}">${capitalize(risk.status)}</span></td>
+    </tr>
+  `).join('');
+}
+
+function openRiskDetail(riskId) {
+  const risk = (store.pmRisks || []).find(r => r.id === riskId);
+  if (!risk) return;
+  
+  alert(`Risk: ${risk.description}\n\nMitigation: ${risk.mitigation}\nOwner: ${risk.owner}\nStatus: ${risk.status}`);
+}
+
+function setRiskView(view) {
+  console.log('Setting risk view to:', view);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ISSUES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderIssuesTab() {
+  renderIssueStats();
+  renderIssueList();
+  renderChangeRequests();
+}
+
+function renderIssueStats() {
+  const container = document.getElementById('pm-issue-stats');
+  if (!container) return;
+  
+  const issues = store.pmIssues || [];
+  const stats = {
+    open: issues.filter(i => i.status === 'open').length,
+    'in-progress': issues.filter(i => i.status === 'in-progress').length,
+    resolved: issues.filter(i => i.status === 'resolved').length,
+    closed: issues.filter(i => i.status === 'closed').length
+  };
+  
+  container.innerHTML = Object.entries(stats).map(([status, count]) => `
+    <div class="issue-stat-card ${status}">
+      <div class="stat-number">${count}</div>
+      <div class="stat-label">${capitalize(status.replace('-', ' '))}</div>
+    </div>
+  `).join('');
+}
+
+function renderIssueList() {
+  const container = document.getElementById('pm-issue-list');
+  if (!container) return;
+  
+  const issues = store.pmIssues || [];
+  
+  container.innerHTML = issues.map(issue => `
+    <div class="issue-item ${issue.priority}" onclick="openIssueDetail('${issue.id}')">
+      <div class="issue-header">
+        <span class="issue-id">${issue.id}</span>
+        <span class="issue-priority ${issue.priority}">${capitalize(issue.priority)}</span>
+        <span class="issue-status ${issue.status}">${capitalize(issue.status.replace('-', ' '))}</span>
+      </div>
+      <h4 class="issue-title">${issue.title}</h4>
+      <p class="issue-desc">${issue.description}</p>
+      <div class="issue-meta">
+        <span class="issue-date">Reported: ${issue.date}</span>
+        <span class="issue-reporter">by ${issue.reporter}</span>
+        <span class="issue-assignee">Assigned: ${issue.assignee}</span>
+      </div>
+      ${issue.comments ? `<div class="issue-actions"><span class="issue-comments">💬 ${issue.comments} comments</span></div>` : ''}
+    </div>
+  `).join('');
+}
+
+function openIssueDetail(issueId) {
+  const issue = (store.pmIssues || []).find(i => i.id === issueId);
+  if (!issue) return;
+  
+  alert(`Issue: ${issue.title}\n\n${issue.description}\n\nStatus: ${issue.status}\nAssigned to: ${issue.assignee}`);
+}
+
+function renderChangeRequests() {
+  const container = document.getElementById('pm-change-requests');
+  if (!container) return;
+  
+  const crs = store.pmChangeRequests || [
+    { id: 'CR-001', title: 'Client requested additional bathroom', description: 'Add half-bath on main floor. Impact: $8,500, +5 days', status: 'pending' },
+    { id: 'CR-002', title: 'Upgrade kitchen countertops to granite', description: 'Client upgrade. Cost adjustment: +$3,200', status: 'approved' }
+  ];
+  
+  container.innerHTML = crs.map(cr => `
+    <div class="change-request-item ${cr.status}">
+      <div class="cr-header">
+        <span class="cr-id">${cr.id}</span>
+        <span class="cr-status ${cr.status}">${capitalize(cr.status)}</span>
+      </div>
+      <h4>${cr.title}</h4>
+      <p>${cr.description}</p>
+      ${cr.status === 'pending' ? `
+        <div class="cr-actions">
+          <button class="btn-primary btn-sm" onclick="approveChangeRequest('${cr.id}')">Approve</button>
+          <button class="btn-secondary btn-sm" onclick="rejectChangeRequest('${cr.id}')">Reject</button>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+function approveChangeRequest(crId) {
+  alert(`Change request ${crId} approved!`);
+  // In real app, would update status and log
+}
+
+function rejectChangeRequest(crId) {
+  alert(`Change request ${crId} rejected.`);
+}
+
+function filterIssues() {
+  renderIssuesTab();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// REPORTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderReportsTab() {
+  const container = document.getElementById('pm-reports-container');
+  if (!container) return;
+  
+  const tasks = store.pmTasks || [];
+  const completed = tasks.filter(t => t.status === 'done').length;
+  const total = tasks.length;
+  const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+  
+  container.innerHTML = `
+    <div class="report-card">
+      <div class="report-header">
+        <h3>📊 Executive Summary</h3>
+        <span class="report-date">Generated: ${new Date().toLocaleDateString()}</span>
+      </div>
+      <div class="report-content">
+        <div class="report-section">
+          <h4>Project Overview</h4>
+          <p><strong>Status:</strong> <span class="status-text on-track">On Track</span></p>
+          <p><strong>Completion:</strong> ${progress}%</p>
+          <p><strong>Tasks:</strong> ${completed} of ${total} completed</p>
+        </div>
+        <div class="report-section">
+          <h4>Task Status</h4>
+          <div class="schedule-summary">
+            <div class="schedule-item">
+              <span class="schedule-label">Progress</span>
+              <div class="schedule-bar"><div class="schedule-fill actual" style="width: ${progress}%"></div></div>
+              <span>${progress}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Render audit log
+  renderAuditLog();
+}
+
+function renderAuditLog() {
+  const container = document.getElementById('pm-audit-log');
+  if (!container) return;
+  
+  const activities = store.pmActivities || [
+    { time: 'Dec 15, 2024 2:30 PM', user: 'John Doe', action: 'Updated task "Electrical rough-in" status' },
+    { time: 'Dec 15, 2024 11:45 AM', user: 'Sarah Miller', action: 'Added comment to issue I001' },
+    { time: 'Dec 15, 2024 9:00 AM', user: 'System', action: 'Generated daily status report' }
+  ];
+  
+  container.innerHTML = activities.map(a => `
+    <div class="audit-entry">
+      <span class="audit-time">${a.time}</span>
+      <span class="audit-user">${a.user}</span>
+      <span class="audit-action">${a.action}</span>
+    </div>
+  `).join('');
+}
+
+function generatePMReport() {
+  alert('Report generated! In a full implementation, this would create a PDF report.');
+}
+
+function exportPMReport() {
+  alert('Export feature would download the report as PDF.');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CLIENT PORTAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderClientPortal() {
+  const progressRing = document.getElementById('client-progress-ring');
+  if (progressRing) {
+    const tasks = store.pmTasks || [];
+    const completed = tasks.filter(t => t.status === 'done').length;
+    const total = tasks.length;
+    const progress = total > 0 ? Math.round((completed / total) * 100) : 45;
+    
+    progressRing.innerHTML = `
+      <div class="client-progress-ring">
+        <svg viewBox="0 0 36 36">
+          <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+          <path class="ring-fill client" stroke-dasharray="${progress}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+        </svg>
+        <div class="progress-value">${progress}%</div>
+      </div>
+    `;
+  }
+  
+  const updatesList = document.getElementById('client-updates-list');
+  if (updatesList) {
+    updatesList.innerHTML = `
+      <div class="client-update">
+        <div class="update-date">Dec 14, 2024</div>
+        <h4>Framing Complete - Inspection Passed!</h4>
+        <p>We've completed all framing work and passed the city inspection.</p>
+      </div>
+      <div class="client-update">
+        <div class="update-date">Dec 10, 2024</div>
+        <h4>Roof Trusses Installed</h4>
+        <p>The roof trusses have been installed and sheathed.</p>
+      </div>
+    `;
+  }
+  
+  const messagesList = document.getElementById('client-messages-list');
+  if (messagesList) {
+    messagesList.innerHTML = `
+      <div class="client-message from-builder">
+        <div class="msg-avatar">JD</div>
+        <div class="msg-bubble">
+          <p>Framing inspection passed today!</p>
+          <span class="msg-time">Dec 14, 2:30 PM</span>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function shareClientPortal() {
+  alert('Client portal link copied to clipboard!\n\nIn a full implementation, this would generate a shareable link for your client.');
+}
+
+function sendClientMessage() {
+  const input = document.getElementById('client-message-input');
+  if (!input || !input.value.trim()) return;
+  
+  const messagesList = document.getElementById('client-messages-list');
+  if (messagesList) {
+    const newMessage = document.createElement('div');
+    newMessage.className = 'client-message from-builder';
+    newMessage.innerHTML = `
+      <div class="msg-avatar">You</div>
+      <div class="msg-bubble">
+        <p>${input.value}</p>
+        <span class="msg-time">Just now</span>
+      </div>
+    `;
+    messagesList.appendChild(newMessage);
+    input.value = '';
+    messagesList.scrollTop = messagesList.scrollHeight;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ACTIVITY LOG
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function addPMActivity(action) {
+  const activities = store.pmActivities || [];
+  const user = store.currentUser?.name || 'User';
+  
+  activities.unshift({
+    time: new Date().toLocaleString(),
+    user: user,
+    action: action
+  });
+  
+  // Keep only last 50 activities
+  if (activities.length > 50) activities.pop();
+  
+  store.pmActivities = activities;
+  saveStore();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// AI INSIGHTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function showAIDetail(type) {
+  const insights = {
+    schedule: 'Based on current progress analysis, the electrical work is taking longer than planned. Consider adding a second electrician or scheduling overtime.',
+    resource: 'Your plumbing team (Mike) has availability next week. You could advance the bathroom rough-in to balance workload.',
+    budget: 'Current spending trajectory shows you\'ll finish 3% under budget. Material costs have been well-controlled.'
+  };
+  
+  alert(`AI Analysis: ${type}\n\n${insights[type] || 'No additional details available.'}`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UTILITY FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function refreshScheduleData() {
+  renderKanbanBoard();
+  renderGanttChart();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MODALS FOR NEW ITEMS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// New Task Modal
+function openNewTaskModal() {
+  openModal('pm-new-task-modal');
+}
+
+// Initialize PM Dashboard when navigating to it
+const originalNavigateTo = navigateTo;
+navigateTo = function(page) {
+  originalNavigateTo(page);
+  if (page === 'pm-dashboard') {
+    setTimeout(() => {
+      switchPMTab('overview');
+    }, 100);
+  }
+};
+
+console.log('📊 Project Management System loaded successfully');
