@@ -1215,6 +1215,14 @@ async function createProject() {
   } catch(e) { /* use local store */ }
 
   store.projects.push(project);
+  
+  // AUTO-ADD PROJECT TO PM SYSTEM
+  // Create default tasks based on project type
+  addProjectTasksToPM(project);
+  
+  // Add project as a resource in PM
+  if (!store.pmResources) store.pmResources = [];
+  
   localStorage.setItem('foreman_store', JSON.stringify(store));
   
   // Clear form
@@ -1237,7 +1245,7 @@ async function createProject() {
   }
   
   closeModal('new-project-modal');
-  showToast(`Project "${name}" created!`, 'success');
+  showToast(`Project "${name}" created with ${generateDefaultProjectTasks(project).length} default tasks!`, 'success');
   renderProjects();
   loadDashboard();
 }
@@ -5346,11 +5354,32 @@ function renderKanbanCard(task) {
   const priorityColors = { critical: '#ef4444', high: '#f97316', medium: '#eab308', low: '#22c55e' };
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'done';
   
+  // Get assignee avatars
+  const assigneeAvatars = (task.assignees && task.assignees.length > 0) 
+    ? task.assignees.map(a => `<span class="avatar" title="${a.name}">${a.initials}</span>`).join('')
+    : (task.assignee ? `<span class="avatar" title="${task.assigneeName || ''}">${task.assignee}</span>` : '');
+  
+  // Format cost display
+  const costDisplay = task.cost ? `<span class="task-cost-badge">$${parseFloat(task.cost).toLocaleString()}</span>` : '';
+  
+  // Format duration display
+  const durationDisplay = task.duration ? `<span class="task-duration-badge">📅 ${task.duration} day${task.duration > 1 ? 's' : ''}</span>` : '';
+  
+  // Get project name if linked
+  const project = task.projectId ? (store.projects || []).find(p => p.id === task.projectId) : null;
+  const projectDisplay = project ? `<span class="task-project-link" onclick="event.stopPropagation(); navigateTo('projects')">📁 ${project.name}</span>` : '';
+  
   return `
-    <div class="kanban-card" draggable="true" data-task-id="${task.id}" onclick="openTaskDetail(${task.id})">
-      <div class="card-priority ${task.priority}" style="border-left-color: ${priorityColors[task.priority]}"></div>
+    <div class="kanban-card" draggable="true" data-task-id="${task.id}" onclick="openTaskDetail('${task.id}')">
+      ${costDisplay}
+      <div class="card-priority ${task.priority}" style="border-left-color: ${priorityColors[task.priority] || '#6b7280'}"></div>
       <h5 class="card-title">${task.title}</h5>
       <p class="card-desc">${task.description || ''}</p>
+      ${projectDisplay}
+      <div class="task-meta-row">
+        ${durationDisplay}
+        ${task.dueDate ? `<span class="task-meta-item ${isOverdue ? 'overdue' : ''}">📅 ${task.dueDate}</span>` : ''}
+      </div>
       ${task.status !== 'todo' && task.status !== 'done' ? `
         <div class="card-progress">
           <div class="progress-bar"><div class="progress-fill" style="width: ${task.progress || 0}%"></div></div>
@@ -5358,14 +5387,17 @@ function renderKanbanCard(task) {
         </div>
       ` : ''}
       <div class="card-meta">
-        <span class="card-due ${isOverdue ? 'overdue' : ''}">${task.status === 'done' ? '✓ Completed ' + (task.completedDate || '') : 'Due: ' + (task.dueDate || 'TBD')}</span>
-        ${task.assignee ? `<div class="card-avatars"><span class="avatar" title="${task.assigneeName}">${task.assignee}</span></div>` : ''}
+        ${assigneeAvatars ? `<div class="card-avatars task-assignees">${assigneeAvatars}</div>` : ''}
       </div>
       <div class="card-tags">
         <span class="tag ${task.category}">${task.category || 'task'}</span>
         ${task.priority === 'critical' ? '<span class="tag priority-critical">Critical</span>' : ''}
+        ${task.priority === 'high' ? '<span class="tag priority-high">High</span>' : ''}
       </div>
-      ${task.comments ? `<div class="card-comments"><span>💬 ${task.comments}</span></div>` : ''}
+      <div class="kanban-card-actions" onclick="event.stopPropagation()">
+        <button class="btn-edit" onclick="editPMTask('${task.id}')">✏️ Edit</button>
+        <button class="btn-delete" onclick="deletePMTask('${task.id}')">🗑️ Delete</button>
+      </div>
     </div>
   `;
 }
@@ -6158,8 +6190,374 @@ function refreshScheduleData() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // New Task Modal
-function openNewTaskModal() {
+function openNewTaskModal(projectId = null) {
+  // Reset form
+  document.getElementById('pm-task-form').reset();
+  document.getElementById('pm-task-id').value = '';
+  document.getElementById('pm-task-project-id').value = projectId || '';
+  document.getElementById('pm-task-modal-title').textContent = '➕ Add New Task';
+  document.getElementById('pm-task-progress').value = 0;
+  document.getElementById('pm-task-progress-value').textContent = '0%';
+  
+  // Populate assignees from payroll employees/contractors
+  populateTaskAssignees();
+  
+  // If no project specified, show project selector
+  if (!projectId) {
+    updateTaskProjectDropdown();
+  }
+  
   openModal('pm-new-task-modal');
+}
+
+// Populate assignees from payroll system
+function populateTaskAssignees() {
+  const container = document.getElementById('pm-task-assignees-container');
+  if (!container) return;
+  
+  const employees = store.payroll?.employees || [];
+  const contractors = store.payroll?.contractors || [];
+  const pmResources = store.pmResources || [];
+  
+  let html = '';
+  
+  // Add employees from payroll
+  if (employees.length > 0) {
+    html += '<div class="assignee-section"><strong>Employees:</strong>';
+    employees.forEach((emp, i) => {
+      const name = emp.name || `${emp.first_name || ''} ${emp.last_name || ''}`.trim();
+      const initials = getInitials(name);
+      html += `
+        <label class="assignee-checkbox">
+          <input type="checkbox" name="assignee" value="emp-${i}" data-name="${name}" data-initials="${initials}">
+          <span class="assignee-avatar-small">${initials}</span>
+          <span>${name}</span>
+          <small style="color:#666">${emp.role || emp.position || ''}</small>
+        </label>`;
+    });
+    html += '</div>';
+  }
+  
+  // Add contractors from payroll
+  if (contractors.length > 0) {
+    html += '<div class="assignee-section"><strong>Contractors:</strong>';
+    contractors.forEach((con, i) => {
+      const name = con.name || con.company_name || `Contractor ${i+1}`;
+      const initials = getInitials(name);
+      html += `
+        <label class="assignee-checkbox">
+          <input type="checkbox" name="assignee" value="con-${i}" data-name="${name}" data-initials="${initials}">
+          <span class="assignee-avatar-small">${initials}</span>
+          <span>${name}</span>
+          <small style="color:#666">${con.trade || con.specialty || ''}</small>
+        </label>`;
+    });
+    html += '</div>';
+  }
+  
+  // Add from PM resources if available
+  const laborResources = pmResources.filter(r => r.type === 'labor');
+  if (laborResources.length > 0) {
+    html += '<div class="assignee-section"><strong>Team Members:</strong>';
+    laborResources.forEach((res, i) => {
+      html += `
+        <label class="assignee-checkbox">
+          <input type="checkbox" name="assignee" value="res-${res.id}" data-name="${res.name}" data-initials="${res.initials || getInitials(res.name)}">
+          <span class="assignee-avatar-small">${res.initials || getInitials(res.name)}</span>
+          <span>${res.name}</span>
+          <small style="color:#666">${res.role || ''}</small>
+        </label>`;
+    });
+    html += '</div>';
+  }
+  
+  if (!html) {
+    html = '<p style="color:#999;font-style:italic">No team members found. Add employees in Payroll or Resources.</p>';
+  }
+  
+  container.innerHTML = html;
+}
+
+// Get initials from name
+function getInitials(name) {
+  if (!name) return '??';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+}
+
+// Update project dropdown in task form
+function updateTaskProjectDropdown() {
+  const projects = store.projects || [];
+  const selectContainer = document.getElementById('pm-task-project-select');
+  if (!selectContainer) return;
+  
+  if (projects.length === 0) {
+    selectContainer.innerHTML = '<p style="color:#999">No projects available. Create a project first.</p>';
+    return;
+  }
+  
+  selectContainer.innerHTML = `
+    <select id="pm-task-project" onchange="onProjectSelect(this.value)">
+      <option value="">No Project (General Task)</option>
+      ${projects.map(p => `<option value="${p.id}">${p.name} - ${p.client_name || 'No Client'}</option>`).join('')}
+    </select>`;
+}
+
+// Save PM Task
+function savePMTask(event) {
+  event.preventDefault();
+  
+  const taskId = document.getElementById('pm-task-id').value;
+  const projectId = document.getElementById('pm-task-project-id').value || document.getElementById('pm-task-project')?.value || '';
+  
+  // Get selected assignees
+  const assigneeCheckboxes = document.querySelectorAll('input[name="assignee"]:checked');
+  const assignees = Array.from(assigneeCheckboxes).map(cb => ({
+    value: cb.value,
+    name: cb.dataset.name,
+    initials: cb.dataset.initials
+  }));
+  
+  const taskData = {
+    id: taskId || Date.now().toString(),
+    projectId: projectId,
+    title: document.getElementById('pm-task-title').value.trim(),
+    description: document.getElementById('pm-task-description').value.trim(),
+    category: document.getElementById('pm-task-category').value,
+    startDate: document.getElementById('pm-task-start').value,
+    dueDate: document.getElementById('pm-task-due').value,
+    duration: parseInt(document.getElementById('pm-task-duration').value) || 1,
+    cost: parseFloat(document.getElementById('pm-task-cost').value) || 0,
+    priority: document.getElementById('pm-task-priority').value,
+    status: document.getElementById('pm-task-status').value,
+    progress: parseInt(document.getElementById('pm-task-progress').value) || 0,
+    notes: document.getElementById('pm-task-notes').value.trim(),
+    assignees: assignees,
+    assignee: assignees.length > 0 ? assignees[0].initials : '',
+    assigneeName: assignees.length > 0 ? assignees.map(a => a.name).join(', ') : '',
+    createdAt: taskId ? undefined : new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  
+  // Remove undefined fields
+  Object.keys(taskData).forEach(key => taskData[key] === undefined && delete taskData[key]);
+  
+  // Initialize pmTasks if needed
+  if (!store.pmTasks) store.pmTasks = [];
+  
+  if (taskId) {
+    // Update existing task
+    const idx = store.pmTasks.findIndex(t => t.id === taskId);
+    if (idx >= 0) {
+      store.pmTasks[idx] = { ...store.pmTasks[idx], ...taskData };
+    }
+  } else {
+    // Add new task
+    store.pmTasks.push(taskData);
+  }
+  
+  saveStore();
+  closeModal('pm-new-task-modal');
+  showToast(`Task "${taskData.title}" saved!`, 'success');
+  
+  // Refresh displays
+  renderKanbanBoard();
+  renderGanttChart();
+  updatePMOverview();
+}
+
+// Edit PM Task
+function editPMTask(taskId) {
+  const task = (store.pmTasks || []).find(t => t.id === taskId);
+  if (!task) return;
+  
+  document.getElementById('pm-task-id').value = task.id;
+  document.getElementById('pm-task-project-id').value = task.projectId || '';
+  document.getElementById('pm-task-title').value = task.title || '';
+  document.getElementById('pm-task-description').value = task.description || '';
+  document.getElementById('pm-task-category').value = task.category || 'general';
+  document.getElementById('pm-task-start').value = task.startDate || '';
+  document.getElementById('pm-task-due').value = task.dueDate || '';
+  document.getElementById('pm-task-duration').value = task.duration || 1;
+  document.getElementById('pm-task-cost').value = task.cost || '';
+  document.getElementById('pm-task-priority').value = task.priority || 'medium';
+  document.getElementById('pm-task-status').value = task.status || 'todo';
+  document.getElementById('pm-task-progress').value = task.progress || 0;
+  document.getElementById('pm-task-progress-value').textContent = (task.progress || 0) + '%';
+  document.getElementById('pm-task-notes').value = task.notes || '';
+  document.getElementById('pm-task-modal-title').textContent = '✏️ Edit Task';
+  
+  populateTaskAssignees();
+  
+  // Select assignees
+  setTimeout(() => {
+    if (task.assignees && task.assignees.length > 0) {
+      task.assignees.forEach(a => {
+        const cb = document.querySelector(`input[name="assignee"][value="${a.value}"]`);
+        if (cb) cb.checked = true;
+      });
+    } else if (task.assignee) {
+      // Legacy single assignee
+      const cb = document.querySelector(`input[name="assignee"][data-initials="${task.assignee}"]`);
+      if (cb) cb.checked = true;
+    }
+  }, 100);
+  
+  openModal('pm-new-task-modal');
+}
+
+// Delete PM Task
+function deletePMTask(taskId) {
+  if (!confirm('Are you sure you want to delete this task?')) return;
+  
+  store.pmTasks = (store.pmTasks || []).filter(t => t.id !== taskId);
+  saveStore();
+  showToast('Task deleted', 'success');
+  renderKanbanBoard();
+  renderGanttChart();
+}
+
+// Update PM Overview stats
+function updatePMOverview() {
+  const tasks = store.pmTasks || [];
+  
+  // Count by status
+  const todo = tasks.filter(t => t.status === 'todo').length;
+  const inProgress = tasks.filter(t => t.status === 'inprogress').length;
+  const review = tasks.filter(t => t.status === 'review').length;
+  const done = tasks.filter(t => t.status === 'done').length;
+  
+  // Calculate total cost
+  const totalCost = tasks.reduce((sum, t) => sum + (t.cost || 0), 0);
+  
+  // Update overview if elements exist
+  const scheduleStats = document.querySelector('.schedule-stats');
+  if (scheduleStats) {
+    scheduleStats.innerHTML = `
+      <div class="stat-item"><div class="stat-value">${done}</div><div class="stat-label">Completed</div></div>
+      <div class="stat-item"><div class="stat-value">${inProgress}</div><div class="stat-label">In Progress</div></div>
+      <div class="stat-item warning"><div class="stat-value">${tasks.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'done').length}</div><div class="stat-label">Overdue</div></div>
+      <div class="stat-item"><div class="stat-value">${todo}</div><div class="stat-label">Upcoming</div></div>
+    `;
+  }
+}
+
+// Add tasks from project creation
+function addProjectTasksToPM(project) {
+  if (!project || !project.id) return;
+  
+  // Create default tasks based on project type/trade
+  const defaultTasks = generateDefaultProjectTasks(project);
+  
+  defaultTasks.forEach(task => {
+    task.projectId = project.id;
+    task.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+    if (!store.pmTasks) store.pmTasks = [];
+    store.pmTasks.push(task);
+  });
+  
+  saveStore();
+}
+
+// Generate default tasks based on project type
+function generateDefaultProjectTasks(project) {
+  const trade = project.trade || project.project_type || 'general';
+  const startDate = project.start_date || new Date().toISOString().split('T')[0];
+  
+  const taskTemplates = {
+    'Framing': [
+      { title: 'Material delivery - lumber', category: 'framing', duration: 1, cost: 0, priority: 'high' },
+      { title: 'Layout and marking', category: 'framing', duration: 1, cost: 0, priority: 'high' },
+      { title: 'Exterior wall framing', category: 'framing', duration: 3, cost: 0, priority: 'high' },
+      { title: 'Interior wall framing', category: 'framing', duration: 2, cost: 0, priority: 'medium' },
+      { title: 'Framing inspection', category: 'inspection', duration: 1, cost: 0, priority: 'high' }
+    ],
+    'Electrical': [
+      { title: 'Material pickup - wire, boxes, panels', category: 'electrical', duration: 1, cost: 0, priority: 'high' },
+      { title: 'Main panel installation', category: 'electrical', duration: 1, cost: 0, priority: 'critical' },
+      { title: 'Rough-in wiring', category: 'electrical', duration: 3, cost: 0, priority: 'high' },
+      { title: 'Electrical inspection', category: 'inspection', duration: 1, cost: 0, priority: 'high' },
+      { title: 'Fixtures and devices', category: 'electrical', duration: 2, cost: 0, priority: 'medium' }
+    ],
+    'Plumbing': [
+      { title: 'Material pickup - pipe, fittings', category: 'plumbing', duration: 1, cost: 0, priority: 'high' },
+      { title: 'Rough-in supply lines', category: 'plumbing', duration: 2, cost: 0, priority: 'high' },
+      { title: 'Rough-in drain lines', category: 'plumbing', duration: 2, cost: 0, priority: 'high' },
+      { title: 'Plumbing inspection', category: 'inspection', duration: 1, cost: 0, priority: 'high' },
+      { title: 'Fixture installation', category: 'plumbing', duration: 2, cost: 0, priority: 'medium' }
+    ],
+    'HVAC': [
+      { title: 'Material pickup - ductwork', category: 'hvac', duration: 1, cost: 0, priority: 'high' },
+      { title: 'Main trunk installation', category: 'hvac', duration: 2, cost: 0, priority: 'high' },
+      { title: 'Branch ductwork', category: 'hvac', duration: 2, cost: 0, priority: 'medium' },
+      { title: 'Unit installation', category: 'hvac', duration: 1, cost: 0, priority: 'high' },
+      { title: 'HVAC inspection', category: 'inspection', duration: 1, cost: 0, priority: 'high' }
+    ],
+    'General': [
+      { title: 'Site preparation', category: 'general', duration: 1, cost: 0, priority: 'high' },
+      { title: 'Material ordering', category: 'general', duration: 1, cost: 0, priority: 'high' },
+      { title: 'Work execution', category: 'general', duration: 3, cost: 0, priority: 'medium' },
+      { title: 'Final cleanup', category: 'general', duration: 1, cost: 0, priority: 'low' },
+      { title: 'Final inspection', category: 'inspection', duration: 1, cost: 0, priority: 'high' }
+    ]
+  };
+  
+  const templates = taskTemplates[trade] || taskTemplates['General'];
+  
+  // Calculate dates based on duration
+  let currentDate = startDate ? new Date(startDate) : new Date();
+  
+  return templates.map((template, index) => {
+    const task = {
+      title: template.title,
+      description: `${template.title} for ${project.name}`,
+      category: template.category,
+      duration: template.duration,
+      cost: template.cost,
+      priority: template.priority,
+      status: 'todo',
+      progress: 0,
+      startDate: currentDate.toISOString().split('T')[0],
+      dueDate: new Date(currentDate.getTime() + (template.duration * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]
+    };
+    
+    // Move to next task start date
+    currentDate = new Date(currentDate.getTime() + (template.duration * 24 * 60 * 60 * 1000));
+    
+    return task;
+  });
+}
+
+// Open project selection modal for adding tasks
+function openProjectSelectModal() {
+  const projects = store.projects || [];
+  const container = document.getElementById('pm-project-list');
+  
+  if (projects.length === 0) {
+    container.innerHTML = '<p style="color:#999;text-align:center;padding:20px">No projects available. Create a project first.</p>';
+  } else {
+    container.innerHTML = projects.map(p => `
+      <div class="pm-project-item" onclick="selectProjectForTask('${p.id}')">
+        <div class="pm-project-info">
+          <strong>${p.name}</strong>
+          <small>${p.client_name || 'No client'} &bull; ${p.status || 'active'}</small>
+        </div>
+        <span class="pm-project-arrow">&#10140;</span>
+      </div>
+    `).join('');
+  }
+  
+  openModal('pm-project-select-modal');
+}
+
+// Select project for new task
+function selectProjectForTask(projectId) {
+  closeModal('pm-project-select-modal');
+  openNewTaskModal(projectId);
+}
+
+// Get tasks by project
+function getTasksByProject(projectId) {
+  return (store.pmTasks || []).filter(t => t.projectId === projectId);
 }
 
 // Initialize PM Dashboard when navigating to it
