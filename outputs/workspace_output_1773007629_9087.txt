@@ -1,5 +1,0 @@
-=== CRITICAL: PASSWORD IN LOCALSTORAGE ===
-3173:  // Store hashed password in localStorage (client-side only)
-3174:  const stored = localStorage.getItem('userPassword') || 'default';
-3175:  localStorage.setItem('userPassword', newPw);
-=== SYNCSTORE DEFINITION ===

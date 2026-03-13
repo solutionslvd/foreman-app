@@ -1,2 +1,0 @@
-3066:<div id="permit-modal" class="modal-overlay hidden">
-3119:<div id="incident-modal" class="modal-overlay hidden">

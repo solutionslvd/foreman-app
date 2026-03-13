@@ -1,1 +1,0 @@
-{"status":"healthy","service":"BuildAI Alberta","version":"2.0.0","timestamp":1773035419,"uptime":"active"}

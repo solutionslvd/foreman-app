@@ -1,4 +1,0 @@
-id="new-estimate-modal"
-id="new-expense-modal"
-id="new-invoice-modal"
-id="new-project-modal"

@@ -1,4 +1,0 @@
-464:  else if (page === 'compliance') loadCompliance();
-465:  else if (page === 'billing') loadBilling();
-1248:async function loadCompliance() {
-1326:async function loadBilling() {

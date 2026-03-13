@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "<string>", line 10, in <module>
-NameError: name 'overall_status' is not defined
-=== NEW USER (no data) ===

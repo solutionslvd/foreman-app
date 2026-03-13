@@ -1,2 +1,0 @@
-1379:async function savePermit() {
-1409:async function saveIncident() {

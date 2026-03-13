@@ -1,4 +1,0 @@
-  File "<stdin>", line 66
-    print(f"  🔘 {text:30} onclick="{onclick[:50]}..."" if len(onclick) > 50 else f"  🔘 {text:30} onclick="{onclick}"")
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-SyntaxError: invalid syntax. Perhaps you forgot a comma?

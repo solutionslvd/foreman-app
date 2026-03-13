@@ -1,6 +1,0 @@
-=== BILLING FIX VERIFICATION ===
-Billing/status (user): 500
-
-Billing/payments (user): 500
-
-Billing/payments (admin): 500

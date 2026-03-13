@@ -1,1 +1,0 @@
-Done - auth added to all project endpoints

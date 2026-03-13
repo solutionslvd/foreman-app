@@ -1,2 +1,0 @@
-id="page-profile"
-id="page-help"

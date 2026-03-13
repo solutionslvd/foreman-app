@@ -1,1 +1,0 @@
-Done - change-password and store sync endpoints added

@@ -1,4 +1,0 @@
-  4812 web/app.js
-  3274 web/app.html
-   445 app/main.py
-  8531 total

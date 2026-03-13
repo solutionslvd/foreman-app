@@ -1,3 +1,0 @@
-All app modules imported OK
-Config: <class 'app.config.AppConfig'>
-Users DB type: <class 'dict'>

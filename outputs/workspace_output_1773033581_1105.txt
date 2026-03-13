@@ -1,5 +1,0 @@
-Total dangerous innerHTML lines: 4
-  Line 1212: [p.address] ${p.address ? `<div style="font-size:12px;color:var(--text-muted);margin-top:.3rem">📍 ${p.address}</
-  Line 2572: [p.name] projSel.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-  Line 3512: [r.vendor] showToast(`Expense saved: $${expense.amount.toFixed(2)} from ${r.vendor}`, 'success');
-  Line 4859: [p.name] sel.innerHTML += `<option value="${p.id}">${p.name}</option>`;

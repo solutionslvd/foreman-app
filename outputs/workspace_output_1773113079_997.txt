@@ -1,6 +1,0 @@
-242:        <a class="nav-item" data-page="billing" onclick="navigateTo('billing')">
-243:          <span class="nav-icon">💰</span><span>Billing</span>
-1844:    <!-- ── BILLING ─────────────────────────────────────────── -->
-1845:    <div id="page-billing" class="page admin-only-page">
-1847:        <h1 class="page-title">💰 Billing & Subscription</h1>
-1849:      <div class="billing-plans">

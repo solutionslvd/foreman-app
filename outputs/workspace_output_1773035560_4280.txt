@@ -1,2 +1,0 @@
-130:      detail_fn=lambda d: f"role={d.get('user',{}).get('role','?')}", severity="critical")
-135:      detail_fn=lambda d: f"role={d.get('role','?')}, plan={d.get('plan','?')}")

@@ -1,6 +1,0 @@
-Name: bcrypt
-Version: 5.0.0
-Summary: Modern password hashing for your software and your servers
-Home-page: 
-Author: 
-passlib[bcrypt]==1.7.4

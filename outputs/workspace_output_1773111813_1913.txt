@@ -1,4 +1,0 @@
-  File "<stdin>", line 67
-    print(f"  🔘 {text:30} onclick="{onclick_display}"")
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-SyntaxError: invalid syntax. Perhaps you forgot a comma?

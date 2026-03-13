@@ -1,2 +1,0 @@
-Hash: $2b$12$KFH96eyMZYtkIAAVhV/hcelD34dxn1XR4wG7hX8yACAIsndbIlS2y
-Verify: True

@@ -1,8 +1,0 @@
-======================================================================
-CORRECTED FUNCTION ANALYSIS
-======================================================================
-
-Total unique functions called from onclick: 82
-Total functions defined in app.js: 240
-Functions FOUND: 82
-Functions MISSING: 0

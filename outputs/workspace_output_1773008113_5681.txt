@@ -1,6 +1,0 @@
-=== TEST 5: BUG-007 - Invoice due_date ===
-        "invoice_number": "INV-2026-0001",
-        "invoice_date": "2026-03-08",
-        "due_date": "2026-04-07",
-=== TEST 6: BUG-001 - Store sync endpoint ===
-Expecting value: line 1 column 1 (char 0)

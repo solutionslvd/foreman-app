@@ -1,1 +1,0 @@
-'        ${escapeHtml(p.address ? `<div style="font-size:12px;color:var(--text-muted);margin-top:.3rem">📍 ${p.address || \'\')}</div>` : \'\'}\n'

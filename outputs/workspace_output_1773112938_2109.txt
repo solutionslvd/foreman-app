@@ -1,4 +1,0 @@
-  File "<stdin>", line 80
-    pages_handled = re.findall(r"page\s*===\s*['"](\w+)['"]", nav_body)
-                                                 ^
-SyntaxError: closing parenthesis ']' does not match opening parenthesis '('

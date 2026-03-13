@@ -1,0 +1,59 @@
+name: Keep-Alive Ping
+
+# Ping the Foreman app every 10 minutes to prevent Render spin-down
+# Render free tier spins down after 15 minutes of inactivity
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+    # Allow manual trigger from GitHub Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Ping Health Endpoint
+        id: health
+        run: |
+          echo "Pinging health endpoint..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://foreman-app.onrender.com/health)
+          echo "Health check response: $response"
+          echo "health_status=$response" >> $GITHUB_OUTPUT
+          if [ "$response" != "200" ]; then
+            echo "::warning::Health check returned HTTP $response"
+          fi
+          
+      - name: Ping App Endpoint
+        id: app
+        run: |
+          echo "Pinging app endpoint..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://foreman-app.onrender.com/app)
+          echo "App ping response: $response"
+          echo "app_status=$response" >> $GITHUB_OUTPUT
+          if [ "$response" != "200" ]; then
+            echo "::warning::App ping returned HTTP $response"
+          fi
+          
+      - name: Ping SSE Stream
+        id: stream
+        run: |
+          echo "Pinging SSE stream endpoint..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 https://foreman-app.onrender.com/api/stream)
+          echo "Stream ping response: $response"
+          echo "stream_status=$response" >> $GITHUB_OUTPUT
+          
+      - name: Summary
+        run: |
+          echo "### Keep-Alive Ping Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Endpoint | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| /health | ${{ steps.health.outputs.health_status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| /app | ${{ steps.app.outputs.app_status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| /api/stream | ${{ steps.stream.outputs.stream_status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Timestamp: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY

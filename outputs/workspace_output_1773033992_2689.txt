@@ -1,5 +1,0 @@
-=== Testing live server ===
-Health: ✅ healthy
-Admin login (bcrypt): ✅ Token received
-Compliance (new user): ✅ status=warning, score=80.0, not_configured=False
-NDA template: ✅ bare_brackets=False, has_not_set_warning=False

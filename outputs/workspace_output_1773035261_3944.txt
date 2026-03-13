@@ -1,7 +1,0 @@
-=== FINAL VERIFICATION ===
-billing/status (user): HTTP 200 — {'plan': 'starter', 'plan_name': 'Starter', 'plan_price': 49, 'plan_features': [
-billing/payments (user): HTTP 200 — {'payments': [], 'total': 0, 'count': 0}
-billing/payments (admin): HTTP 200
-compliance/status (user): HTTP 200 — 
-ledger/P&L (user): HTTP 200
-users/me: 

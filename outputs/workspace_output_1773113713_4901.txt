@@ -1,2 +1,0 @@
--rw-r--r-- 1 root root 11290 Mar  6 05:02 web/privacy.html
--rw-r--r-- 1 root root 15377 Mar  6 05:03 web/terms.html

@@ -1,8 +1,0 @@
-Testing login API...
-Status: 200
-Response: {'success': True, 'token': 'KBsOD2Yc6LP9YhzCFAjqnNGfWwfjOKgyahV9iupXNqwXqt0a47C7v5hf_JQRIdWRRw0ECHsD14lZ9P6Naf1WpQ', 'expires_at': '2026-03-11T03:16:43.920874', 'user': {'id': 'b347f5a2ee97ac44', 'email': 'test@foreman.ca', 'business_name': 'Test Construction Ltd.', 'trade': 'Framing', 'contact_name': 'Test User', 'plan': 'pro', 'role': 'user', 'nda_accepted': False, 'email_access_granted': False, 'gdrive_access_granted': False}}
-
-Token received: KBsOD2Yc6LP9YhzCFAjq...
-
-Dashboard API: 200
-Dashboard data: {'ytd': {'revenue': 0, 'expenses': 0, 'net_income': 0, 'gross_margin': 0}, 'mtd': {'revenue': 0, 'expenses': 0, 'net_income': 0}, 'ar_outstanding': 0.0, 'ar_overdue': 0.0, 'bank_balance': 0.0}

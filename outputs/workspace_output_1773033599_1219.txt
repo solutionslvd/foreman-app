@@ -1,1 +1,0 @@
-BUG-011 FIXED - XSS protection applied

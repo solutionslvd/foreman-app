@@ -1,9 +1,0 @@
-2723:    setVal('s-ai-name', ai.assistant_name);
-2729:    setChecked('s-ai-proactive', ai.proactive_suggestions);
-2813:    assistant_name: getVal('s-ai-name'),
-2819:    proactive_suggestions: getChecked('s-ai-proactive'),
-4541:    // Show suggestions
-4542:    if (data.suggestions && data.suggestions.length > 0) {
-4543:      const sugDiv = document.getElementById('chat-suggestions');
-4545:        sugDiv.innerHTML = data.suggestions.map(s => 
-4546:          `<button class="suggestion-chip" onclick="sendQuickPrompt('${s.replace(/'/g, "\'")}')">${s}</button>`

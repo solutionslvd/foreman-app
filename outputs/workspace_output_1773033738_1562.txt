@@ -1,6 +1,0 @@
-/workspace/app/api/chat.py
-/workspace/app/email_ai.py
-/workspace/app/roles.py
-/workspace/app/main.py
-/workspace/app/ai_engine.py
-/workspace/app/settings_manager.py

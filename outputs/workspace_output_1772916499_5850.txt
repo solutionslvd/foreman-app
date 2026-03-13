@@ -1,2 +1,0 @@
-./.agent_hooks/run_all_hooks.py
-./.agent_hooks/shutdown/00_track_processes_on_ports.py
