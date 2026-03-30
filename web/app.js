@@ -59,6 +59,13 @@ function loadUnifiedStore() {
   } catch(e) { console.warn('loadUnifiedStore error:', e); }
 }
 
+// ── saveStore: persist the unified store to localStorage ──────────────────
+function saveStore() {
+  try {
+    localStorage.setItem('foreman_store', JSON.stringify(store));
+  } catch(e) { console.warn('saveStore error:', e); }
+}
+
 // ── BUG-008 FIX: Migrate old fragmented keys into unified store ───────────────
 function migrateLegacyStorage() {
   const legacyKeys = {
