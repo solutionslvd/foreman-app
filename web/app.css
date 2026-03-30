@@ -4392,3 +4392,104 @@ img { max-width: 100%; }
     width: auto;
   }
 }
+
+/* ============================================================
+   PM OVERVIEW — DYNAMIC STYLES
+   ============================================================ */
+
+/* Empty states */
+.pm-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+  color: #6b7280;
+}
+.pm-empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+.pm-empty-state h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px;
+}
+.pm-empty-state p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 20px;
+  max-width: 380px;
+}
+
+.pm-empty-mini {
+  padding: 16px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13px;
+}
+.pm-empty-mini p { margin: 0 0 10px; }
+
+/* Active Projects list in overview */
+.pm-projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.pm-project-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-radius: 6px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.pm-project-row:last-child { border-bottom: none; }
+.pm-project-row:hover { background: #f8faff; }
+.pm-project-info { min-width: 0; }
+.pm-project-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pm-project-client {
+  display: block;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+.pm-project-progress { min-width: 120px; }
+.pm-project-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.pm-project-budget {
+  font-size: 12px;
+  font-weight: 600;
+  color: #059669;
+}
+
+/* Widget badge variants */
+.pm-widget-badge.healthy { background: #d1fae5; color: #065f46; }
+.pm-widget-badge.warning { background: #fef3c7; color: #92400e; }
+.pm-widget-badge.critical { background: #fee2e2; color: #991b1b; }
+
+/* Btn size small */
+.btn.btn-sm { padding: 4px 10px; font-size: 12px; }
+
+@media (max-width: 600px) {
+  .pm-project-row { grid-template-columns: 1fr; gap: 6px; }
+}

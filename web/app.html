@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/app.css?v=2.3"></link>
+<link rel="stylesheet" href="/static/app.css?v=2.4"></link>
 <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
 <body class="dark-theme">
@@ -498,119 +498,13 @@
 
       <!-- PM Overview Tab -->
       <div id="pm-tab-overview" class="pm-tab-content active">
-        <div class="pm-dashboard-grid">
-          <div class="pm-widget health-score">
-            <div class="pm-widget-header">
-              <h3>Project Health</h3>
-              <span class="pm-widget-badge healthy">On Track</span>
-            </div>
-            <div class="health-score-display">
-              <div class="health-ring">
-                <svg viewBox="0 0 36 36">
-                  <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                  <path class="ring-fill good" stroke-dasharray="78, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                </svg>
-                <div class="health-value">78%</div>
-              </div>
-              <div class="health-breakdown">
-                <div class="health-item"><span class="health-label">Schedule</span><div class="mini-bar"><div class="mini-fill" style="width:85%"></div></div><span class="health-pct">85%</span></div>
-                <div class="health-item"><span class="health-label">Budget</span><div class="mini-bar"><div class="mini-fill good" style="width:92%"></div></div><span class="health-pct">92%</span></div>
-                <div class="health-item"><span class="health-label">Quality</span><div class="mini-bar"><div class="mini-fill good" style="width:88%"></div></div><span class="health-pct">88%</span></div>
-                <div class="health-item"><span class="health-label">Resources</span><div class="mini-bar"><div class="mini-fill warning" style="width:65%"></div></div><span class="health-pct">65%</span></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="pm-widget">
-            <div class="pm-widget-header"><h3>📅 Schedule Performance</h3></div>
-            <div class="schedule-stats">
-              <div class="stat-item"><div class="stat-value">24</div><div class="stat-label">Completed</div></div>
-              <div class="stat-item"><div class="stat-value">12</div><div class="stat-label">In Progress</div></div>
-              <div class="stat-item warning"><div class="stat-value">3</div><div class="stat-label">Overdue</div></div>
-              <div class="stat-item"><div class="stat-value">8</div><div class="stat-label">Upcoming</div></div>
-            </div>
-          </div>
-
-          <div class="pm-widget">
-            <div class="pm-widget-header"><h3>💰 Budget Status</h3><span class="budget-total">$245,000</span></div>
-            <div class="budget-breakdown">
-              <div class="budget-item"><span class="budget-label">Labor</span><div class="budget-bar"><div class="budget-fill" style="width:72%"></div></div><span class="budget-value">$72K / $100K</span></div>
-              <div class="budget-item"><span class="budget-label">Materials</span><div class="budget-bar"><div class="budget-fill" style="width:58%"></div></div><span class="budget-value">$43.5K / $75K</span></div>
-              <div class="budget-item"><span class="budget-label">Equipment</span><div class="budget-bar"><div class="budget-fill warning" style="width:85%"></div></div><span class="budget-value">$25.5K / $30K</span></div>
-            </div>
-          </div>
-
-          <div class="pm-widget">
-            <div class="pm-widget-header"><h3>⚠️ Risk Overview</h3></div>
-            <div class="risk-summary">
-              <div class="risk-stat critical"><span class="risk-count">2</span><span class="risk-label">Critical</span></div>
-              <div class="risk-stat high"><span class="risk-count">5</span><span class="risk-label">High</span></div>
-              <div class="risk-stat medium"><span class="risk-count">8</span><span class="risk-label">Medium</span></div>
-              <div class="risk-stat low"><span class="risk-count">12</span><span class="risk-label">Low</span></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Activity & Notifications -->
-        <div class="pm-two-col">
-          <div class="pm-widget activity-feed-widget">
-            <div class="pm-widget-header"><h3>📝 Recent Activity</h3></div>
-            <div class="activity-feed" id="pm-activity-feed">
-              <div class="activity-item">
-                <div class="activity-avatar">JD</div>
-                <div class="activity-content">
-                  <div class="activity-text"><strong>John Doe</strong> completed task <em>Framing inspection</em></div>
-                  <div class="activity-time">2 hours ago</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-avatar">SM</div>
-                <div class="activity-content">
-                  <div class="activity-text"><strong>Sarah Miller</strong> uploaded <em>Safety_report.pdf</em></div>
-                  <div class="activity-time">4 hours ago</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="pm-widget notifications-widget">
-            <div class="pm-widget-header"><h3>🔔 Notifications</h3><span class="notification-badge">5</span></div>
-            <div class="notification-list" id="pm-notifications">
-              <div class="notification-item unread">
-                <span class="notif-icon">⚠️</span>
-                <div class="notif-content">
-                  <div class="notif-text">Task "Electrical rough-in" is overdue</div>
-                  <div class="notif-time">1 hour ago</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- AI Insights -->
-        <div class="pm-widget ai-insights-panel">
-          <div class="pm-widget-header"><h3>🤖 AI Insights</h3><span class="ai-badge">Powered by Foreman AI</span></div>
-          <div class="ai-insights-grid">
-            <div class="ai-insight schedule">
-              <div class="insight-icon">📅</div>
-              <div class="insight-content">
-                <div class="insight-title">Schedule Risk Detected</div>
-                <div class="insight-text">Project may be 5-7 days behind schedule. Consider adding resources to electrical work.</div>
-              </div>
-            </div>
-            <div class="ai-insight resource">
-              <div class="insight-icon">👥</div>
-              <div class="insight-content">
-                <div class="insight-title">Resource Optimization</div>
-                <div class="insight-text">Plumbing team has 40% availability next week. Consider advancing bathroom rough-in tasks.</div>
-              </div>
-            </div>
-            <div class="ai-insight budget">
-              <div class="insight-icon">💰</div>
-              <div class="insight-content">
-                <div class="insight-title">Budget Forecast</div>
-                <div class="insight-text">Projected to be 3% under budget at current spending rate.</div>
-              </div>
-            </div>
+        <!-- Overview rendered dynamically by renderPMOverview() in app.js -->
+        <div id="pm-overview-content">
+          <div class="pm-empty-state">
+            <div class="pm-empty-icon">🏗️</div>
+            <h3>No Projects Yet</h3>
+            <p>Add a project from the <strong>Projects</strong> tab and it will automatically appear here with tasks, schedule, and tracking.</p>
+            <button class="btn btn-primary" onclick="navigateTo('projects')">➕ Add Your First Project</button>
           </div>
         </div>
       </div>
@@ -3487,7 +3381,7 @@
   </div>
 </div>
 
-<script src="/static/app.js?v=2.3"></script>
+<script src="/static/app.js?v=2.4"></script>
 
 <!-- Edit Project Modal -->
 <div id="modal-edit-project" class="modal-overlay hidden">

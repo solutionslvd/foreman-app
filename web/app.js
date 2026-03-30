@@ -5500,49 +5500,48 @@ store.pmClientUpdates = store.pmClientUpdates || [];
 store.pmCurrentView = 'board';
 store.pmCurrentTab = 'overview';
 
-// Sample PM Data for Demo
-const samplePMTasks = [
-  { id: 1, title: 'Electrical rough-in', description: 'Complete electrical rough-in for main floor', status: 'todo', priority: 'critical', assignee: 'JD', assigneeName: 'John Doe', dueDate: '2024-12-15', category: 'electrical', progress: 0 },
-  { id: 2, title: 'Plumbing layout', description: 'Design and mark plumbing routes', status: 'todo', priority: 'high', assignee: 'SM', assigneeName: 'Sarah Miller', dueDate: '2024-12-18', category: 'plumbing', progress: 0 },
-  { id: 3, title: 'HVAC ductwork', description: 'Install main HVAC ducts', status: 'inprogress', priority: 'medium', assignee: 'MJ', assigneeName: 'Mike Johnson', dueDate: '2024-12-20', category: 'hvac', progress: 60 },
-  { id: 4, title: 'Insulation installation', description: 'Install insulation in exterior walls', status: 'inprogress', priority: 'high', assignee: 'SM', assigneeName: 'Sarah Miller', dueDate: '2024-12-22', category: 'insulation', progress: 35 },
-  { id: 5, title: 'Framing inspection', description: 'City inspection for framing work', status: 'review', priority: 'medium', assignee: 'JD', assigneeName: 'John Doe', dueDate: '2024-12-16', category: 'inspection', progress: 90, comments: 3 },
-  { id: 6, title: 'Foundation work', description: 'Complete foundation and slab pour', status: 'done', priority: 'low', assignee: 'JD', assigneeName: 'John Doe', completedDate: '2024-12-10', category: 'foundation', progress: 100 },
-  { id: 7, title: 'Framing - main floor', description: 'Frame exterior and interior walls', status: 'done', priority: 'medium', assignee: 'SM', assigneeName: 'Sarah Miller', completedDate: '2024-12-12', category: 'framing', progress: 100 }
-];
+// ── PM Data Initialization (empty — populated from real projects/payroll) ──
+// Clear any old stale sample data that may be in localStorage
+(function purgeSampleData() {
+  const tasks = store.pmTasks || [];
+  // Sample tasks had numeric ids (1-7) and hardcoded 2024 dates — remove them
+  const purged = tasks.filter(t => {
+    const id = String(t.id);
+    // Remove legacy numeric-id sample tasks
+    if (/^[1-7]$/.test(id)) return false;
+    return true;
+  });
+  if (purged.length !== tasks.length) {
+    store.pmTasks = purged;
+    saveStore();
+  }
+  // Remove sample risks R001-R004
+  const risks = store.pmRisks || [];
+  const purgedRisks = risks.filter(r => !/^R00[1-4]$/.test(String(r.id)));
+  if (purgedRisks.length !== risks.length) {
+    store.pmRisks = purgedRisks;
+    saveStore();
+  }
+  // Remove sample issues I001-I003
+  const issues = store.pmIssues || [];
+  const purgedIssues = issues.filter(i => !/^I00[1-3]$/.test(String(i.id)));
+  if (purgedIssues.length !== issues.length) {
+    store.pmIssues = purgedIssues;
+    saveStore();
+  }
+  // Remove hardcoded sample labor resources (ids 1-8 with no projectId)
+  const resources = store.pmResources || [];
+  const purgedRes = resources.filter(r => {
+    if (typeof r.id === 'number' && r.id >= 1 && r.id <= 8 && r.type === 'labor') return false;
+    return true;
+  });
+  if (purgedRes.length !== resources.length) {
+    store.pmResources = purgedRes;
+    saveStore();
+  }
+})();
 
-const samplePMRisks = [
-  { id: 'R001', description: 'Steel beam delivery delay', category: 'Supply Chain', impact: 'high', likelihood: 'high', score: 9, mitigation: 'Pre-order materials, identify backup supplier', owner: 'John D.', status: 'active' },
-  { id: 'R002', description: 'Subcontractor availability - Electrical', category: 'Resource', impact: 'high', likelihood: 'medium', score: 6, mitigation: 'Book subcontractor early, have backup', owner: 'Sarah M.', status: 'monitoring' },
-  { id: 'R003', description: 'Weather delays - Snow/Freezing', category: 'Environmental', impact: 'medium', likelihood: 'high', score: 6, mitigation: 'Build weather buffer into schedule', owner: 'Mike J.', status: 'monitoring' },
-  { id: 'R004', description: 'Permit approval delays', category: 'Regulatory', impact: 'medium', likelihood: 'medium', score: 4, mitigation: 'Submit early, follow up weekly', owner: 'John D.', status: 'mitigated' }
-];
-
-const samplePMIssues = [
-  { id: 'I001', title: 'Foundation crack discovered during inspection', description: 'A 2-foot crack was found in the foundation wall during the framing inspection.', priority: 'critical', status: 'open', reporter: 'John D.', assignee: 'Sarah M.', date: '2024-12-14', comments: 4, attachments: 2 },
-  { id: 'I002', title: 'HVAC ductwork doesn\'t match plans', description: 'Installed ductwork routing conflicts with planned plumbing lines.', priority: 'high', status: 'in-progress', reporter: 'Mike J.', assignee: 'Amy J.', date: '2024-12-13', comments: 7, attachments: 3 },
-  { id: 'I003', title: 'Missing insulation in north wall', description: 'Found gap in insulation installation. Has been corrected.', priority: 'medium', status: 'resolved', reporter: 'Sarah M.', assignee: 'John D.', date: '2024-12-10', resolvedDate: '2024-12-12' }
-];
-
-const samplePMResources = [
-  { id: 1, name: 'John Doe', initials: 'JD', role: 'Lead Carpenter', type: 'labor', utilization: 85, tasks: 4 },
-  { id: 2, name: 'Sarah Miller', initials: 'SM', role: 'Electrician', type: 'labor', utilization: 60, tasks: 3 },
-  { id: 3, name: 'Mike Johnson', initials: 'MJ', role: 'Plumber', type: 'labor', utilization: 40, tasks: 2 },
-  { id: 4, name: 'Amy Jackson', initials: 'AJ', role: 'HVAC Tech', type: 'labor', utilization: 95, tasks: 5 },
-  { id: 5, name: 'Skid Steer', icon: '🚜', type: 'equipment', status: 'available', project: '' },
-  { id: 6, name: 'Scaffolding Set', icon: '🏗️', type: 'equipment', status: 'in-use', project: '123 Main St' },
-  { id: 7, name: 'Compressor', icon: '🔩', type: 'equipment', status: 'in-use', project: '123 Main St' },
-  { id: 8, name: 'Generator', icon: '⚡', type: 'equipment', status: 'maintenance', project: 'In shop' }
-];
-
-// Initialize PM data if empty
-if (store.pmTasks.length === 0) {
-  store.pmTasks = samplePMTasks;
-  store.pmRisks = samplePMRisks;
-  store.pmIssues = samplePMIssues;
-  store.pmResources = samplePMResources;
-  saveStore();
-}
+// Sync existing projects into PM (any project not yet tracked)
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PM TAB NAVIGATION
@@ -5563,6 +5562,7 @@ function switchPMTab(tab) {
   
   // Render content based on tab
   switch(tab) {
+    case 'overview': renderPMOverview(); break;
     case 'tasks': renderKanbanBoard(); break;
     case 'schedule': renderGanttChart(); break;
     case 'resources': renderResourcesTab(); break;
@@ -5973,72 +5973,135 @@ function ganttToday() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function renderResourcesTab() {
-  const resources = store.pmResources || [];
-  const labor = resources.filter(r => r.type === 'labor');
-  const equipment = resources.filter(r => r.type === 'equipment');
-  
+  // Build labor list from payroll employees + manually added PM resources
+  const payrollEmployees = (store.payroll && store.payroll.employees) ? store.payroll.employees : [];
+  const pmResources = store.pmResources || [];
+  const equipment = pmResources.filter(r => r.type === 'equipment');
+
+  // Build labor from payroll employees
+  const labor = payrollEmployees.map(emp => {
+    const name = (emp.name || ((emp.first_name || '') + ' ' + (emp.last_name || ''))).trim();
+    const initials = name.split(' ').filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 2) || '??';
+    const activeTasks = (store.pmTasks || []).filter(t =>
+      t.status !== 'done' && (
+        t.assignee === initials ||
+        (t.assigneeName || '').toLowerCase() === name.toLowerCase() ||
+        String(t.assigneeId) === String(emp.id)
+      )
+    );
+    const taskCount = activeTasks.length;
+    const utilization = Math.min(100, taskCount * 20);
+    return { id: emp.id, name, initials, role: emp.position || emp.trade || emp.role || 'Team Member', type: 'labor', utilization, tasks: taskCount };
+  });
+
+  // Include manually added labor resources not already from payroll
+  const manualLabor = pmResources.filter(r => r.type === 'labor' && !payrollEmployees.find(e => {
+    const n = ((e.name || '') || ((e.first_name || '') + ' ' + (e.last_name || ''))).trim();
+    return n.toLowerCase() === (r.name || '').toLowerCase();
+  }));
+  const allLabor = [...labor, ...manualLabor];
+
   // Render team
   const teamGrid = document.getElementById('pm-team-grid');
   if (teamGrid) {
-    teamGrid.innerHTML = labor.map(person => `
-      <div class="team-card">
-        <div class="team-avatar">${person.initials}</div>
-        <div class="team-info">
-          <h4>${person.name}</h4>
-          <span class="team-role">${person.role}</span>
+    if (allLabor.length === 0) {
+      teamGrid.innerHTML = `
+        <div class="pm-empty-mini" style="grid-column:1/-1">
+          <p>No team members yet. Add employees in the <strong>Payroll</strong> tab or assign resources here.</p>
+          <button class="btn btn-sm btn-outline" onclick="navigateTo('payroll')">Go to Payroll</button>
+        </div>`;
+    } else {
+      teamGrid.innerHTML = allLabor.map(person => `
+        <div class="team-card">
+          <div class="team-avatar">${person.initials}</div>
+          <div class="team-info">
+            <h4>${person.name}</h4>
+            <span class="team-role">${person.role}</span>
+          </div>
+          <div class="utilization-bar">
+            <div class="util-fill ${person.utilization > 90 ? 'warning' : person.utilization > 70 ? 'high' : 'medium'}"
+                 style="width:${person.utilization || 0}%"></div>
+          </div>
+          <span class="util-label">${person.utilization || 0}% allocated ${person.utilization > 90 ? '⚠️' : ''}</span>
+          <div class="team-tasks"><span class="task-count">${person.tasks} active task${person.tasks !== 1 ? 's' : ''}</span></div>
         </div>
-        <div class="utilization-bar">
-          <div class="util-fill ${person.utilization > 90 ? 'warning' : person.utilization > 70 ? 'high' : 'medium'}" 
-               style="width: ${person.utilization}%"></div>
-        </div>
-        <span class="util-label">${person.utilization}% allocated ${person.utilization > 90 ? '⚠️' : ''}</span>
-        <div class="team-tasks"><span class="task-count">${person.tasks} active tasks</span></div>
-      </div>
-    `).join('');
+      `).join('');
+    }
   }
-  
+
   // Render equipment
   const equipmentGrid = document.getElementById('pm-equipment-grid');
   if (equipmentGrid) {
-    equipmentGrid.innerHTML = equipment.map(item => `
-      <div class="equipment-card">
-        <div class="equip-icon">${item.icon}</div>
-        <div class="equip-info">
-          <h4>${item.name}</h4>
-          <span class="equip-status ${item.status}">${formatStatus(item.status)}</span>
+    if (equipment.length === 0) {
+      equipmentGrid.innerHTML = `<div class="pm-empty-mini" style="grid-column:1/-1"><p>No equipment tracked yet. Use <strong>Assign Resource</strong> to add equipment.</p></div>`;
+    } else {
+      equipmentGrid.innerHTML = equipment.map(item => `
+        <div class="equipment-card">
+          <div class="equip-icon">${item.icon || '🔧'}</div>
+          <div class="equip-info">
+            <h4>${item.name}</h4>
+            <span class="equip-status ${item.status}">${formatStatus(item.status)}</span>
+          </div>
+          <div class="equip-project">${item.project || 'Not assigned'}</div>
         </div>
-        <div class="equip-project">${item.project || 'Not assigned'}</div>
-      </div>
-    `).join('');
+      `).join('');
+    }
   }
-  
-  // Render capacity chart
+
   renderCapacityChart();
 }
 
 function renderCapacityChart() {
   const capacityChart = document.getElementById('pm-capacity-chart');
   if (!capacityChart) return;
-  
-  const weeks = ['Dec 16-20', 'Dec 23-27', 'Dec 30-Jan 3', 'Jan 6-10'];
-  const hours = [180, 160, 220, 190];
-  const available = 200;
-  
+
+  // Build weekly capacity from real data
+  const employees = (store.payroll && store.payroll.employees) ? store.payroll.employees : [];
+  const tasks = store.pmTasks || [];
+  const teamSize = employees.length;
+  // Standard: 40h/week per person
+  const availableHours = teamSize * 40 || 40;
+
+  // Generate next 4 weeks
+  const weeks = [];
+  const today = new Date();
+  for (let i = 0; i < 4; i++) {
+    const start = new Date(today);
+    start.setDate(today.getDate() + (i * 7) - today.getDay() + 1);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 4);
+    const label = `${start.toLocaleDateString('en-US',{month:'short',day:'numeric'})} - ${end.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+    // Count tasks scheduled in this week
+    const weekTasks = tasks.filter(t => {
+      if (!t.dueDate || t.status === 'done') return false;
+      const due = new Date(t.dueDate);
+      return due >= start && due <= end;
+    });
+    // Estimate hours: each task = 8h default or task.duration days * 8
+    const scheduledHours = weekTasks.reduce((s, t) => s + ((t.duration || 1) * 8), 0);
+    weeks.push({ label, scheduledHours, availableHours });
+  }
+
+  if (weeks.every(w => w.scheduledHours === 0) && teamSize === 0) {
+    capacityChart.innerHTML = `<div class="pm-empty-mini"><p>Add employees in Payroll and assign tasks to see capacity planning.</p></div>`;
+    return;
+  }
+
   capacityChart.innerHTML = `
     <div class="capacity-header">
-      <span>Week</span><span>Labor Hours</span><span>Available</span><span>Variance</span>
+      <span>Week</span><span>Scheduled Hours</span><span>Available</span><span>Variance</span>
     </div>
-    ${weeks.map((week, i) => {
-      const hoursVal = hours[i];
-      const variance = available - hoursVal;
-      const isOver = hoursVal > available;
+    ${weeks.map(w => {
+      const variance = w.availableHours - w.scheduledHours;
+      const isOver = w.scheduledHours > w.availableHours;
+      const pct = Math.min(Math.round((w.scheduledHours / w.availableHours) * 100), 100);
       return `
         <div class="capacity-row ${isOver ? 'warning' : ''}">
-          <span>${week}</span>
+          <span>${w.label}</span>
           <div class="capacity-bar-container">
-            <div class="capacity-bar ${isOver ? 'over' : ''}" style="width: ${Math.min(hoursVal, 220)}px;">${hoursVal}h</div>
+            <div class="capacity-bar ${isOver ? 'over' : ''}" style="width:${pct}%">${w.scheduledHours}h</div>
           </div>
-          <span>${available}h</span>
+          <span>${w.availableHours}h</span>
           <span class="variance ${variance >= 0 ? 'positive' : 'negative'}">${variance >= 0 ? '+' : ''}${variance}h</span>
         </div>
       `;
@@ -6682,27 +6745,289 @@ function deletePMTask(taskId) {
 
 // Update PM Overview stats
 function updatePMOverview() {
-  const tasks = store.pmTasks || [];
-  
-  // Count by status
-  const todo = tasks.filter(t => t.status === 'todo').length;
+  // Alias — triggers full re-render
+  renderPMOverview();
+}
+
+function renderPMOverview() {
+  const container = document.getElementById('pm-overview-content');
+  if (!container) return;
+
+  const tasks    = store.pmTasks    || [];
+  const risks    = store.pmRisks    || [];
+  const issues   = store.pmIssues   || [];
+  const projects = store.projects   || [];
+  const now      = new Date();
+
+  // ── Task stats ──────────────────────────────────────────────
+  const total      = tasks.length;
+  const done       = tasks.filter(t => t.status === 'done').length;
   const inProgress = tasks.filter(t => t.status === 'inprogress').length;
-  const review = tasks.filter(t => t.status === 'review').length;
-  const done = tasks.filter(t => t.status === 'done').length;
-  
-  // Calculate total cost
-  const totalCost = tasks.reduce((sum, t) => sum + (t.cost || 0), 0);
-  
-  // Update overview if elements exist
-  const scheduleStats = document.querySelector('.schedule-stats');
-  if (scheduleStats) {
-    scheduleStats.innerHTML = `
-      <div class="stat-item"><div class="stat-value">${done}</div><div class="stat-label">Completed</div></div>
-      <div class="stat-item"><div class="stat-value">${inProgress}</div><div class="stat-label">In Progress</div></div>
-      <div class="stat-item warning"><div class="stat-value">${tasks.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'done').length}</div><div class="stat-label">Overdue</div></div>
-      <div class="stat-item"><div class="stat-value">${todo}</div><div class="stat-label">Upcoming</div></div>
-    `;
+  const todo       = tasks.filter(t => t.status === 'todo').length;
+  const review     = tasks.filter(t => t.status === 'review').length;
+  const overdue    = tasks.filter(t => t.dueDate && new Date(t.dueDate) < now && t.status !== 'done').length;
+  const pctDone    = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  // ── Budget stats ─────────────────────────────────────────────
+  const totalBudget  = projects.reduce((s, p) => s + (parseFloat(p.budget || p.contract_value) || 0), 0);
+  const totalSpent   = projects.reduce((s, p) => s + (parseFloat(p.spent) || 0), 0);
+  const taskCosts    = tasks.reduce((s, t) => s + (parseFloat(t.cost) || 0), 0);
+  const budgetUsed   = totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0;
+
+  // ── Risk stats ───────────────────────────────────────────────
+  const activeRisks  = risks.filter(r => r.status !== 'mitigated' && r.status !== 'closed');
+  const criticalR    = activeRisks.filter(r => (r.score || getRiskScore(r.impact, r.likelihood)) >= 9).length;
+  const highR        = activeRisks.filter(r => { const s = r.score || getRiskScore(r.impact, r.likelihood); return s >= 6 && s < 9; }).length;
+  const mediumR      = activeRisks.filter(r => { const s = r.score || getRiskScore(r.impact, r.likelihood); return s >= 4 && s < 6; }).length;
+  const lowR         = activeRisks.filter(r => { const s = r.score || getRiskScore(r.impact, r.likelihood); return s < 4; }).length;
+
+  // ── Health score ─────────────────────────────────────────────
+  const scheduleHealth = total > 0 ? Math.max(0, Math.round(100 - (overdue / total) * 100)) : 100;
+  const budgetHealth   = totalBudget > 0 ? Math.max(0, 100 - budgetUsed) : 100;
+  const qualityHealth  = total > 0 ? Math.round(((done + review) / total) * 100) : 100;
+  const riskHealth     = Math.max(0, 100 - (criticalR * 20 + highR * 10 + mediumR * 5));
+  const healthScore    = Math.round((scheduleHealth + budgetHealth + qualityHealth + riskHealth) / 4);
+  const healthClass    = healthScore >= 75 ? 'good' : healthScore >= 50 ? 'warning' : 'critical';
+  const healthLabel    = healthScore >= 75 ? 'On Track' : healthScore >= 50 ? 'At Risk' : 'Critical';
+  const healthBadge    = healthScore >= 75 ? 'healthy' : healthScore >= 50 ? 'warning' : 'critical';
+
+  // ── Activity feed ────────────────────────────────────────────
+  const activities = store.pmActivities || [];
+  const recentActivity = activities.slice(-8).reverse();
+
+  // ── PM Notifications ─────────────────────────────────────────
+  const pmNotifs = [];
+  tasks.forEach(t => {
+    if (t.status === 'done') return;
+    if (!t.dueDate) return;
+    const diff = Math.floor((now - new Date(t.dueDate)) / 86400000);
+    if (diff > 0) {
+      pmNotifs.push({ icon: '🚨', text: `Task "${t.title}" is ${diff}d overdue`, cls: 'critical' });
+    } else if (diff >= -1) {
+      pmNotifs.push({ icon: '⏰', text: `Task "${t.title}" is due ${diff === 0 ? 'today' : 'tomorrow'}`, cls: 'warning' });
+    }
+  });
+  issues.filter(i => i.status === 'open' && (i.priority === 'critical' || i.priority === 'high')).forEach(i => {
+    pmNotifs.push({ icon: '🔴', text: `${capitalize(i.priority)} issue: "${i.title}"`, cls: 'high' });
+  });
+
+  // ── AI Insights (generated from real data) ───────────────────
+  const insights = [];
+  if (overdue > 0) {
+    insights.push({ icon: '📅', cls: 'schedule', title: 'Schedule Alert', text: `${overdue} task${overdue > 1 ? 's are' : ' is'} overdue. Review the Tasks tab to reassign or update deadlines.` });
+  } else if (total > 0) {
+    insights.push({ icon: '📅', cls: 'schedule', title: 'Schedule On Track', text: `All ${total} tasks are within their deadlines. ${inProgress} currently in progress.` });
   }
+  if (totalBudget > 0) {
+    const budgetMsg = budgetUsed > 90 ? `Budget is ${budgetUsed}% utilized — approaching limit. Review spend before adding new costs.`
+      : budgetUsed > 75 ? `Budget is ${budgetUsed}% utilized. Monitor upcoming expenses closely.`
+      : `Budget is ${budgetUsed}% utilized across ${projects.length} project${projects.length !== 1 ? 's' : ''}. Spend is healthy.`;
+    insights.push({ icon: '💰', cls: 'budget', title: 'Budget Forecast', text: budgetMsg });
+  }
+  if (activeRisks.length > 0) {
+    insights.push({ icon: '⚠️', cls: 'risk', title: 'Risk Monitor', text: `${activeRisks.length} active risk${activeRisks.length > 1 ? 's' : ''} on record${criticalR > 0 ? ` including ${criticalR} critical` : ''}. Review the Risks tab for mitigation actions.` });
+  }
+  if (insights.length === 0) {
+    insights.push({ icon: '🤖', cls: 'info', title: 'All Systems Good', text: 'No active alerts. Add projects and tasks to get AI-powered insights on schedule, budget, and resource utilization.' });
+  }
+
+  // ── No projects state ────────────────────────────────────────
+  if (projects.length === 0 && tasks.length === 0) {
+    container.innerHTML = `
+      <div class="pm-empty-state">
+        <div class="pm-empty-icon">🏗️</div>
+        <h3>No Projects Yet</h3>
+        <p>Add a project from the <strong>Projects</strong> tab and it will automatically appear here with tasks, schedule, and tracking.</p>
+        <button class="btn btn-primary" onclick="navigateTo('projects')">➕ Add Your First Project</button>
+      </div>`;
+    return;
+  }
+
+  // ── Format helpers ───────────────────────────────────────────
+  const fmt$ = v => v >= 1000000 ? '$' + (v/1000000).toFixed(1) + 'M'
+    : v >= 1000 ? '$' + (v/1000).toFixed(0) + 'K'
+    : '$' + v.toFixed(0);
+
+  container.innerHTML = `
+    <div class="pm-dashboard-grid">
+
+      <!-- Health Score -->
+      <div class="pm-widget health-score">
+        <div class="pm-widget-header">
+          <h3>Project Health</h3>
+          <span class="pm-widget-badge ${healthBadge}">${healthLabel}</span>
+        </div>
+        <div class="health-score-display">
+          <div class="health-ring">
+            <svg viewBox="0 0 36 36">
+              <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              <path class="ring-fill ${healthClass}" stroke-dasharray="${healthScore}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            </svg>
+            <div class="health-value">${healthScore}%</div>
+          </div>
+          <div class="health-breakdown">
+            <div class="health-item"><span class="health-label">Schedule</span><div class="mini-bar"><div class="mini-fill ${scheduleHealth < 60 ? 'warning' : ''}" style="width:${scheduleHealth}%"></div></div><span class="health-pct">${scheduleHealth}%</span></div>
+            <div class="health-item"><span class="health-label">Budget</span><div class="mini-bar"><div class="mini-fill ${budgetHealth < 20 ? 'warning' : 'good'}" style="width:${budgetHealth}%"></div></div><span class="health-pct">${budgetHealth}%</span></div>
+            <div class="health-item"><span class="health-label">Progress</span><div class="mini-bar"><div class="mini-fill good" style="width:${qualityHealth}%"></div></div><span class="health-pct">${qualityHealth}%</span></div>
+            <div class="health-item"><span class="health-label">Risk</span><div class="mini-bar"><div class="mini-fill ${riskHealth < 60 ? 'warning' : ''}" style="width:${riskHealth}%"></div></div><span class="health-pct">${riskHealth}%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule Performance -->
+      <div class="pm-widget">
+        <div class="pm-widget-header"><h3>📅 Schedule Performance</h3></div>
+        <div class="schedule-stats">
+          <div class="stat-item"><div class="stat-value">${done}</div><div class="stat-label">Completed</div></div>
+          <div class="stat-item"><div class="stat-value">${inProgress}</div><div class="stat-label">In Progress</div></div>
+          <div class="stat-item ${overdue > 0 ? 'warning' : ''}"><div class="stat-value">${overdue}</div><div class="stat-label">Overdue</div></div>
+          <div class="stat-item"><div class="stat-value">${todo}</div><div class="stat-label">To Do</div></div>
+        </div>
+        <div style="margin-top:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:4px;">
+            <span>Overall Progress</span><span>${pctDone}%</span>
+          </div>
+          <div style="height:8px;background:#f3f4f6;border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${pctDone}%;background:${pctDone >= 75 ? '#10b981' : pctDone >= 40 ? '#f59e0b' : '#2563eb'};border-radius:4px;transition:width 0.5s;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget Status -->
+      <div class="pm-widget">
+        <div class="pm-widget-header">
+          <h3>💰 Budget Status</h3>
+          <span class="budget-total">${totalBudget > 0 ? fmt$(totalBudget) : '—'}</span>
+        </div>
+        ${totalBudget > 0 ? `
+        <div class="budget-breakdown">
+          <div class="budget-item">
+            <span class="budget-label">Spent</span>
+            <div class="budget-bar"><div class="budget-fill ${budgetUsed > 90 ? 'warning' : ''}" style="width:${Math.min(budgetUsed,100)}%"></div></div>
+            <span class="budget-value">${fmt$(totalSpent)} / ${fmt$(totalBudget)}</span>
+          </div>
+          <div class="budget-item">
+            <span class="budget-label">Remaining</span>
+            <div class="budget-bar"><div class="budget-fill good" style="width:${Math.max(0,100-budgetUsed)}%"></div></div>
+            <span class="budget-value">${fmt$(Math.max(0, totalBudget - totalSpent))}</span>
+          </div>
+          ${taskCosts > 0 ? `
+          <div class="budget-item">
+            <span class="budget-label">Task Costs</span>
+            <div class="budget-bar"><div class="budget-fill" style="width:${totalBudget > 0 ? Math.min(Math.round((taskCosts/totalBudget)*100),100) : 0}%"></div></div>
+            <span class="budget-value">${fmt$(taskCosts)}</span>
+          </div>` : ''}
+        </div>` : `
+        <div class="pm-empty-mini">
+          <p>No budget data yet. Set contract values on your projects.</p>
+          <button class="btn btn-sm btn-outline" onclick="navigateTo('projects')">Go to Projects</button>
+        </div>`}
+      </div>
+
+      <!-- Risk Overview -->
+      <div class="pm-widget">
+        <div class="pm-widget-header"><h3>⚠️ Risk Overview</h3>
+          <button class="btn btn-sm btn-outline" onclick="switchPMTab('risks')" style="font-size:11px;padding:2px 8px;">View All</button>
+        </div>
+        ${activeRisks.length > 0 ? `
+        <div class="risk-summary">
+          <div class="risk-stat critical" onclick="switchPMTab('risks')" style="cursor:pointer;"><span class="risk-count">${criticalR}</span><span class="risk-label">Critical</span></div>
+          <div class="risk-stat high" onclick="switchPMTab('risks')" style="cursor:pointer;"><span class="risk-count">${highR}</span><span class="risk-label">High</span></div>
+          <div class="risk-stat medium" onclick="switchPMTab('risks')" style="cursor:pointer;"><span class="risk-count">${mediumR}</span><span class="risk-label">Medium</span></div>
+          <div class="risk-stat low" onclick="switchPMTab('risks')" style="cursor:pointer;"><span class="risk-count">${lowR}</span><span class="risk-label">Low</span></div>
+        </div>` : `
+        <div class="pm-empty-mini"><p>No active risks logged. Use the <strong>Risks</strong> tab to track project risks.</p></div>`}
+      </div>
+    </div>
+
+    <!-- Projects Summary -->
+    ${projects.length > 0 ? `
+    <div class="pm-widget" style="margin-bottom:16px;">
+      <div class="pm-widget-header"><h3>🏗️ Active Projects</h3>
+        <button class="btn btn-sm btn-outline" onclick="navigateTo('projects')" style="font-size:11px;padding:2px 8px;">Manage Projects</button>
+      </div>
+      <div class="pm-projects-list">
+        ${projects.map(p => {
+          const pTasks = tasks.filter(t => String(t.projectId) === String(p.id));
+          const pDone  = pTasks.filter(t => t.status === 'done').length;
+          const pTotal = pTasks.length;
+          const pPct   = pTotal > 0 ? Math.round((pDone / pTotal) * 100) : 0;
+          const pBudget = parseFloat(p.budget || p.contract_value) || 0;
+          const statusCls = p.status === 'completed' ? 'done' : p.status === 'active' ? 'inprogress' : 'todo';
+          return `
+          <div class="pm-project-row" onclick="navigateTo('projects')">
+            <div class="pm-project-info">
+              <span class="pm-project-name">${p.name || 'Untitled Project'}</span>
+              <span class="pm-project-client">${p.client_name || ''}</span>
+            </div>
+            <div class="pm-project-progress">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:3px;">
+                <span>${pDone}/${pTotal} tasks</span><span>${pPct}%</span>
+              </div>
+              <div style="height:5px;background:#f3f4f6;border-radius:3px;overflow:hidden;">
+                <div style="height:100%;width:${pPct}%;background:${pPct >= 75 ? '#10b981' : '#2563eb'};border-radius:3px;"></div>
+              </div>
+            </div>
+            <div class="pm-project-meta">
+              ${pBudget > 0 ? `<span class="pm-project-budget">${fmt$(pBudget)}</span>` : ''}
+              <span class="status-badge ${statusCls}">${capitalize(p.status || 'active')}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- Activity & Notifications -->
+    <div class="pm-two-col">
+      <div class="pm-widget activity-feed-widget">
+        <div class="pm-widget-header"><h3>📝 Recent Activity</h3></div>
+        <div class="activity-feed" id="pm-activity-feed">
+          ${recentActivity.length > 0
+            ? recentActivity.map(a => `
+              <div class="activity-item">
+                <div class="activity-avatar">${a.initials || '??'}</div>
+                <div class="activity-content">
+                  <div class="activity-text">${a.text || a.action || ''}</div>
+                  <div class="activity-time">${a.time || a.date || ''}</div>
+                </div>
+              </div>`).join('')
+            : `<div class="pm-empty-mini"><p>Activity will appear here as you manage tasks, risks, and issues.</p></div>`}
+        </div>
+      </div>
+      <div class="pm-widget notifications-widget">
+        <div class="pm-widget-header">
+          <h3>🔔 Alerts</h3>
+          ${pmNotifs.length > 0 ? `<span class="notification-badge">${pmNotifs.length}</span>` : ''}
+        </div>
+        <div class="notification-list" id="pm-notifications">
+          ${pmNotifs.length > 0
+            ? pmNotifs.slice(0,8).map(n => `
+              <div class="notification-item unread">
+                <span class="notif-icon">${n.icon}</span>
+                <div class="notif-content">
+                  <div class="notif-text">${n.text}</div>
+                </div>
+              </div>`).join('')
+            : `<div class="pm-empty-mini"><p>✅ No active alerts. All tasks and issues are on track.</p></div>`}
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Insights -->
+    <div class="pm-widget ai-insights-panel">
+      <div class="pm-widget-header"><h3>🤖 AI Insights</h3><span class="ai-badge">Powered by Foreman AI</span></div>
+      <div class="ai-insights-grid">
+        ${insights.map(i => `
+          <div class="ai-insight ${i.cls}">
+            <div class="insight-icon">${i.icon}</div>
+            <div class="insight-content">
+              <div class="insight-title">${i.title}</div>
+              <div class="insight-text">${i.text}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
 }
 
 // Add tasks from project creation
@@ -6836,6 +7161,18 @@ navigateTo = function(page) {
 };
 
 console.log('📊 Project Management System loaded successfully');
+
+// Sync existing projects into PM (runs after addProjectTasksToPM is defined)
+(function syncProjectsToPM() {
+  const projects = store.projects || [];
+  projects.forEach(project => {
+    if (!project || !project.id) return;
+    const existing = (store.pmTasks || []).filter(t => String(t.projectId) === String(project.id));
+    if (existing.length === 0) {
+      addProjectTasksToPM(project);
+    }
+  });
+})();
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PM MILESTONE HANDLERS
