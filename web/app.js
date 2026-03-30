@@ -1261,10 +1261,10 @@ async function loadCompliance() {
       // Update WCB section
       const wcbRateEl = document.getElementById('wcb-rate');
       const wcbYtdEl = document.getElementById('wcb-ytd');
-      if (wcbRateEl &amp;&amp; status.wcb) {
+      if (wcbRateEl && status.wcb) {
         wcbRateEl.textContent = status.wcb.rate || 'N/A';
       }
-      if (wcbYtdEl &amp;&amp; status.wcb) {
+      if (wcbYtdEl && status.wcb) {
         wcbYtdEl.textContent = formatCurrency(status.wcb.ytd_premiums || 0);
       }
     }
@@ -1276,7 +1276,7 @@ async function loadCompliance() {
   try {
     const training = await apiGet('/api/compliance/training');
     const trainingList = document.getElementById('training-list');
-    if (trainingList &amp;&amp; training &amp;&amp; training.length > 0) {
+    if (trainingList && training && training.length > 0) {
       trainingList.innerHTML = training.map(t => {
         const statusClass = t.status === 'current' ? 'current' : (t.status === 'expiring' ? 'expiring' : 'expired');
         const icon = t.status === 'current' ? '✅' : (t.status === 'expiring' ? '⚠️' : '❌');
@@ -1299,7 +1299,7 @@ async function loadCompliance() {
   try {
     const permits = await apiGet('/api/compliance/permits');
     const permitsList = document.getElementById('permits-list');
-    if (permitsList &amp;&amp; permits &amp;&amp; permits.length > 0) {
+    if (permitsList && permits && permits.length > 0) {
       permitsList.innerHTML = permits.map(p => `
         <div class="permit-item">
           <span>${p.permit_number || p.type}</span>
@@ -1315,7 +1315,7 @@ async function loadCompliance() {
   try {
     const checklist = await apiGet('/api/compliance/safety-checklist');
     const checklistEl = document.getElementById('safety-checklist');
-    if (checklistEl &amp;&amp; checklist &amp;&amp; checklist.items) {
+    if (checklistEl && checklist && checklist.items) {
       const checkboxes = checklistEl.querySelectorAll('input[type="checkbox"]');
       checkboxes.forEach((cb, i) => {
         if (checklist.items[i] !== undefined) {
@@ -1354,7 +1354,7 @@ async function loadBilling() {
       if (card) {
         const btn = card.querySelector('button');
         if (btn) {
-          if (subscription &amp;&amp; subscription.plan === planName) {
+          if (subscription && subscription.plan === planName) {
             btn.textContent = 'Current Plan';
             btn.className = 'btn-secondary';
             btn.disabled = true;
@@ -4719,7 +4719,7 @@ function renderMarkdown(text) {
   if (!text) return '';
   let html = text
     // Escape HTML first
-    .replace(/&/g, '&amp;')
+    .replace(/&/g, '&')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     // Bold
@@ -6572,3 +6572,211 @@ navigateTo = function(page) {
 };
 
 console.log('📊 Project Management System loaded successfully');
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PM MILESTONE HANDLERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function openPMMilestoneModal() {
+  // Populate project dropdown
+  const sel = document.getElementById('pm-milestone-project');
+  if (sel) {
+    sel.innerHTML = '<option value="">— All Projects —</option>';
+    (store.projects || []).forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.name || p.title || 'Untitled Project';
+      sel.appendChild(opt);
+    });
+  }
+  // Default date to 2 weeks from now
+  const dateEl = document.getElementById('pm-milestone-date');
+  if (dateEl) {
+    const d = new Date();
+    d.setDate(d.getDate() + 14);
+    dateEl.value = d.toISOString().split('T')[0];
+  }
+  openModal('pm-new-milestone-modal');
+}
+
+function savePMMilestone(event) {
+  event.preventDefault();
+  const milestone = {
+    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+    title: document.getElementById('pm-milestone-title').value.trim(),
+    date: document.getElementById('pm-milestone-date').value,
+    status: document.getElementById('pm-milestone-status').value,
+    description: document.getElementById('pm-milestone-desc').value.trim(),
+    projectId: document.getElementById('pm-milestone-project').value,
+    createdAt: new Date().toISOString()
+  };
+  if (!store.pmMilestones) store.pmMilestones = [];
+  store.pmMilestones.push(milestone);
+  saveStore();
+  closeModal('pm-new-milestone-modal');
+  showToast('✅ Milestone saved!', 'success');
+  // Reset form
+  document.getElementById('pm-milestone-form').reset();
+  // Refresh gantt if visible
+  if (document.querySelector('.pm-tab[data-tab="schedule"]')?.classList.contains('active')) {
+    renderGanttChart();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PM RESOURCE HANDLERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function openPMResourceModal() {
+  // Populate person dropdown from payroll
+  const sel = document.getElementById('pm-resource-person');
+  if (sel) {
+    sel.innerHTML = '<option value="">— Select Person —</option>';
+    const employees = store.payroll?.employees || [];
+    const contractors = store.payroll?.contractors || [];
+    if (employees.length) {
+      const eg = document.createElement('optgroup');
+      eg.label = 'Employees';
+      employees.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.id || e.name;
+        opt.textContent = e.name + (e.trade ? ` (${e.trade})` : '');
+        eg.appendChild(opt);
+      });
+      sel.appendChild(eg);
+    }
+    if (contractors.length) {
+      const cg = document.createElement('optgroup');
+      cg.label = 'Contractors';
+      contractors.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id || c.name;
+        opt.textContent = c.name + (c.trade ? ` (${c.trade})` : '');
+        cg.appendChild(opt);
+      });
+      sel.appendChild(cg);
+    }
+    if (!employees.length && !contractors.length) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'No staff found — add in Payroll first';
+      sel.appendChild(opt);
+    }
+  }
+  openModal('pm-assign-resource-modal');
+}
+
+function savePMResource(event) {
+  event.preventDefault();
+  const personSel = document.getElementById('pm-resource-person');
+  const personName = personSel.options[personSel.selectedIndex]?.text || '';
+  const resource = {
+    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+    personId: document.getElementById('pm-resource-person').value,
+    personName: personName,
+    role: document.getElementById('pm-resource-role').value.trim(),
+    startDate: document.getElementById('pm-resource-start').value,
+    endDate: document.getElementById('pm-resource-end').value,
+    dailyHours: parseFloat(document.getElementById('pm-resource-hours').value) || 8,
+    dailyRate: parseFloat(document.getElementById('pm-resource-rate').value) || 0,
+    notes: document.getElementById('pm-resource-notes').value.trim(),
+    createdAt: new Date().toISOString()
+  };
+  if (!store.pmResources) store.pmResources = [];
+  store.pmResources.push(resource);
+  saveStore();
+  closeModal('pm-assign-resource-modal');
+  showToast('✅ Resource assigned!', 'success');
+  document.getElementById('pm-resource-form').reset();
+  // Refresh resources tab if visible
+  if (document.querySelector('.pm-tab[data-tab="resources"]')?.classList.contains('active')) {
+    renderResourcesTab();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PM RISK HANDLERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function savePMRisk(event) {
+  event.preventDefault();
+  const risk = {
+    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+    title: document.getElementById('pm-risk-title').value.trim(),
+    category: document.getElementById('pm-risk-category').value,
+    probability: document.getElementById('pm-risk-probability').value,
+    impact: document.getElementById('pm-risk-impact').value,
+    description: document.getElementById('pm-risk-desc').value.trim(),
+    mitigation: document.getElementById('pm-risk-mitigation').value.trim(),
+    owner: document.getElementById('pm-risk-owner').value.trim(),
+    status: document.getElementById('pm-risk-status').value,
+    createdAt: new Date().toISOString()
+  };
+  if (!store.pmRisks) store.pmRisks = [];
+  store.pmRisks.push(risk);
+  saveStore();
+  closeModal('pm-new-risk-modal');
+  showToast('⚠️ Risk logged!', 'warning');
+  document.getElementById('pm-risk-form').reset();
+  if (document.querySelector('.pm-tab[data-tab="risks"]')?.classList.contains('active')) {
+    renderRisksTab();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PM ISSUE HANDLERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function savePMIssue(event) {
+  event.preventDefault();
+  const issue = {
+    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+    title: document.getElementById('pm-issue-title').value.trim(),
+    type: document.getElementById('pm-issue-type').value,
+    priority: document.getElementById('pm-issue-priority').value,
+    status: document.getElementById('pm-issue-status').value,
+    description: document.getElementById('pm-issue-desc').value.trim(),
+    assignee: document.getElementById('pm-issue-assignee').value.trim(),
+    dueDate: document.getElementById('pm-issue-due').value,
+    resolution: document.getElementById('pm-issue-resolution').value.trim(),
+    createdAt: new Date().toISOString()
+  };
+  if (!store.pmIssues) store.pmIssues = [];
+  store.pmIssues.push(issue);
+  saveStore();
+  closeModal('pm-new-issue-modal');
+  showToast('🚨 Issue logged!', 'error');
+  document.getElementById('pm-issue-form').reset();
+  if (document.querySelector('.pm-tab[data-tab="issues"]')?.classList.contains('active')) {
+    renderIssuesTab();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PM CLIENT UPDATE HANDLERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function savePMClientUpdate(event) {
+  event.preventDefault();
+  const update = {
+    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+    title: document.getElementById('pm-client-update-title').value.trim(),
+    type: document.getElementById('pm-client-update-type').value,
+    progress: parseInt(document.getElementById('pm-client-update-progress').value) || null,
+    message: document.getElementById('pm-client-update-message').value.trim(),
+    nextSteps: document.getElementById('pm-client-update-next').value.trim(),
+    notifyClient: document.getElementById('pm-client-update-notify').checked,
+    includePhotos: document.getElementById('pm-client-update-photos').checked,
+    postedAt: new Date().toISOString(),
+    postedBy: currentUser?.name || 'Project Manager'
+  };
+  if (!store.pmClientUpdates) store.pmClientUpdates = [];
+  store.pmClientUpdates.push(update);
+  saveStore();
+  closeModal('pm-client-update-modal');
+  showToast('📢 Client update posted!', 'success');
+  document.getElementById('pm-client-update-form').reset();
+  if (document.querySelector('.pm-tab[data-tab="client"]')?.classList.contains('active')) {
+    renderClientPortal();
+  }
+}
