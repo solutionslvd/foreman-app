@@ -254,6 +254,8 @@ function showApp() {
   document.getElementById('main-app').classList.remove('hidden');
   setupUserUI();
   loadDashboard();
+  // Refresh notification badge on every app load
+  setTimeout(updateNotifBadge, 300);
 }
 
 function showForm(formId) {
@@ -3320,8 +3322,263 @@ document.addEventListener('click', (e) => {
 // ═══════════════════════════════════════════════════════════
 // NOTIFICATIONS
 // ═══════════════════════════════════════════════════════════
+// ── Notification store ──────────────────────────────────────
+// Each item: { id, type, category, title, desc, time, read }
+// categories: 'tasks' | 'alerts' | 'info'
+function getNotifStore() {
+  if (!store.notifications) store.notifications = [];
+  return store.notifications;
+}
+
+function buildNotifications() {
+  const now = new Date();
+  const generated = [];
+
+  // 1. Overdue tasks
+  const tasks = store.pmTasks || [];
+  tasks.forEach(task => {
+    if (task.status === 'done') return;
+    if (!task.dueDate) return;
+    const due = new Date(task.dueDate);
+    const diffDays = Math.floor((now - due) / 86400000);
+    if (diffDays > 0) {
+      generated.push({
+        id: 'task-overdue-' + task.id,
+        type: 'overdue',
+        category: 'tasks',
+        icon: '🚨',
+        title: 'Overdue Task: ' + task.title,
+        desc: 'Was due ' + diffDays + ' day' + (diffDays > 1 ? 's' : '') + ' ago' +
+              (task.assigneeName ? ' · Assigned to ' + task.assigneeName : ''),
+        time: task.dueDate,
+        read: false
+      });
+    } else if (diffDays >= -2) {
+      generated.push({
+        id: 'task-due-soon-' + task.id,
+        type: 'warning',
+        category: 'tasks',
+        icon: '⏰',
+        title: 'Due Soon: ' + task.title,
+        desc: diffDays === 0 ? 'Due today!' : 'Due in ' + Math.abs(diffDays) + ' day' + (Math.abs(diffDays) > 1 ? 's' : '') +
+              (task.assigneeName ? ' · ' + task.assigneeName : ''),
+        time: task.dueDate,
+        read: false
+      });
+    }
+  });
+
+  // 2. Open high-priority issues
+  const issues = store.pmIssues || [];
+  issues.forEach(issue => {
+    if (issue.status === 'resolved' || issue.status === 'closed') return;
+    if (issue.priority === 'critical' || issue.priority === 'high') {
+      generated.push({
+        id: 'issue-open-' + issue.id,
+        type: 'overdue',
+        category: 'alerts',
+        icon: '🔴',
+        title: (issue.priority === 'critical' ? 'Critical' : 'High') + ' Issue: ' + issue.title,
+        desc: 'Status: ' + issue.status + (issue.assignee ? ' · Assigned to ' + issue.assignee : ''),
+        time: issue.date || '',
+        read: false
+      });
+    }
+  });
+
+  // 3. High-probability risks
+  const risks = store.pmRisks || [];
+  risks.forEach(risk => {
+    if (risk.status === 'mitigated' || risk.status === 'closed') return;
+    if (risk.score >= 6 || risk.impact === 'high') {
+      generated.push({
+        id: 'risk-' + risk.id,
+        type: 'warning',
+        category: 'alerts',
+        icon: '⚠️',
+        title: 'Risk Alert: ' + risk.description,
+        desc: 'Category: ' + risk.category + ' · Score: ' + (risk.score || 'N/A') + ' · Owner: ' + (risk.owner || 'Unassigned'),
+        time: '',
+        read: false
+      });
+    }
+  });
+
+  // 4. Recently completed tasks (last 48h)
+  tasks.forEach(task => {
+    if (task.status !== 'done' || !task.completedDate) return;
+    const comp = new Date(task.completedDate);
+    const diffH = Math.floor((now - comp) / 3600000);
+    if (diffH <= 48) {
+      generated.push({
+        id: 'task-done-' + task.id,
+        type: 'success',
+        category: 'tasks',
+        icon: '✅',
+        title: 'Task Completed: ' + task.title,
+        desc: 'Completed ' + (diffH < 1 ? 'just now' : diffH + 'h ago') +
+              (task.assigneeName ? ' by ' + task.assigneeName : ''),
+        time: task.completedDate,
+        read: false
+      });
+    }
+  });
+
+  // 5. Projects summary
+  const projects = store.projects || [];
+  if (projects.length > 0) {
+    const activeProjects = projects.filter(p => p.status !== 'completed' && p.status !== 'cancelled');
+    if (activeProjects.length > 0) {
+      generated.push({
+        id: 'projects-active',
+        type: 'info',
+        category: 'info',
+        icon: '🏗️',
+        title: activeProjects.length + ' Active Project' + (activeProjects.length > 1 ? 's' : ''),
+        desc: activeProjects.slice(0, 3).map(p => p.name || p.title || 'Untitled').join(', ') +
+              (activeProjects.length > 3 ? ` and ${activeProjects.length - 3} more` : ''),
+        time: '',
+        read: true
+      });
+    }
+  }
+
+  // Merge with existing store — preserve read state, add new ones
+  const existing = getNotifStore();
+  store.notifications = generated.map(n => {
+    const e = existing.find(x => x.id === n.id);
+    return e ? { ...n, read: e.read } : n;
+  });
+
+  saveStore();
+  return store.notifications;
+}
+
+function updateNotifBadge() {
+  const notifs = buildNotifications();
+  const unread = notifs.filter(n => !n.read).length;
+  const badge = document.getElementById('notif-count');
+  if (badge) {
+    badge.textContent = unread > 99 ? '99+' : unread;
+    if (unread > 0) {
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+}
+
 function showNotifications() {
-  showToast('No new notifications', 'info');
+  const panel = document.getElementById('notifications-panel');
+  const overlay = document.getElementById('notif-overlay');
+  if (!panel) return;
+
+  // Close user menu if open
+  const userMenu = document.getElementById('user-menu');
+  if (userMenu && !userMenu.classList.contains('hidden')) {
+    userMenu.classList.add('hidden');
+  }
+
+  if (!panel.classList.contains('hidden')) {
+    closeNotifications();
+    return;
+  }
+
+  renderNotifPanel('all');
+  panel.classList.remove('hidden');
+  if (overlay) overlay.classList.remove('hidden');
+}
+
+function closeNotifications() {
+  const panel = document.getElementById('notifications-panel');
+  const overlay = document.getElementById('notif-overlay');
+  if (panel) panel.classList.add('hidden');
+  if (overlay) overlay.classList.add('hidden');
+}
+
+function switchNotifTab(tab, btn) {
+  document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderNotifPanel(tab);
+}
+
+function renderNotifPanel(filter) {
+  const list = document.getElementById('notif-list');
+  if (!list) return;
+
+  const notifs = buildNotifications();
+  let filtered = notifs;
+  if (filter === 'unread') filtered = notifs.filter(n => !n.read);
+  else if (filter === 'tasks') filtered = notifs.filter(n => n.category === 'tasks');
+  else if (filter === 'alerts') filtered = notifs.filter(n => n.category === 'alerts');
+
+  if (filtered.length === 0) {
+    list.innerHTML = `
+      <div class="notif-empty">
+        <span class="notif-empty-icon">✅</span>
+        <p>${filter === 'unread' ? 'No unread notifications' : "You're all caught up!"}</p>
+      </div>`;
+    return;
+  }
+
+  function timeAgo(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    const diff = Math.floor((Date.now() - d) / 60000);
+    if (diff < 1) return 'just now';
+    if (diff < 60) return diff + 'm ago';
+    if (diff < 1440) return Math.floor(diff / 60) + 'h ago';
+    return Math.floor(diff / 1440) + 'd ago';
+  }
+
+  list.innerHTML = filtered.map(n => `
+    <div class="notif-item ${n.read ? '' : 'unread'} notif-type-${n.type}"
+         onclick="markNotificationRead('${n.id}', this)">
+      <div class="notif-item-icon">${n.icon || '🔔'}</div>
+      <div class="notif-item-body">
+        <p class="notif-item-title">${n.title}</p>
+        <p class="notif-item-desc">${n.desc}</p>
+        <span class="notif-item-time">${timeAgo(n.time)}</span>
+      </div>
+      ${n.read ? '' : '<div class="notif-unread-dot"></div>'}
+    </div>
+  `).join('');
+}
+
+function markNotificationRead(id, el) {
+  const notifs = getNotifStore();
+  const n = notifs.find(x => x.id === id);
+  if (n) {
+    n.read = true;
+    store.notifications = notifs;
+    saveStore();
+    if (el) {
+      el.classList.remove('unread');
+      const dot = el.querySelector('.notif-unread-dot');
+      if (dot) dot.remove();
+    }
+    updateNotifBadge();
+  }
+}
+
+function markAllNotificationsRead() {
+  const notifs = getNotifStore();
+  notifs.forEach(n => { n.read = true; });
+  store.notifications = notifs;
+  saveStore();
+  updateNotifBadge();
+  const activeTab = document.querySelector('.notif-tab.active');
+  const tabName = activeTab ? activeTab.textContent.toLowerCase() : 'all';
+  renderNotifPanel(tabName);
+}
+
+function clearAllNotifications() {
+  store.notifications = [];
+  saveStore();
+  updateNotifBadge();
+  closeNotifications();
+  showToast('Notifications cleared', 'success');
 }
 
 // ═══════════════════════════════════════════════════════════

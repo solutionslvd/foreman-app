@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="/static/app.css?v=2.3"></link>
 <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
 <body class="dark-theme">
@@ -48,7 +48,7 @@
       <button class="btn-primary btn-full" onclick="handleLogin()">
         <span>Sign In</span>
       </button>
-      <p class="auth-switch">Don't have an account? <a href="#" onclick="showForm('register-form')">Sign Up</a></p>
+      <p class="auth-switch">Don't have an account? <a href="#" onclick="showForm('register-form'); return false;">Sign Up</a></p>
       <p class="auth-switch"><a href="#" onclick="showForm('admin-login-form')">Admin Login →</a></p>
       <div style="margin-top:16px;padding:12px;background:#dbeafe;border-radius:8px;font-size:0.8rem;color:#1e40af;text-align:center">
         <strong>Demo Account:</strong><br>test@foreman.ca &bull; Test1234!
@@ -148,6 +148,33 @@
       <div class="user-avatar" onclick="toggleUserMenu()" id="user-avatar">A</div>
     </div>
   </header>
+
+  <!-- Notifications Panel -->
+  <div id="notifications-panel" class="notifications-panel hidden">
+    <div class="notif-panel-header">
+      <h3>🔔 Notifications</h3>
+      <div class="notif-header-actions">
+        <button class="notif-mark-all-btn" onclick="markAllNotificationsRead()">Mark all read</button>
+        <button class="notif-close-btn" onclick="closeNotifications()">✕</button>
+      </div>
+    </div>
+    <div class="notif-tabs">
+      <button class="notif-tab active" onclick="switchNotifTab('all', this)">All</button>
+      <button class="notif-tab" onclick="switchNotifTab('unread', this)">Unread</button>
+      <button class="notif-tab" onclick="switchNotifTab('tasks', this)">Tasks</button>
+      <button class="notif-tab" onclick="switchNotifTab('alerts', this)">Alerts</button>
+    </div>
+    <div id="notif-list" class="notif-list">
+      <div class="notif-empty">
+        <span class="notif-empty-icon">✅</span>
+        <p>You're all caught up!</p>
+      </div>
+    </div>
+    <div class="notif-panel-footer">
+      <button onclick="clearAllNotifications()" class="notif-clear-btn">Clear all notifications</button>
+    </div>
+  </div>
+  <div id="notif-overlay" class="notif-overlay hidden" onclick="closeNotifications()"></div>
 
   <!-- User Dropdown Menu -->
   <div id="user-menu" class="user-menu hidden">
@@ -3460,7 +3487,7 @@
   </div>
 </div>
 
-<script src="/static/app.js?v=2.2"></script>
+<script src="/static/app.js?v=2.3"></script>
 
 <!-- Edit Project Modal -->
 <div id="modal-edit-project" class="modal-overlay hidden">
