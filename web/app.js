@@ -6153,21 +6153,23 @@ function renderRiskMatrix() {
     if (matrixData[key]) matrixData[key].push(risk);
   });
   
+  const gridCells = ['high', 'medium', 'low'].map(impact => 
+    ['low', 'medium', 'high'].map(likelihood => {
+      const key = `${impact}-${likelihood}`;
+      const count = matrixData[key]?.length || 0;
+      const severity = getSeverityClass(impact, likelihood);
+      return `<div class="matrix-cell ${severity}" title="${capitalize(impact)} impact, ${capitalize(likelihood)} likelihood" onclick="showRisksInCell('${impact}', '${likelihood}')"><span class="cell-count">${count || ''}</span></div>`;
+    }).join('')
+  ).join('');
+
   matrix.innerHTML = `
-    <div class="matrix-y-axis"><span>High</span><span>Impact</span><span>Low</span></div>
-    <div class="matrix-grid">
-      ${['high', 'medium', 'low'].map(impact => 
-        ['low', 'medium', 'high'].map(likelihood => {
-          const key = `${impact}-${likelihood}`;
-          const count = matrixData[key]?.length || 0;
-          const severity = getSeverityClass(impact, likelihood);
-          return `<div class="matrix-cell ${severity}" onclick="showRisksInCell('${impact}', '${likelihood}')">
-            <span class="cell-count">${count || ''}</span>
-          </div>`;
-        }).join('')
-      ).join('')}
+    <div style="display:flex;gap:4px;align-items:flex-start;overflow-x:auto;padding-bottom:4px">
+      <div class="matrix-y-axis"><span>High</span><span style="font-weight:600;opacity:0.7">Impact</span><span>Low</span></div>
+      <div>
+        <div class="matrix-grid">${gridCells}</div>
+        <div class="matrix-x-axis"><span>Low</span><span style="font-weight:600;opacity:0.7">Likelihood</span><span>High</span></div>
+      </div>
     </div>
-    <div class="matrix-x-axis"><span>Low</span><span>Likelihood</span><span>High</span></div>
   `;
 }
 

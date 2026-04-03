@@ -3236,21 +3236,28 @@ img { max-width: 100%; }
 
 /* ── Risk Management ─────────────────────────────────────────────────────── */
 /* Risk matrix rendered by renderRiskMatrix() in JS */
+/* Layout: [y-axis col] [grid+x-axis stacked] */
 #pm-risk-matrix {
   overflow-x: auto;
   margin-bottom: 20px;
 }
 .matrix-y-axis {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
-  font-size: 10px;
+  align-items: center;
+  font-size: 9px;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 2px 4px;
-  max-width: 148px;
+  letter-spacing: 0.3px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  height: 140px;
+  padding: 4px 0;
+  margin-right: 6px;
+  flex-shrink: 0;
 }
+.matrix-y-axis span { writing-mode: vertical-rl; transform: rotate(180deg); }
 .matrix-grid {
   display: grid;
   grid-template-columns: repeat(3, 44px);
@@ -3274,12 +3281,12 @@ img { max-width: 100%; }
 .matrix-x-axis {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 4px 4px 0;
-  max-width: 148px;
+  letter-spacing: 0.3px;
+  padding: 4px 0 0;
+  width: 140px;
 }
 
 .risk-matrix {
