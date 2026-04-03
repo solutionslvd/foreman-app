@@ -5889,17 +5889,21 @@ function renderGanttChart() {
   // Generate task list
   const taskListContainer = document.getElementById('gantt-tasks');
   if (taskListContainer) {
-    let html = '';
-    tasks.forEach(task => {
-      const icon = getCategoryIcon(task.category);
-      html += `
-        <div class="gantt-task-item ${task.category}" onclick="openTaskDetail(${task.id})">
-          <span class="task-indent ${task.status === 'done' ? 'completed' : ''}"></span>
-          <span class="task-name">${icon} ${task.title}</span>
-        </div>
-      `;
-    });
-    taskListContainer.innerHTML = html;
+    if (tasks.length === 0) {
+      taskListContainer.innerHTML = '<div class="pm-empty-mini"><span style="font-size:20px">📅</span><p>No tasks yet. Add tasks in the <strong>Tasks</strong> tab to see the schedule.</p></div>';
+    } else {
+      let html = '';
+      tasks.forEach(task => {
+        const icon = getCategoryIcon(task.category);
+        html += `
+          <div class="gantt-task-item ${task.category}" onclick="openTaskDetail('${task.id}')">
+            <span class="task-indent ${task.status === 'done' ? 'completed' : ''}"></span>
+            <span class="task-name">${icon} ${escapeHtml(task.title)}</span>
+          </div>
+        `;
+      });
+      taskListContainer.innerHTML = html;
+    }
   }
   
   // Generate bars
@@ -6187,17 +6191,24 @@ function renderRiskRegister() {
   
   const risks = store.pmRisks || [];
   
+  if (risks.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted)">
+      <div style="font-size:24px;margin-bottom:8px">⚠️</div>
+      <div>No risks logged yet. Click <strong>+ Add Risk</strong> to start tracking.</div>
+    </td></tr>`;
+    return;
+  }
   tbody.innerHTML = risks.map(risk => `
     <tr class="risk-row ${getSeverityClass(risk.impact, risk.likelihood)}" onclick="openRiskDetail('${risk.id}')">
-      <td>${risk.id}</td>
-      <td>${risk.description}</td>
-      <td>${risk.category}</td>
-      <td class="impact-${risk.impact}">${capitalize(risk.impact)}</td>
-      <td class="likelihood-${risk.likelihood}">${capitalize(risk.likelihood)}</td>
-      <td class="score-${getSeverityClass(risk.impact, risk.likelihood)}">${risk.score}</td>
-      <td>${risk.mitigation || '-'}</td>
-      <td>${risk.owner}</td>
-      <td><span class="status-badge ${risk.status}">${capitalize(risk.status)}</span></td>
+      <td>${escapeHtml(risk.id || '')}</td>
+      <td>${escapeHtml(risk.description || risk.title || '')}</td>
+      <td>${escapeHtml(risk.category || '')}</td>
+      <td class="impact-${risk.impact}">${capitalize(risk.impact || '')}</td>
+      <td class="likelihood-${risk.likelihood}">${capitalize(risk.likelihood || '')}</td>
+      <td class="score-${getSeverityClass(risk.impact, risk.likelihood)}">${risk.score || getRiskScore(risk.impact, risk.likelihood)}</td>
+      <td>${escapeHtml(risk.mitigation || '-')}</td>
+      <td>${escapeHtml(risk.owner || '-')}</td>
+      <td><span class="status-badge ${risk.status}">${capitalize(risk.status || '')}</span></td>
     </tr>
   `).join('');
 }
@@ -6205,8 +6216,7 @@ function renderRiskRegister() {
 function openRiskDetail(riskId) {
   const risk = (store.pmRisks || []).find(r => r.id === riskId);
   if (!risk) return;
-  
-  alert(`Risk: ${risk.description}\n\nMitigation: ${risk.mitigation}\nOwner: ${risk.owner}\nStatus: ${risk.status}`);
+  showToast(`Risk: ${risk.description || risk.title} — Owner: ${risk.owner || 'N/A'} | Status: ${risk.status}`, 'info');
 }
 
 function setRiskView(view) {
@@ -6249,19 +6259,23 @@ function renderIssueList() {
   
   const issues = store.pmIssues || [];
   
+  if (issues.length === 0) {
+    container.innerHTML = `<div class="pm-empty-mini"><span style="font-size:24px">🔧</span><p>No issues logged yet. Click <strong>+ Log Issue</strong> to track problems and change requests.</p></div>`;
+    return;
+  }
   container.innerHTML = issues.map(issue => `
     <div class="issue-item ${issue.priority}" onclick="openIssueDetail('${issue.id}')">
       <div class="issue-header">
-        <span class="issue-id">${issue.id}</span>
-        <span class="issue-priority ${issue.priority}">${capitalize(issue.priority)}</span>
-        <span class="issue-status ${issue.status}">${capitalize(issue.status.replace('-', ' '))}</span>
+        <span class="issue-id">${escapeHtml(issue.id || '')}</span>
+        <span class="issue-priority ${issue.priority}">${capitalize(issue.priority || '')}</span>
+        <span class="issue-status ${issue.status}">${capitalize((issue.status || '').replace('-', ' '))}</span>
       </div>
-      <h4 class="issue-title">${issue.title}</h4>
-      <p class="issue-desc">${issue.description}</p>
+      <h4 class="issue-title">${escapeHtml(issue.title || '')}</h4>
+      <p class="issue-desc">${escapeHtml(issue.description || '')}</p>
       <div class="issue-meta">
-        <span class="issue-date">Reported: ${issue.date}</span>
-        <span class="issue-reporter">by ${issue.reporter}</span>
-        <span class="issue-assignee">Assigned: ${issue.assignee}</span>
+        <span class="issue-date">Reported: ${escapeHtml(issue.date || '')}</span>
+        <span class="issue-reporter">by ${escapeHtml(issue.reporter || '')}</span>
+        <span class="issue-assignee">Assigned: ${escapeHtml(issue.assignee || '-')}</span>
       </div>
       ${issue.comments ? `<div class="issue-actions"><span class="issue-comments">💬 ${issue.comments} comments</span></div>` : ''}
     </div>
@@ -6271,31 +6285,32 @@ function renderIssueList() {
 function openIssueDetail(issueId) {
   const issue = (store.pmIssues || []).find(i => i.id === issueId);
   if (!issue) return;
-  
-  alert(`Issue: ${issue.title}\n\n${issue.description}\n\nStatus: ${issue.status}\nAssigned to: ${issue.assignee}`);
+  showToast(`${issue.title} — ${issue.status} | Assigned: ${issue.assignee || 'N/A'}`, 'info');
 }
 
 function renderChangeRequests() {
   const container = document.getElementById('pm-change-requests');
   if (!container) return;
   
-  const crs = store.pmChangeRequests || [
-    { id: 'CR-001', title: 'Client requested additional bathroom', description: 'Add half-bath on main floor. Impact: $8,500, +5 days', status: 'pending' },
-    { id: 'CR-002', title: 'Upgrade kitchen countertops to granite', description: 'Client upgrade. Cost adjustment: +$3,200', status: 'approved' }
-  ];
+  const crs = store.pmChangeRequests || [];
+  
+  if (crs.length === 0) {
+    container.innerHTML = `<div class="pm-empty-mini"><span style="font-size:20px">📝</span><p>No change requests yet. Use <strong>+ Add Change Request</strong> to track scope changes.</p></div>`;
+    return;
+  }
   
   container.innerHTML = crs.map(cr => `
     <div class="change-request-item ${cr.status}">
       <div class="cr-header">
-        <span class="cr-id">${cr.id}</span>
-        <span class="cr-status ${cr.status}">${capitalize(cr.status)}</span>
+        <span class="cr-id">${escapeHtml(cr.id || '')}</span>
+        <span class="cr-status ${cr.status}">${capitalize(cr.status || '')}</span>
       </div>
-      <h4>${cr.title}</h4>
-      <p>${cr.description}</p>
+      <h4>${escapeHtml(cr.title || '')}</h4>
+      <p>${escapeHtml(cr.description || '')}</p>
       ${cr.status === 'pending' ? `
         <div class="cr-actions">
-          <button class="btn-primary btn-sm" onclick="approveChangeRequest('${cr.id}')">Approve</button>
-          <button class="btn-secondary btn-sm" onclick="rejectChangeRequest('${cr.id}')">Reject</button>
+          <button class="btn btn-primary btn-sm" onclick="approveChangeRequest('${cr.id}')">✓ Approve</button>
+          <button class="btn btn-secondary btn-sm" onclick="rejectChangeRequest('${cr.id}')">✗ Reject</button>
         </div>
       ` : ''}
     </div>
@@ -6303,12 +6318,23 @@ function renderChangeRequests() {
 }
 
 function approveChangeRequest(crId) {
-  alert(`Change request ${crId} approved!`);
-  // In real app, would update status and log
+  const cr = (store.pmChangeRequests || []).find(c => c.id === crId);
+  if (!cr) return;
+  cr.status = 'approved';
+  saveStore();
+  logPMActivity(`Approved change request: "${cr.title}"`);
+  renderChangeRequests();
+  showToast(`Change request ${crId} approved!`, 'success');
 }
 
 function rejectChangeRequest(crId) {
-  alert(`Change request ${crId} rejected.`);
+  const cr = (store.pmChangeRequests || []).find(c => c.id === crId);
+  if (!cr) return;
+  cr.status = 'rejected';
+  saveStore();
+  logPMActivity(`Rejected change request: "${cr.title}"`);
+  renderChangeRequests();
+  showToast(`Change request ${crId} rejected.`, 'warning');
 }
 
 function filterIssues() {
@@ -6322,40 +6348,76 @@ function filterIssues() {
 function renderReportsTab() {
   const container = document.getElementById('pm-reports-container');
   if (!container) return;
-  
+
   const tasks = store.pmTasks || [];
+  const risks = store.pmRisks || [];
+  const issues = store.pmIssues || [];
+
+  if (tasks.length === 0 && risks.length === 0 && issues.length === 0) {
+    container.innerHTML = `<div class="pm-empty-mini" style="padding:48px 24px">
+      <span style="font-size:32px">📊</span>
+      <h3 style="margin:12px 0 8px;color:var(--text-primary)">No Report Data Yet</h3>
+      <p>Add projects, tasks, and track progress to generate reports.</p>
+    </div>`;
+    renderAuditLog();
+    return;
+  }
+
   const completed = tasks.filter(t => t.status === 'done').length;
+  const inProgress = tasks.filter(t => t.status === 'inprogress').length;
+  const inReview = tasks.filter(t => t.status === 'review').length;
+  const todo = tasks.filter(t => t.status === 'todo').length;
   const total = tasks.length;
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
-  
+
+  const overdueCount = tasks.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'done').length;
+  const openRisks = risks.filter(r => r.status !== 'closed').length;
+  const criticalRisks = risks.filter(r => r.severity === 'critical' || getSeverityClass(r.impact, r.likelihood) === 'critical').length;
+  const openIssues = issues.filter(i => i.status !== 'resolved' && i.status !== 'closed').length;
+
+  const statusClass = overdueCount > 0 || criticalRisks > 0 ? 'at-risk' : openRisks > 2 ? 'warning' : 'on-track';
+  const statusLabel = statusClass === 'at-risk' ? '⚠️ At Risk' : statusClass === 'warning' ? '🟡 Monitor' : '✅ On Track';
+
   container.innerHTML = `
     <div class="report-card">
       <div class="report-header">
         <h3>📊 Executive Summary</h3>
-        <span class="report-date">Generated: ${new Date().toLocaleDateString()}</span>
+        <span class="report-date">Generated: ${new Date().toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
       </div>
       <div class="report-content">
         <div class="report-section">
           <h4>Project Overview</h4>
-          <p><strong>Status:</strong> <span class="status-text on-track">On Track</span></p>
+          <p><strong>Status:</strong> <span class="status-text ${statusClass}">${statusLabel}</span></p>
           <p><strong>Completion:</strong> ${progress}%</p>
           <p><strong>Tasks:</strong> ${completed} of ${total} completed</p>
+          ${overdueCount > 0 ? `<p><strong style="color:var(--danger)">⚠️ Overdue Tasks:</strong> ${overdueCount}</p>` : ''}
         </div>
         <div class="report-section">
-          <h4>Task Status</h4>
+          <h4>Task Breakdown</h4>
           <div class="schedule-summary">
             <div class="schedule-item">
-              <span class="schedule-label">Progress</span>
+              <span class="schedule-label">Overall Progress</span>
               <div class="schedule-bar"><div class="schedule-fill actual" style="width: ${progress}%"></div></div>
               <span>${progress}%</span>
             </div>
           </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
+            <span style="color:var(--text-secondary);font-size:13px">📋 To Do: <strong>${todo}</strong></span>
+            <span style="color:var(--info);font-size:13px">🔄 In Progress: <strong>${inProgress}</strong></span>
+            <span style="color:var(--warning);font-size:13px">👀 Review: <strong>${inReview}</strong></span>
+            <span style="color:var(--success);font-size:13px">✅ Done: <strong>${completed}</strong></span>
+          </div>
+        </div>
+        <div class="report-section">
+          <h4>Risk & Issues Summary</h4>
+          <p><strong>Open Risks:</strong> ${openRisks} ${criticalRisks > 0 ? `<span style="color:var(--danger)">(${criticalRisks} critical)</span>` : ''}</p>
+          <p><strong>Open Issues:</strong> ${openIssues}</p>
+          <p><strong>Change Requests:</strong> ${(store.pmChangeRequests || []).filter(c => c.status === 'pending').length} pending</p>
         </div>
       </div>
     </div>
   `;
-  
-  // Render audit log
+
   renderAuditLog();
 }
 
@@ -6363,27 +6425,76 @@ function renderAuditLog() {
   const container = document.getElementById('pm-audit-log');
   if (!container) return;
   
-  const activities = store.pmActivities || [
-    { time: 'Dec 15, 2024 2:30 PM', user: 'John Doe', action: 'Updated task "Electrical rough-in" status' },
-    { time: 'Dec 15, 2024 11:45 AM', user: 'Sarah Miller', action: 'Added comment to issue I001' },
-    { time: 'Dec 15, 2024 9:00 AM', user: 'System', action: 'Generated daily status report' }
-  ];
+  const activities = store.pmActivities || [];
   
-  container.innerHTML = activities.map(a => `
+  if (activities.length === 0) {
+    container.innerHTML = `
+      <div class="pm-empty-mini">
+        <span style="font-size:20px">📋</span>
+        <p>No activity yet. Actions on tasks, risks, and issues will appear here.</p>
+      </div>`;
+    return;
+  }
+  
+  container.innerHTML = activities.slice().reverse().slice(0, 50).map(a => `
     <div class="audit-entry">
-      <span class="audit-time">${a.time}</span>
-      <span class="audit-user">${a.user}</span>
-      <span class="audit-action">${a.action}</span>
+      <span class="audit-time">${a.time || ''}</span>
+      <span class="audit-user">${escapeHtml(a.user || 'System')}</span>
+      <span class="audit-action">${escapeHtml(a.action || '')}</span>
     </div>
   `).join('');
 }
 
+function logPMActivity(action, user) {
+  if (!store.pmActivities) store.pmActivities = [];
+  const now = new Date();
+  const timeStr = now.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }) 
+    + ' ' + now.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', hour12: true });
+  store.pmActivities.push({
+    time: timeStr,
+    user: user || (store.currentUser?.name || store.currentUser?.email || 'You'),
+    action: action
+  });
+  if (store.pmActivities.length > 200) store.pmActivities = store.pmActivities.slice(-200);
+  saveStore();
+}
+
 function generatePMReport() {
-  alert('Report generated! In a full implementation, this would create a PDF report.');
+  const tasks = store.pmTasks || [];
+  const risks = store.pmRisks || [];
+  const issues = store.pmIssues || [];
+  const done = tasks.filter(t => t.status === 'done').length;
+  const inProgress = tasks.filter(t => t.status === 'inprogress').length;
+  const openRisks = risks.filter(r => r.status !== 'closed').length;
+  const openIssues = issues.filter(i => i.status !== 'resolved' && i.status !== 'closed').length;
+  showToast(`Report ready: ${tasks.length} tasks (${done} done, ${inProgress} in progress), ${openRisks} open risks, ${openIssues} open issues`, 'success');
+  logPMActivity('Generated PM status report');
 }
 
 function exportPMReport() {
-  alert('Export feature would download the report as PDF.');
+  const tasks = store.pmTasks || [];
+  const risks = store.pmRisks || [];
+  const issues = store.pmIssues || [];
+  const lines = [
+    'Project Management Report',
+    'Generated: ' + new Date().toLocaleString(),
+    '',
+    '--- TASKS ---',
+    ...tasks.map(t => `[${t.status}] ${t.title} (${t.assignee || 'Unassigned'})`),
+    '',
+    '--- RISKS ---',
+    ...risks.map(r => `[${r.severity}] ${r.title} - ${r.status}`),
+    '',
+    '--- ISSUES ---',
+    ...issues.map(i => `[${i.priority}] ${i.title} - ${i.status}`)
+  ];
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pm-report-' + new Date().toISOString().slice(0, 10) + '.txt';
+  a.click();
+  showToast('Report exported!', 'success');
+  logPMActivity('Exported PM report');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -6396,8 +6507,7 @@ function renderClientPortal() {
     const tasks = store.pmTasks || [];
     const completed = tasks.filter(t => t.status === 'done').length;
     const total = tasks.length;
-    const progress = total > 0 ? Math.round((completed / total) * 100) : 45;
-    
+    const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
     progressRing.innerHTML = `
       <div class="client-progress-ring">
         <svg viewBox="0 0 36 36">
@@ -6408,60 +6518,84 @@ function renderClientPortal() {
       </div>
     `;
   }
-  
+
   const updatesList = document.getElementById('client-updates-list');
   if (updatesList) {
-    updatesList.innerHTML = `
-      <div class="client-update">
-        <div class="update-date">Dec 14, 2024</div>
-        <h4>Framing Complete - Inspection Passed!</h4>
-        <p>We've completed all framing work and passed the city inspection.</p>
-      </div>
-      <div class="client-update">
-        <div class="update-date">Dec 10, 2024</div>
-        <h4>Roof Trusses Installed</h4>
-        <p>The roof trusses have been installed and sheathed.</p>
-      </div>
-    `;
+    const updates = store.clientUpdates || [];
+    if (updates.length === 0) {
+      updatesList.innerHTML = `<div class="pm-empty-mini"><span style="font-size:20px">📢</span><p>No updates posted yet. Use the button above to share a project update with your client.</p></div>`;
+    } else {
+      updatesList.innerHTML = updates.slice().reverse().map(u => `
+        <div class="client-update">
+          <div class="update-date">${escapeHtml(u.date || '')}</div>
+          <h4>${escapeHtml(u.title || '')}</h4>
+          <p>${escapeHtml(u.body || '')}</p>
+        </div>
+      `).join('');
+    }
   }
-  
+
   const messagesList = document.getElementById('client-messages-list');
   if (messagesList) {
-    messagesList.innerHTML = `
-      <div class="client-message from-builder">
-        <div class="msg-avatar">JD</div>
-        <div class="msg-bubble">
-          <p>Framing inspection passed today!</p>
-          <span class="msg-time">Dec 14, 2:30 PM</span>
-        </div>
-      </div>
-    `;
+    const messages = store.clientMessages || [];
+    if (messages.length === 0) {
+      messagesList.innerHTML = `<div class="pm-empty-mini"><span style="font-size:20px">💬</span><p>No messages yet. Send a message to start the conversation.</p></div>`;
+    } else {
+      messagesList.innerHTML = messages.map(m => {
+        const initials = (m.user || 'You').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        return `
+          <div class="client-message from-builder">
+            <div class="msg-avatar">${initials}</div>
+            <div class="msg-bubble">
+              <p>${escapeHtml(m.text || '')}</p>
+              <span class="msg-time">${escapeHtml(m.time || '')}</span>
+            </div>
+          </div>`;
+      }).join('');
+      messagesList.scrollTop = messagesList.scrollHeight;
+    }
   }
 }
 
+function postClientUpdate() {
+  const title = prompt('Update title (e.g. "Framing Complete"):');
+  if (!title || !title.trim()) return;
+  const body = prompt('Update details:');
+  if (!body || !body.trim()) return;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
+  if (!store.clientUpdates) store.clientUpdates = [];
+  store.clientUpdates.push({ date: dateStr, title: title.trim(), body: body.trim() });
+  saveStore();
+  logPMActivity('Posted client update: "' + title.trim() + '"');
+  renderClientPortal();
+  showToast('Client update posted!', 'success');
+}
+
 function shareClientPortal() {
-  alert('Client portal link copied to clipboard!\n\nIn a full implementation, this would generate a shareable link for your client.');
+  const url = window.location.href;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => showToast('Portal link copied to clipboard!', 'success'));
+  } else {
+    showToast('Copy this link to share with your client: ' + url, 'info');
+  }
 }
 
 function sendClientMessage() {
   const input = document.getElementById('client-message-input');
   if (!input || !input.value.trim()) return;
-  
-  const messagesList = document.getElementById('client-messages-list');
-  if (messagesList) {
-    const newMessage = document.createElement('div');
-    newMessage.className = 'client-message from-builder';
-    newMessage.innerHTML = `
-      <div class="msg-avatar">You</div>
-      <div class="msg-bubble">
-        <p>${input.value}</p>
-        <span class="msg-time">Just now</span>
-      </div>
-    `;
-    messagesList.appendChild(newMessage);
-    input.value = '';
-    messagesList.scrollTop = messagesList.scrollHeight;
-  }
+  const text = input.value.trim();
+  const now = new Date();
+  const timeStr = now.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) 
+    + ', ' + now.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit', hour12: true });
+  const user = store.currentUser?.name || store.currentUser?.email || 'You';
+  if (!store.clientMessages) store.clientMessages = [];
+  store.clientMessages.push({ text, time: timeStr, user });
+  if (store.clientMessages.length > 100) store.clientMessages = store.clientMessages.slice(-100);
+  saveStore();
+  logPMActivity('Sent client message');
+  input.value = '';
+  renderClientPortal();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -6490,13 +6624,16 @@ function addPMActivity(action) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function showAIDetail(type) {
+  const tasks = store.pmTasks || [];
+  const done = tasks.filter(t => t.status === 'done').length;
+  const total = tasks.length;
+  const progress = total > 0 ? Math.round((done / total) * 100) : 0;
   const insights = {
-    schedule: 'Based on current progress analysis, the electrical work is taking longer than planned. Consider adding a second electrician or scheduling overtime.',
-    resource: 'Your plumbing team (Mike) has availability next week. You could advance the bathroom rough-in to balance workload.',
-    budget: 'Current spending trajectory shows you\'ll finish 3% under budget. Material costs have been well-controlled.'
+    schedule: `Schedule Analysis: ${progress}% of tasks complete (${done}/${total}). ${progress < 50 ? 'Project is in early stages — ensure milestones are on track.' : progress < 80 ? 'Good progress. Review any overdue tasks.' : 'Approaching completion — focus on final inspections and closeout.'}`,
+    resource: `Resource Analysis: ${(store.pmResources || []).length} resources assigned. Review the Resources tab to balance workload across your team.`,
+    budget: `Budget Analysis: Review your Accounting tab for current spend vs. budget. Ensure change orders are captured in the Issues tab.`
   };
-  
-  alert(`AI Analysis: ${type}\n\n${insights[type] || 'No additional details available.'}`);
+  showToast(insights[type] || 'No AI insight available for this category.', 'info');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -6683,8 +6820,9 @@ function savePMTask(event) {
   }
   
   saveStore();
+  logPMActivity((taskId ? 'Updated' : 'Created') + ' task: "' + taskData.title + '"');
   closeModal('pm-new-task-modal');
-  showToast(`Task "${taskData.title}" saved!`, 'success');
+  showToast(`Task "${taskData.title}" ${taskId ? 'updated' : 'created'}!`, 'success');
   
   // Refresh displays
   renderKanbanBoard();
@@ -7286,13 +7424,11 @@ function savePMResource(event) {
   if (!store.pmResources) store.pmResources = [];
   store.pmResources.push(resource);
   saveStore();
+  logPMActivity('Assigned resource: "' + (personName || resource.role) + '"');
   closeModal('pm-assign-resource-modal');
   showToast('✅ Resource assigned!', 'success');
   document.getElementById('pm-resource-form').reset();
-  // Refresh resources tab if visible
-  if (document.querySelector('.pm-tab[data-tab="resources"]')?.classList.contains('active')) {
-    renderResourcesTab();
-  }
+  renderResourcesTab();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7313,15 +7449,19 @@ function savePMRisk(event) {
     status: document.getElementById('pm-risk-status').value,
     createdAt: new Date().toISOString()
   };
+  if (!risk.title) { showToast('Risk title is required', 'error'); return; }
+  risk.likelihood = risk.probability || 'medium';
+  risk.severity = getSeverityClass(risk.impact, risk.likelihood);
+  risk.score = getRiskScore(risk.impact, risk.likelihood);
+  risk.date = new Date().toLocaleDateString('en-CA');
   if (!store.pmRisks) store.pmRisks = [];
   store.pmRisks.push(risk);
   saveStore();
+  logPMActivity('Added risk: "' + risk.title + '"');
   closeModal('pm-new-risk-modal');
   showToast('⚠️ Risk logged!', 'warning');
   document.getElementById('pm-risk-form').reset();
-  if (document.querySelector('.pm-tab[data-tab="risks"]')?.classList.contains('active')) {
-    renderRisksTab();
-  }
+  renderRisksTab();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7342,15 +7482,17 @@ function savePMIssue(event) {
     resolution: document.getElementById('pm-issue-resolution').value.trim(),
     createdAt: new Date().toISOString()
   };
+  if (!issue.title) { showToast('Issue title is required', 'error'); return; }
+  issue.date = new Date().toLocaleDateString('en-CA');
+  issue.reporter = store.currentUser?.name || store.currentUser?.email || 'You';
   if (!store.pmIssues) store.pmIssues = [];
   store.pmIssues.push(issue);
   saveStore();
+  logPMActivity('Logged issue: "' + issue.title + '"');
   closeModal('pm-new-issue-modal');
-  showToast('🚨 Issue logged!', 'error');
+  showToast('🚨 Issue logged!', 'warning');
   document.getElementById('pm-issue-form').reset();
-  if (document.querySelector('.pm-tab[data-tab="issues"]')?.classList.contains('active')) {
-    renderIssuesTab();
-  }
+  renderIssuesTab();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7371,13 +7513,23 @@ function savePMClientUpdate(event) {
     postedAt: new Date().toISOString(),
     postedBy: currentUser?.name || 'Project Manager'
   };
-  if (!store.pmClientUpdates) store.pmClientUpdates = [];
-  store.pmClientUpdates.push(update);
+  if (!update.title) { showToast('Update title is required', 'error'); return; }
+  // Normalize to store.clientUpdates for consistency with renderClientPortal()
+  const clientUpdate = {
+    id: update.id,
+    date: new Date().toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }),
+    title: update.title,
+    body: update.message || update.nextSteps || '',
+    type: update.type,
+    progress: update.progress,
+    postedBy: update.postedBy
+  };
+  if (!store.clientUpdates) store.clientUpdates = [];
+  store.clientUpdates.push(clientUpdate);
   saveStore();
+  logPMActivity('Posted client update: "' + update.title + '"');
   closeModal('pm-client-update-modal');
   showToast('📢 Client update posted!', 'success');
   document.getElementById('pm-client-update-form').reset();
-  if (document.querySelector('.pm-tab[data-tab="client"]')?.classList.contains('active')) {
-    renderClientPortal();
-  }
+  renderClientPortal();
 }
