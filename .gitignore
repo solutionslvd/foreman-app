@@ -18,6 +18,18 @@ var/
 wheels/
 *.egg-info/
 .installed.cfg
+
+# Browser data & screenshots (dev artifacts)
+.browser_data/
+.screenshots/
+.psiphon_data/
+outputs/
+summarized_conversations/
+_superninja_startup.conf
+fix_*.py
+
+# Node
+node_modules/
 *.egg
 
 # Virtual environments

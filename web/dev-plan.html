@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Foreman AI — Comprehensive Development Plan</title>
+<style>
+  :root {
+    --orange: #f97316;
+    --orange-dark: #ea6c07;
+    --orange-light: #fff7ed;
+    --dark: #0f172a;
+    --dark2: #1e293b;
+    --dark3: #334155;
+    --gray: #64748b;
+    --gray-light: #94a3b8;
+    --border: #e2e8f0;
+    --white: #ffffff;
+    --green: #22c55e;
+    --green-light: #f0fdf4;
+    --blue: #3b82f6;
+    --blue-light: #eff6ff;
+    --red: #ef4444;
+    --red-light: #fef2f2;
+    --yellow: #eab308;
+    --yellow-light: #fefce8;
+    --purple: #8b5cf6;
+    --purple-light: #f5f3ff;
+    --teal: #14b8a6;
+    --teal-light: #f0fdfa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #f8fafc;
+    color: var(--dark);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .cover {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0f172a 100%);
+    color: white;
+    padding: 80px 60px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(249,115,22,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(249,115,22,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover-logo {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 60px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cover-logo-icon { font-size: 28px; }
+  .cover h1 {
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover h1 span { color: var(--orange); }
+  .cover-sub {
+    font-size: 20px;
+    color: #94a3b8;
+    margin-bottom: 50px;
+    max-width: 600px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 40px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .cover-meta-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #64748b; }
+  .cover-meta-value { font-size: 16px; font-weight: 600; color: #e2e8f0; }
+  .cover-badges {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-top: 50px;
+    position: relative; z-index: 1;
+  }
+  .cover-badge {
+    background: rgba(249,115,22,0.15);
+    border: 1px solid rgba(249,115,22,0.3);
+    color: var(--orange);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .cover-toc {
+    margin-top: 60px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 40px;
+    position: relative; z-index: 1;
+  }
+  .cover-toc h3 {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 20px;
+  }
+  .cover-toc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .cover-toc-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    font-size: 13px;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .cover-toc-item:hover { background: rgba(249,115,22,0.1); border-color: rgba(249,115,22,0.3); color: white; }
+  .toc-num {
+    width: 22px; height: 22px;
+    background: rgba(249,115,22,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--orange);
+    flex-shrink: 0;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 30px; }
+  .section-header {
+    background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
+    color: white;
+    padding: 50px 60px;
+    margin: 40px 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .section-header::after {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .section-num {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--orange);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .section-header h2 { font-size: 32px; font-weight: 800; }
+  .section-header p { color: #94a3b8; font-size: 16px; margin-top: 8px; max-width: 700px; }
+  .section-body { padding: 40px 60px; background: white; margin-bottom: 0; }
+  .phase-1 { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+  .phase-2 { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .phase-3 { background: #f3e8ff; color: #7c3aed; border: 1px solid #e9d5ff; }
+  .phase-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  }
+  .card-grid { display: grid; gap: 20px; margin: 24px 0; }
+  .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  .card-icon { font-size: 28px; margin-bottom: 12px; }
+  .card h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--dark); }
+  .card p { font-size: 13px; color: var(--gray); line-height: 1.6; }
+  .card-orange { border-top: 3px solid var(--orange); }
+  .card-green  { border-top: 3px solid var(--green); }
+  .card-blue   { border-top: 3px solid var(--blue); }
+  .card-purple { border-top: 3px solid var(--purple); }
+  .card-teal   { border-top: 3px solid var(--teal); }
+  .card-red    { border-top: 3px solid var(--red); }
+  .ai-option {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    transition: box-shadow 0.2s;
+  }
+  .ai-option:hover { box-shadow: 0 6px 30px rgba(0,0,0,0.1); }
+  .ai-option-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px;
+    background: var(--dark2);
+    color: white;
+  }
+  .ai-option-title { display: flex; align-items: center; gap: 12px; }
+  .ai-option-icon { font-size: 28px; }
+  .ai-option-name { font-size: 18px; font-weight: 700; }
+  .ai-option-provider { font-size: 12px; color: #94a3b8; }
+  .ai-option-badges { display: flex; gap: 8px; }
+  .ai-option-body { padding: 24px; }
+  .ai-option-body p { font-size: 14px; color: var(--gray); margin-bottom: 16px; }
+  .ai-pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .pros-list, .cons-list { padding: 16px; border-radius: 8px; }
+  .pros-list { background: var(--green-light); border: 1px solid #bbf7d0; }
+  .cons-list { background: var(--red-light); border: 1px solid #fecaca; }
+  .pros-list h5 { color: #15803d; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .cons-list h5 { color: #b91c1c; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .pros-list li, .cons-list li { font-size: 13px; margin-left: 16px; margin-bottom: 4px; color: var(--dark3); }
+  .cost-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  .cost-table th {
+    background: var(--dark); color: white;
+    padding: 10px 14px; text-align: left;
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .cost-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .cost-table tr:last-child td { border-bottom: none; }
+  .cost-table tr:nth-child(even) td { background: #f8fafc; }
+  .recommended-badge {
+    background: linear-gradient(135deg, var(--orange), #dc2626);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .phase-timeline { margin: 30px 0; }
+  .phase-block {
+    display: flex; gap: 20px;
+    margin-bottom: 30px;
+    position: relative;
+  }
+  .phase-block::before {
+    content: '';
+    position: absolute;
+    left: 22px; top: 50px;
+    width: 2px; height: calc(100% + 10px);
+    background: var(--border);
+  }
+  .phase-block:last-child::before { display: none; }
+  .phase-circle {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .phase-circle-1 { background: #dcfce7; color: #15803d; border: 2px solid #22c55e; }
+  .phase-circle-2 { background: #dbeafe; color: #1d4ed8; border: 2px solid #3b82f6; }
+  .phase-circle-3 { background: #f3e8ff; color: #7c3aed; border: 2px solid #8b5cf6; }
+  .phase-content { flex: 1; }
+  .phase-content h4 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .phase-content .phase-duration { font-size: 12px; color: var(--gray); margin-bottom: 12px; }
+  .phase-items { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .phase-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    background: #f8fafc; border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px;
+    font-size: 13px;
+  }
+  .phase-item-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-top: 4px; flex-shrink: 0;
+  }
+  .compare-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+  .compare-table th {
+    background: var(--dark); color: white;
+    padding: 12px 16px; text-align: left;
+    font-weight: 600;
+  }
+  .compare-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:nth-child(even) td { background: #f8fafc; }
+  .compare-table .highlight-col { background: rgba(249,115,22,0.05) !important; font-weight: 600; }
+  .check { color: var(--green); }
+  .cross { color: var(--red); }
+  .partial { color: var(--yellow); }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 2px;
+  }
+  .tag-orange { background: #fff7ed; color: var(--orange); border: 1px solid #fed7aa; }
+  .tag-green  { background: var(--green-light); color: #15803d; border: 1px solid #bbf7d0; }
+  .tag-blue   { background: var(--blue-light); color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .tag-purple { background: var(--purple-light); color: #7c3aed; border: 1px solid #e9d5ff; }
+  .tag-red    { background: var(--red-light); color: #b91c1c; border: 1px solid #fecaca; }
+  .tag-gray   { background: #f1f5f9; color: #475569; border: 1px solid var(--border); }
+  .callout {
+    padding: 16px 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout-orange { background: var(--orange-light); border-left: 4px solid var(--orange); }
+  .callout-blue   { background: var(--blue-light); border-left: 4px solid var(--blue); }
+  .callout-green  { background: var(--green-light); border-left: 4px solid var(--green); }
+  .callout-red    { background: var(--red-light); border-left: 4px solid var(--red); }
+  .callout-purple { background: var(--purple-light); border-left: 4px solid var(--purple); }
+  .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .callout-content h5 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .callout-content p { font-size: 13px; color: var(--dark3); line-height: 1.5; }
+  .arch-diagram {
+    background: var(--dark);
+    border-radius: 12px;
+    padding: 30px;
+    margin: 24px 0;
+    color: white;
+  }
+  .arch-tier {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .arch-tier::after {
+    content: '↓';
+    position: absolute;
+    bottom: -22px; left: 50%;
+    transform: translateX(-50%);
+    color: #475569;
+    font-size: 14px;
+    z-index: 1;
+  }
+  .arch-tier:last-child::after { display: none; }
+  .arch-tier-1 { background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3); }
+  .arch-tier-2 { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); }
+  .arch-tier-3 { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); }
+  .arch-tier-4 { background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); }
+  .arch-tier-5 { background: rgba(20,184,166,0.15); border: 1px solid rgba(20,184,166,0.3); }
+  .arch-tier-icon { font-size: 22px; }
+  .arch-tier-name { font-size: 14px; font-weight: 700; flex: 1; }
+  .arch-tier-detail { font-size: 12px; color: #94a3b8; }
+  .payment-flow {
+    display: flex; align-items: center; gap: 0;
+    margin: 24px 0; overflow-x: auto; padding-bottom: 10px;
+  }
+  .flow-step {
+    min-width: 110px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .flow-step-icon { font-size: 22px; margin-bottom: 6px; }
+  .flow-step-label { font-size: 11px; font-weight: 600; color: var(--dark3); }
+  .flow-arrow {
+    color: var(--gray-light); font-size: 20px;
+    padding: 0 4px; flex-shrink: 0;
+  }
+  .cost-breakdown {
+    background: var(--dark);
+    border-radius: 12px;
+    padding: 28px;
+    color: white;
+    margin: 24px 0;
+  }
+  .cost-line {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 14px;
+  }
+  .cost-line:last-child { border-bottom: none; }
+  .cost-line.total {
+    margin-top: 8px;
+    padding-top: 14px;
+    border-top: 2px solid rgba(249,115,22,0.4);
+    border-bottom: none;
+    font-size: 16px; font-weight: 700;
+  }
+  .cost-line .label { color: #94a3b8; }
+  .cost-line .value { color: white; font-weight: 600; }
+  .cost-line.total .value { color: var(--orange); font-size: 20px; }
+  h3.subsection {
+    font-size: 20px; font-weight: 700;
+    margin: 32px 0 16px;
+    color: var(--dark);
+    display: flex; align-items: center; gap: 8px;
+  }
+  h3.subsection::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    margin-left: 12px;
+  }
+  .divider { height: 1px; background: var(--border); margin: 32px 0; }
+  ul.clean { list-style: none; padding: 0; }
+  ul.clean li {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 6px 0;
+    font-size: 14px; color: var(--dark3);
+    border-bottom: 1px solid #f1f5f9;
+  }
+  ul.clean li:last-child { border-bottom: none; }
+  ul.clean li::before { content: '›'; color: var(--orange); font-weight: 700; margin-top: 1px; flex-shrink: 0; }
+  .sticky-nav {
+    position: sticky;
+    top: 0;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 40px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  .nav-link {
+    display: flex; align-items: center; gap: 5px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px; font-weight: 600;
+    color: var(--gray);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .nav-link:hover { background: var(--orange-light); color: var(--orange); }
+  .doc-footer {
+    background: var(--dark);
+    color: #475569;
+    text-align: center;
+    padding: 30px;
+    font-size: 13px;
+    margin-top: 60px;
+  }
+  .doc-footer span { color: var(--orange); }
+  .roadmap-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+  .roadmap-col { border-right: 1px solid var(--border); }
+  .roadmap-col:last-child { border-right: none; }
+  .roadmap-col-header {
+    padding: 16px 20px;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+  }
+  .roadmap-col-header-1 { background: #dcfce7; color: #15803d; }
+  .roadmap-col-header-2 { background: #dbeafe; color: #1d4ed8; }
+  .roadmap-col-header-3 { background: #f3e8ff; color: #7c3aed; }
+  .roadmap-items { padding: 16px; }
+  .roadmap-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    border: 1px solid;
+  }
+  .roadmap-item-1 { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+  .roadmap-item-2 { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+  .roadmap-item-3 { background: #faf5ff; border-color: #e9d5ff; color: #7c3aed; }
+  @media print {
+    .cover { min-height: auto; page-break-after: always; }
+    .section-header { page-break-before: always; }
+  }
+</style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <div class="cover-logo">
+    <span class="cover-logo-icon">🏗️</span>
+    The Foreman AI
+  </div>
+  <h1>Comprehensive<br><span>Development Plan</span></h1>
+  <p class="cover-sub">A phased technical roadmap covering AI selection, infrastructure, competitive positioning, time tracking, invoicing, branding, and user documentation — built to take The Foreman AI from MVP to market leader.</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <span class="cover-meta-label">Version</span>
+      <span class="cover-meta-value">1.0</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="cover-meta-label">Date</span>
+      <span class="cover-meta-value">April 2026</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="cover-meta-label">Phases</span>
+      <span class="cover-meta-value">3 (12 Months)</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="cover-meta-label">Focus Areas</span>
+      <span class="cover-meta-value">7 Sections</span>
+    </div>
+  </div>
+  <div class="cover-badges">
+    <span class="cover-badge">🎨 Branding & UI/UX</span>
+    <span class="cover-badge">🤖 AI System Selection</span>
+    <span class="cover-badge">⏱️ Time Tracking</span>
+    <span class="cover-badge">🏗️ Infrastructure</span>
+    <span class="cover-badge">📊 Competitive Analysis</span>
+    <span class="cover-badge">💳 Invoicing & Payments</span>
+    <span class="cover-badge">📖 User Documentation</span>
+  </div>
+  <div class="cover-toc">
+    <h3>Contents</h3>
+    <div class="cover-toc-grid">
+      <a class="cover-toc-item" href="#section-branding"><span class="toc-num">1</span> Branding & UI/UX Audit</a>
+      <a class="cover-toc-item" href="#section-ai"><span class="toc-num">2</span> AI System Selection</a>
+      <a class="cover-toc-item" href="#section-time"><span class="toc-num">3</span> Time Tracking System</a>
+      <a class="cover-toc-item" href="#section-infra"><span class="toc-num">4</span> Technical Infrastructure</a>
+      <a class="cover-toc-item" href="#section-competitive"><span class="toc-num">5</span> Competitive Analysis</a>
+      <a class="cover-toc-item" href="#section-invoicing"><span class="toc-num">6</span> Invoicing & Payments</a>
+      <a class="cover-toc-item" href="#section-docs"><span class="toc-num">7</span> User Documentation</a>
+    </div>
+  </div>
+</div>
+
+<!-- Sticky Nav -->
+<div class="sticky-nav">
+  <a class="nav-link" href="#section-branding">🎨 Branding</a>
+  <a class="nav-link" href="#section-ai">🤖 AI Selection</a>
+  <a class="nav-link" href="#section-time">⏱️ Time Tracking</a>
+  <a class="nav-link" href="#section-infra">🏗️ Infrastructure</a>
+  <a class="nav-link" href="#section-competitive">📊 Competitive</a>
+  <a class="nav-link" href="#section-invoicing">💳 Invoicing</a>
+  <a class="nav-link" href="#section-docs">📖 Docs</a>
+  <a class="nav-link" href="#section-roadmap">🗺️ Roadmap</a>
+</div>
+
+<!-- SECTION 1: BRANDING -->
+<div id="section-branding">
+  <div class="section-header">
+    <div class="section-num">Section 01</div>
+    <h2>🎨 Branding & UI/UX Consistency Audit</h2>
+    <p>Establish a cohesive visual identity and user experience system that makes The Foreman AI look and feel like a premium construction-tech platform.</p>
+  </div>
+  <div class="section-body">
+
+    <h3 class="subsection">Brand Identity Foundation</h3>
+    <div class="card-grid card-grid-3">
+      <div class="card card-orange">
+        <div class="card-icon">🎨</div>
+        <h4>Color System</h4>
+        <p>Primary: <strong>#F97316</strong> (Foreman Orange). Dark backgrounds: <strong>#0F172A / #1E293B</strong>. Semantic: Green for success, Red for alerts, Blue for info. All colors pass WCAG AA contrast ratios.</p>
+      </div>
+      <div class="card card-blue">
+        <div class="card-icon">🔤</div>
+        <h4>Typography Scale</h4>
+        <p>Primary font: <strong>Inter</strong> or <strong>Segoe UI</strong> system stack. Headings: 700–800 weight. Body: 400–500. Monospace: JetBrains Mono for codes/IDs. Mobile scales: 14px body minimum.</p>
+      </div>
+      <div class="card card-purple">
+        <div class="card-icon">📐</div>
+        <h4>Spacing & Grid</h4>
+        <p>8px base grid system. Component padding: 16px/24px. Page max-width: 1280px. Consistent border-radius: 8px cards, 6px buttons, 50% chips. Section padding: 40–60px.</p>
+      </div>
+      <div class="card card-green">
+        <div class="card-icon">🧩</div>
+        <h4>Component Library</h4>
+        <p>Standardize: Buttons (primary/secondary/ghost/danger), Inputs, Modals, Toast notifications, Badges, Data tables, Cards, Progress bars, and Navigation tabs — all in one CSS file.</p>
+      </div>
+      <div class="card card-teal">
+        <div class="card-icon">📱</div>
+        <h4>Mobile Responsiveness</h4>
+        <p>Target 60%+ field usage on mobile. Breakpoints: 1024px (tablet), 768px (large mobile), 480px (small mobile). Bottom-navigation on mobile, collapsible sidebar, 44px minimum touch targets.</p>
+      </div>
+      <div class="card card-orange">
+        <div class="card-icon">🌙</div>
+        <h4>Dark Mode</h4>
+        <p>Dark mode is primary (existing UI). Add light mode toggle for office use. Store preference in localStorage. Use CSS custom properties for seamless switching without page reload.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h3 class="subsection">Current UI Audit — Issues & Fixes</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Area</th><th>Current Issue</th><th>Recommended Fix</th><th>Priority</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Navigation</strong></td>
+          <td>Sidebar items inconsistently spaced; active states vary</td>
+          <td>Unified nav component with consistent active indicator (orange left border), hover states</td>
+          <td><span class="phase-badge phase-1">Phase 1</span></td>
+        </tr>
+        <tr>
+          <td><strong>Forms</strong></td>
+          <td>Input fields have mixed border styles; some lack focus rings</td>
+          <td>Single form token: border 1px solid #334155, focus: border-orange-500 + ring-2</td>
+          <td><span class="phase-badge phase-1">Phase 1</span></td>
+        </tr>
+        <tr>
+          <td><strong>Empty States</strong></td>
+          <td>Some tabs show blank white areas with no guidance</td>
+          <td>Branded empty state components with icon, headline, description, and CTA button for every tab</td>
+          <td><span class="phase-badge phase-1">Phase 1</span></td>
+        </tr>
+        <tr>
+          <td><strong>Loading States</strong></td>
+          <td>No skeleton screens; content pops in abruptly</td>
+          <td>Add skeleton loader components for dashboard, project list, and PM overview</td>
+          <td><span class="phase-badge phase-2">Phase 2</span></td>
+        </tr>
+        <tr>
+          <td><strong>Toast Notifications</strong></td>
+          <td>Toast positioning inconsistent; z-index conflicts</td>
+          <td>Centralized toast manager in top-right, stacking with dismiss, typed variants</td>
+          <td><span class="phase-badge phase-1">Phase 1</span></td>
+        </tr>
+        <tr>
+          <td><strong>Data Tables</strong></td>
+          <td>Tables overflow on mobile; no horizontal scroll</td>
+          <td>Wrap tables in overflow-x: auto containers; add responsive card-view for mobile</td>
+          <td><span class="phase-badge phase-1">Phase 1</span></td>
+        </tr>
+        <tr>
+          <td><strong>Logo / App Icon</strong></td>
+          <td>Emoji placeholder (🏗️) in several locations</td>
+          <td>Design SVG logo mark — hard hat silhouette + circuit board pattern; PNG/SVG variants</td>
+          <td><span class="phase-badge phase-2">Phase 2</span></td>
+        </tr>
+        <tr>
+          <td><strong>Micro-animations</strong></td>
+          <td>No transition effects; state changes feel abrupt</td>
+          <td>CSS transitions on hover (0.15s), tab switches (0.2s fade/slide), modal entrance (0.25s)</td>
+          <td><span class="phase-badge phase-2">Phase 2</span></td>
+        </tr>
+        <tr>
+          <td><strong>Accessibility</strong></td>
+          <td>Missing ARIA labels on icon buttons; poor keyboard nav</td>
+          <td>Add aria-label, role, tabIndex to all interactive elements. Focus-visible outlines.</td>
+          <td><span class="phase-badge phase-2">Phase 2</span></td>
+        </tr>
+        <tr>
+          <td><strong>Landing Page</strong></td>
+          <td>Generic layout; doesn't showcase construction-specific features</td>
+          <td>Rebuild hero with real screenshots, animated demos, and construction-specific social proof</td>
+          <td><span class="phase-badge phase-3">Phase 3</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-orange">
+      <span class="callout-icon">💡</span>
+      <div class="callout-content">
+        <h5>Branding Investment Recommendation</h5>
+        <p>Invest in a proper SVG logo and design system before scaling marketing. A unified design-tokens.css file with all colors, fonts, and spacing variables will dramatically speed up future development and ensure consistency across web, mobile, and PDF exports.</p>
+      </div>
+    </div>
+
+    <h3 class="subsection">Phase Implementation</h3>
+    <div class="phase-timeline">
+      <div class="phase-block">
+        <div class="phase-circle phase-circle-1">1</div>
+        <div class="phase-content">
+          <h4>Phase 1 — Consistency Pass (Months 1–2)</h4>
+          <p class="phase-duration">Estimated: 2–3 weeks of design + dev work</p>
+          <div class="phase-items">
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>Create design-tokens.css with all variables</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>Standardize form inputs, buttons, badges</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>Fix empty states on all 8+ tabs</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>Centralize toast notification system</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>Fix mobile table overflow issues</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>Ensure all links and CTAs work</div>
+          </div>
+        </div>
+      </div>
+      <div class="phase-block">
+        <div class="phase-circle phase-circle-2">2</div>
+        <div class="phase-content">
+          <h4>Phase 2 — Polish & Brand Identity (Months 3–5)</h4>
+          <p class="phase-duration">Estimated: 4–6 weeks including logo design</p>
+          <div class="phase-items">
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>Custom SVG logo + app icon design</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>Skeleton loaders for all data views</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>CSS micro-animations throughout</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>Light mode implementation</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>Accessibility audit + ARIA fixes</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>PWA manifest + home screen icon</div>
+          </div>
+        </div>
+      </div>
+      <div class="phase-block">
+        <div class="phase-circle phase-circle-3">3</div>
+        <div class="phase-content">
+          <h4>Phase 3 — Marketing & Launch Polish (Months 8–10)</h4>
+          <p class="phase-duration">Estimated: 3–4 weeks</p>
+          <div class="phase-items">
+            <div class="phase-item"><div class="phase-item-dot" style="background:#8b5cf6"></div>Redesigned landing page with screenshots</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#8b5cf6"></div>Marketing site with pricing page</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#8b5cf6"></div>Brand style guide documentation</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#8b5cf6"></div>Social media kit (OG images, banners)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: AI SELECTION -->
+<div id="section-ai">
+  <div class="section-header">
+    <div class="section-num">Section 02</div>
+    <h2>🤖 AI System Selection</h2>
+    <p>Detailed analysis of 5 AI options for powering The Foreman AI assistant — covering models, costs, construction-specific capabilities, and recommended architecture.</p>
+  </div>
+  <div class="section-body">
+
+    <div class="callout callout-blue">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-content">
+        <h5>What AI Needs to Do for The Foreman AI</h5>
+        <p>The AI assistant must handle: natural language project queries, auto-generating task lists from project type, analyzing budget/schedule data, answering contractor questions (OSHA, permits, Davis-Bacon), generating reports, suggesting risk mitigations, and eventually voice input from job sites.</p>
+      </div>
+    </div>
+
+    <h3 class="subsection">Option 1 — OpenAI GPT-4o / o4-mini</h3>
+    <div class="ai-option">
+      <div class="ai-option-header">
+        <div class="ai-option-title">
+          <div class="ai-option-icon">⚡</div>
+          <div>
+            <div class="ai-option-name">OpenAI GPT-4o + o4-mini</div>
+            <div class="ai-option-provider">Provider: OpenAI | Best for: Balanced performance + cost</div>
+          </div>
+        </div>
+        <div class="ai-option-badges">
+          <span class="recommended-badge">⭐ RECOMMENDED</span>
+          <span class="phase-badge phase-1">Phase 1</span>
+        </div>
+      </div>
+      <div class="ai-option-body">
+        <p>GPT-4o is OpenAI's flagship multimodal model — fast, capable, and well-supported. The <strong>o4-mini</strong> variant is 10x cheaper and ideal for routine tasks (task generation, simple Q&A). Use GPT-4o for complex reasoning (budget analysis, risk assessment) and o4-mini for everyday queries. The API ecosystem is the most mature with function calling, structured outputs, streaming, and a Files API for document ingestion.</p>
+        <table class="cost-table">
+          <thead>
+            <tr><th>Model</th><th>Input (per 1M tokens)</th><th>Output (per 1M tokens)</th><th>Context Window</th><th>Best Use Case</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>GPT-4o</td><td>$2.50</td><td>$10.00</td><td>128K</td><td>Complex analysis, reports</td></tr>
+            <tr><td>GPT-4o mini</td><td>$0.15</td><td>$0.60</td><td>128K</td><td>Task gen, quick Q&A, chat</td></tr>
+            <tr><td>o4-mini</td><td>$1.10</td><td>$4.40</td><td>200K</td><td>Reasoning, plan generation</td></tr>
+            <tr><td>GPT-4.1 nano</td><td>$0.10</td><td>$0.40</td><td>1M</td><td>Simple classification, routing</td></tr>
+          </tbody>
+        </table>
+        <div class="ai-pros-cons">
+          <div class="pros-list">
+            <h5>✅ Pros</h5>
+            <ul>
+              <li>Most mature API ecosystem</li>
+              <li>Best function calling & structured output</li>
+              <li>Assistants API for persistent conversations</li>
+              <li>Audio (Whisper) + vision built-in</li>
+              <li>Largest library of tutorials & examples</li>
+              <li>Real-time streaming responses</li>
+              <li>Files API for PDF/doc ingestion</li>
+              <li>JSON mode for reliable data extraction</li>
+            </ul>
+          </div>
+          <div class="cons-list">
+            <h5>❌ Cons</h5>
+            <ul>
+              <li>Costs add up at scale without tiered routing</li>
+              <li>US data residency only (GDPR concerns for EU)</li>
+              <li>Rate limits on lower tiers</li>
+              <li>No self-hosted option</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout callout-green" style="margin-top:16px">
+          <span class="callout-icon">💰</span>
+          <div class="callout-content">
+            <h5>Estimated Monthly Cost (100 active users)</h5>
+            <p>Using 80% o4-mini + 20% GPT-4o: ~500K tokens/day = ~$45–80/month. At 1,000 users: ~$400–600/month. Use tiered routing to keep costs linear.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="subsection">Option 2 — Anthropic Claude Sonnet 4 / Opus 4</h3>
+    <div class="ai-option">
+      <div class="ai-option-header">
+        <div class="ai-option-title">
+          <div class="ai-option-icon">🧠</div>
+          <div>
+            <div class="ai-option-name">Anthropic Claude Sonnet 4 / Opus 4</div>
+            <div class="ai-option-provider">Provider: Anthropic | Best for: Long-context document analysis</div>
+          </div>
+        </div>
+        <div class="ai-option-badges"><span class="phase-badge phase-1">Phase 1</span></div>
+      </div>
+      <div class="ai-option-body">
+        <p>Claude excels at reading and reasoning over <strong>long documents</strong> — perfect for ingesting full construction contracts, subcontractor agreements, plans, and specs. Claude Sonnet 4 offers excellent price/performance. Opus 4 is the most capable model available but at a significant cost premium. Notable for its Constitutional AI safety approach and excellent instruction following.</p>
+        <table class="cost-table">
+          <thead>
+            <tr><th>Model</th><th>Input (per 1M tokens)</th><th>Output (per 1M tokens)</th><th>Context Window</th><th>Best Use Case</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Claude Opus 4</td><td>$15.00</td><td>$75.00</td><td>200K</td><td>Complex multi-step reasoning</td></tr>
+            <tr><td>Claude Sonnet 4</td><td>$3.00</td><td>$15.00</td><td>200K</td><td>Document analysis, contracts</td></tr>
+            <tr><td>Claude Haiku 3.5</td><td>$0.80</td><td>$4.00</td><td>200K</td><td>Fast, lightweight tasks</td></tr>
+          </tbody>
+        </table>
+        <div class="ai-pros-cons">
+          <div class="pros-list">
+            <h5>✅ Pros</h5>
+            <ul>
+              <li>200K context window (longest in class)</li>
+              <li>Outstanding at reading legal/contract docs</li>
+              <li>Nuanced, safe responses (fewer hallucinations)</li>
+              <li>Tool use / function calling supported</li>
+              <li>Extended thinking mode for complex problems</li>
+              <li>AWS Bedrock integration available</li>
+            </ul>
+          </div>
+          <div class="cons-list">
+            <h5>❌ Cons</h5>
+            <ul>
+              <li>Opus 4 is very expensive for production</li>
+              <li>No audio/voice capability</li>
+              <li>Slightly slower API than OpenAI</li>
+              <li>Smaller ecosystem / fewer integrations</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="subsection">Option 3 — Google Gemini 2.5 Pro / Flash</h3>
+    <div class="ai-option">
+      <div class="ai-option-header">
+        <div class="ai-option-title">
+          <div class="ai-option-icon">💎</div>
+          <div>
+            <div class="ai-option-name">Google Gemini 2.5 Pro / Flash</div>
+            <div class="ai-option-provider">Provider: Google | Best for: Multimodal (job site photos)</div>
+          </div>
+        </div>
+        <div class="ai-option-badges"><span class="phase-badge phase-2">Phase 2</span></div>
+      </div>
+      <div class="ai-option-body">
+        <p>Gemini 2.5 Pro has the largest context window (1M tokens) and native multimodal support — meaning it can analyze photos taken on job sites (identify defects, read measurements, inspect material quality). Flash is the fast, cheap variant for everyday use. Access via Google AI Studio or Vertex AI (enterprise with data residency options).</p>
+        <table class="cost-table">
+          <thead>
+            <tr><th>Model</th><th>Input (per 1M tokens)</th><th>Output (per 1M tokens)</th><th>Context Window</th><th>Best Use Case</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Gemini 2.5 Pro</td><td>$1.25</td><td>$10.00</td><td>1M tokens</td><td>Long docs, site photo analysis</td></tr>
+            <tr><td>Gemini 2.5 Flash</td><td>$0.15</td><td>$0.60</td><td>1M tokens</td><td>High-volume routine tasks</td></tr>
+            <tr><td>Gemini 2.0 Flash Lite</td><td>$0.075</td><td>$0.30</td><td>1M tokens</td><td>Cheapest option for simple tasks</td></tr>
+          </tbody>
+        </table>
+        <div class="ai-pros-cons">
+          <div class="pros-list">
+            <h5>✅ Pros</h5>
+            <ul>
+              <li>1M token context — ingest entire project history</li>
+              <li>Native image/video analysis built in</li>
+              <li>Most cost-competitive Flash pricing</li>
+              <li>Google Workspace integration potential</li>
+              <li>Vertex AI for enterprise compliance</li>
+              <li>Grounding with Google Search</li>
+            </ul>
+          </div>
+          <div class="cons-list">
+            <h5>❌ Cons</h5>
+            <ul>
+              <li>Developer experience less polished than OpenAI</li>
+              <li>Function calling less reliable than GPT-4o</li>
+              <li>Requires Google Cloud setup for enterprise</li>
+              <li>Privacy concerns for some enterprise clients</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="subsection">Option 4 — xAI Grok 3 / 3 Mini</h3>
+    <div class="ai-option">
+      <div class="ai-option-header">
+        <div class="ai-option-title">
+          <div class="ai-option-icon">🚀</div>
+          <div>
+            <div class="ai-option-name">xAI Grok 3 / Grok 3 Mini</div>
+            <div class="ai-option-provider">Provider: xAI | Best for: Cost efficiency at scale</div>
+          </div>
+        </div>
+        <div class="ai-option-badges"><span class="phase-badge phase-2">Phase 2</span></div>
+      </div>
+      <div class="ai-option-body">
+        <p>Grok 3 Mini is currently the most cost-efficient reasoning model on the market at $0.30/$0.50 per million tokens. Ideal as a budget fallback or for high-volume, lower-complexity tasks. Access via xAI's API or through Azure AI Foundry. Still newer to the market — ecosystem maturity is behind OpenAI but improving rapidly.</p>
+        <table class="cost-table">
+          <thead>
+            <tr><th>Model</th><th>Input (per 1M tokens)</th><th>Output (per 1M tokens)</th><th>Context Window</th><th>Best Use Case</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Grok 3</td><td>$3.00</td><td>$15.00</td><td>131K</td><td>Complex reasoning tasks</td></tr>
+            <tr><td>Grok 3 Mini</td><td>$0.30</td><td>$0.50</td><td>131K</td><td>Budget-conscious production use</td></tr>
+          </tbody>
+        </table>
+        <div class="ai-pros-cons">
+          <div class="pros-list">
+            <h5>✅ Pros</h5>
+            <ul>
+              <li>Extremely competitive pricing</li>
+              <li>Strong reasoning capabilities</li>
+              <li>Real-time data access (X/Twitter integration)</li>
+              <li>Available via Azure for enterprise</li>
+            </ul>
+          </div>
+          <div class="cons-list">
+            <h5>❌ Cons</h5>
+            <ul>
+              <li>Smallest ecosystem and tooling</li>
+              <li>Less proven in production</li>
+              <li>Limited structured output support</li>
+              <li>No audio/vision (yet)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="subsection">Option 5 — Custom Fine-Tuned Construction Model (RAG)</h3>
+    <div class="ai-option">
+      <div class="ai-option-header">
+        <div class="ai-option-title">
+          <div class="ai-option-icon">🏗️</div>
+          <div>
+            <div class="ai-option-name">Custom Fine-Tuned Model (Construction RAG)</div>
+            <div class="ai-option-provider">Stack: Llama 3.3 70B / Mistral + RAG + Vector DB</div>
+          </div>
+        </div>
+        <div class="ai-option-badges"><span class="phase-badge phase-3">Phase 3</span></div>
+      </div>
+      <div class="ai-option-body">
+        <p>For Phase 3, build a proprietary AI layer using Retrieval-Augmented Generation (RAG) on top of an open-source model. Ingest OSHA regulations, building codes (IRC/IBC), Davis-Bacon wage tables, material price databases, and historical project data from all users to power contextual, construction-specific answers no competitor can replicate.</p>
+        <table class="cost-table">
+          <thead>
+            <tr><th>Component</th><th>Technology</th><th>Monthly Cost</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Base LLM</td><td>Llama 3.3 70B (self-hosted) or GPT-4o fine-tuned</td><td>$200–500 (GPU) or API costs</td><td>Fine-tune on construction Q&A</td></tr>
+            <tr><td>Vector Database</td><td>Pinecone / Weaviate / pgvector</td><td>$25–70/month</td><td>Store construction docs as embeddings</td></tr>
+            <tr><td>Document Pipeline</td><td>LangChain / LlamaIndex</td><td>Open source</td><td>Ingest PDFs, CSVs, specs</td></tr>
+            <tr><td>Embeddings</td><td>text-embedding-3-small</td><td>~$5–20/month</td><td>Low cost, high quality</td></tr>
+            <tr><td>Knowledge Base</td><td>OSHA, IRC, IBC, Davis-Bacon, NEC codes</td><td>One-time ingestion</td><td>Quarterly updates</td></tr>
+          </tbody>
+        </table>
+        <div class="ai-pros-cons">
+          <div class="pros-list">
+            <h5>✅ Pros</h5>
+            <ul>
+              <li>Data never leaves your infrastructure</li>
+              <li>Construction-specific knowledge base</li>
+              <li>Long-term competitive moat</li>
+              <li>Potentially lowest per-query cost at scale</li>
+              <li>Cite sources (OSHA section, code reference)</li>
+            </ul>
+          </div>
+          <div class="cons-list">
+            <h5>❌ Cons</h5>
+            <ul>
+              <li>6–12 months to build properly</li>
+              <li>Requires ML engineering expertise</li>
+              <li>Knowledge base maintenance overhead</li>
+              <li>Overkill for current user base</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h3 class="subsection">Recommended AI Architecture</h3>
+    <div class="callout callout-orange">
+      <span class="callout-icon">🏆</span>
+      <div class="callout-content">
+        <h5>Recommended: Tiered Routing Strategy</h5>
+        <p><strong>Phase 1:</strong> Start with OpenAI GPT-4o mini (80%) + GPT-4o (20% for complex tasks). <strong>Phase 2:</strong> Add Gemini Flash for image/photo analysis from job sites. <strong>Phase 3:</strong> Build Construction RAG layer on top. This minimizes cost, maximizes capability, and creates no single-vendor lock-in.</p>
+      </div>
+    </div>
+    <div class="arch-diagram">
+      <h4 style="color:white;margin-bottom:20px;font-size:16px">🏗️ AI Routing Architecture</h4>
+      <div class="arch-tier arch-tier-1">
+        <span class="arch-tier-icon">📥</span>
+        <span class="arch-tier-name">User Input</span>
+        <span class="arch-tier-detail">Text query, voice (Phase 2), photo (Phase 2)</span>
+      </div>
+      <div class="arch-tier arch-tier-2">
+        <span class="arch-tier-icon">🧭</span>
+        <span class="arch-tier-name">Intent Router (GPT-4o mini)</span>
+        <span class="arch-tier-detail">Classify: simple / complex / document / image → route to appropriate model</span>
+      </div>
+      <div class="arch-tier arch-tier-3">
+        <span class="arch-tier-icon">⚡</span>
+        <span class="arch-tier-name">Model Selection</span>
+        <span class="arch-tier-detail">Simple → GPT-4o mini ($0.15/M) | Complex → GPT-4o ($2.50/M) | Image → Gemini Flash | Document → Claude Sonnet</span>
+      </div>
+      <div class="arch-tier arch-tier-4">
+        <span class="arch-tier-icon">🗂️</span>
+        <span class="arch-tier-name">Context Injection (Phase 3)</span>
+        <span class="arch-tier-detail">RAG retrieval from Construction Knowledge Base → OSHA, codes, project history, wage tables</span>
+      </div>
+      <div class="arch-tier arch-tier-5">
+        <span class="arch-tier-icon">💬</span>
+        <span class="arch-tier-name">Response + Actions</span>
+        <span class="arch-tier-detail">Stream to UI, execute function calls (create task, update budget, generate report)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: TIME TRACKING -->
+<div id="section-time">
+  <div class="section-header">
+    <div class="section-num">Section 03</div>
+    <h2>⏱️ Time Tracking System Design</h2>
+    <p>A GPS-enabled, project-associated time tracking system designed for construction field crews — supporting clock-in/out, daily logs, payroll export, and compliance reporting.</p>
+  </div>
+  <div class="section-body">
+
+    <h3 class="subsection">Core Feature Requirements</h3>
+    <div class="card-grid card-grid-3">
+      <div class="card card-orange">
+        <div class="card-icon">📍</div>
+        <h4>GPS Clock-In/Out</h4>
+        <p>Workers clock in/out via mobile with GPS coordinates captured. Auto-flag if clock-in location is outside a job site geofence radius (configurable: 100–500ft). Shows map of clock-in location on timesheet.</p>
+      </div>
+      <div class="card card-blue">
+        <div class="card-icon">🏗️</div>
+        <h4>Project & Cost Code Association</h4>
+        <p>Every time entry links to a specific project and cost code (labor, equipment, supervision). Workers select from their assigned projects. Enables real-time labor cost tracking per project.</p>
+      </div>
+      <div class="card card-green">
+        <div class="card-icon">📋</div>
+        <h4>Daily Job Logs</h4>
+        <p>Workers submit a daily log with: hours worked, tasks completed, materials used, weather conditions, crew size, photos, and any issues encountered. Syncs to PM tab automatically.</p>
+      </div>
+      <div class="card card-purple">
+        <div class="card-icon">⏰</div>
+        <h4>Overtime Tracking</h4>
+        <p>Automatically calculate regular, overtime (1.5x), and double-time (2x) hours. Support state-specific OT rules (CA: daily OT over 8h; most states: weekly OT over 40h). Alert supervisors when approaching OT thresholds.</p>
+      </div>
+      <div class="card card-teal">
+        <div class="card-icon">💼</div>
+        <h4>Prevailing Wage & Certified Payroll</h4>
+        <p>For government/public works contracts: track trade classifications, pay rates, and fringe benefits. Auto-generate DOL Form WH-347 certified payroll reports. Davis-Bacon Act compliance built-in.</p>
+      </div>
+      <div class="card card-red">
+        <div class="card-icon">📊</div>
+        <h4>Payroll Export</h4>
+        <p>Export timesheets in multiple formats: CSV for QuickBooks, ADP, Gusto, Paychex. Generate pay stubs. Support direct integration via API with QuickBooks Online and ADP Workforce Now.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h3 class="subsection">Mobile App Time Tracking Flow</h3>
+    <div class="payment-flow">
+      <div class="flow-step"><div class="flow-step-icon">📱</div><div class="flow-step-label">Open App (Mobile)</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">🏗️</div><div class="flow-step-label">Select Project</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">📍</div><div class="flow-step-label">GPS Clock In</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">⚙️</div><div class="flow-step-label">Select Cost Code</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">📋</div><div class="flow-step-label">Daily Log Submit</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">🚪</div><div class="flow-step-label">GPS Clock Out</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">✅</div><div class="flow-step-label">Foreman Approval</div></div>
+    </div>
+
+    <h3 class="subsection">Supervisor Dashboard Features</h3>
+    <ul class="clean">
+      <li><strong>Live Crew View</strong> — See who's clocked in right now, on which project, and for how long. Map view showing all active crew locations.</li>
+      <li><strong>Timesheet Approval</strong> — Approve/reject/modify timesheets in bulk. Add notes for discrepancies. One-click approval for the whole crew.</li>
+      <li><strong>OT Alerts</strong> — Push notifications when any employee is approaching OT threshold (configurable: 35h, 38h, 40h warning levels).</li>
+      <li><strong>Missed Clock-Out Alerts</strong> — Auto-alert foreman if an employee has been clocked in for more than 10 hours. Auto-clock out at midnight if not manually done.</li>
+      <li><strong>Labor Cost by Project</strong> — Real-time labor cost burn by project. Compare to budgeted labor hours. Flag when over budget.</li>
+      <li><strong>Weekly/Monthly Reports</strong> — Export timesheets by project, by employee, by cost code, by week. PDF and CSV formats.</li>
+      <li><strong>Prevailing Wage Reports</strong> — Auto-generate DOL WH-347 certified payroll reports for government contracts. Track trade classifications and fringe benefits.</li>
+    </ul>
+
+    <div class="divider"></div>
+    <h3 class="subsection">Integration with Payroll Providers</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Provider</th><th>Integration Method</th><th>Data Exported</th><th>Phase</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>QuickBooks Online</strong></td>
+          <td>Official QB API (OAuth 2.0)</td>
+          <td>Time activities, employee hours, job cost codes</td>
+          <td><span class="phase-badge phase-2">Phase 2</span></td>
+        </tr>
+        <tr>
+          <td><strong>ADP Workforce Now</strong></td>
+          <td>ADP API Central (v2 REST)</td>
+          <td>Workers, pay codes, time entries, project codes</td>
+          <td><span class="phase-badge phase-2">Phase 2</span></td>
+        </tr>
+        <tr>
+          <td><strong>Gusto</strong></td>
+          <td>Gusto API (OAuth)</td>
+          <td>Hours, overtime, departments, projects</td>
+          <td><span class="phase-badge phase-2">Phase 2</span></td>
+        </tr>
+        <tr>
+          <td><strong>Paychex</strong></td>
+          <td>Paychex Flex API</td>
+          <td>Time & labor data, direct integration</td>
+          <td><span class="phase-badge phase-3">Phase 3</span></td>
+        </tr>
+        <tr>
+          <td><strong>CSV Export</strong></td>
+          <td>Direct download</td>
+          <td>Universal format for any payroll system</td>
+          <td><span class="phase-badge phase-1">Phase 1</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 4: INFRASTRUCTURE -->
+<div id="section-infra">
+  <div class="section-header">
+    <div class="section-num">Section 04</div>
+    <h2>🏗️ Technical Infrastructure</h2>
+    <p>24/7 uptime architecture, automated backups, disaster recovery, and a scalable hosting strategy to support The Foreman AI from startup to enterprise.</p>
+  </div>
+  <div class="section-body">
+
+    <h3 class="subsection">Current Stack Assessment</h3>
+    <div class="card-grid card-grid-2">
+      <div class="card card-green">
+        <h4>✅ Current Stack (MVP)</h4>
+        <ul class="clean">
+          <li>FastAPI Python backend</li>
+          <li>Vanilla JS frontend (single-page app)</li>
+          <li>LocalStorage for data persistence</li>
+          <li>Render.com free tier hosting</li>
+          <li>Git-based deployment (master branch)</li>
+        </ul>
+      </div>
+      <div class="card card-red">
+        <h4>⚠️ Current Limitations</h4>
+        <ul class="clean">
+          <li>LocalStorage = no multi-device sync</li>
+          <li>Render free tier sleeps after 15min inactivity</li>
+          <li>No database = no data persistence after logout</li>
+          <li>No authentication system</li>
+          <li>No backup system in place</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h3 class="subsection">Target Production Architecture</h3>
+    <div class="arch-diagram">
+      <h4 style="color:white;margin-bottom:20px;font-size:15px">🏗️ Production Architecture Stack</h4>
+      <div class="arch-tier arch-tier-1">
+        <span class="arch-tier-icon">🌐</span>
+        <span class="arch-tier-name">CDN + SSL</span>
+        <span class="arch-tier-detail">Cloudflare (free) — DDoS protection, caching, global edge, forced HTTPS</span>
+      </div>
+      <div class="arch-tier arch-tier-2">
+        <span class="arch-tier-icon">⚡</span>
+        <span class="arch-tier-name">Frontend Hosting</span>
+        <span class="arch-tier-detail">Cloudflare Pages (free) or Render Static — HTML/CSS/JS, auto-deploy on git push</span>
+      </div>
+      <div class="arch-tier arch-tier-3">
+        <span class="arch-tier-icon">🐍</span>
+        <span class="arch-tier-name">API Backend — FastAPI</span>
+        <span class="arch-tier-detail">Render.com Starter ($7/mo) or Railway ($5/mo) — always-on, no sleep, auto-scale</span>
+      </div>
+      <div class="arch-tier arch-tier-4">
+        <span class="arch-tier-icon">🗄️</span>
+        <span class="arch-tier-name">Database — PostgreSQL</span>
+        <span class="arch-tier-detail">Supabase (free tier) or Render PostgreSQL ($7/mo) — replaces localStorage</span>
+      </div>
+      <div class="arch-tier arch-tier-5">
+        <span class="arch-tier-icon">🔐</span>
+        <span class="arch-tier-name">Auth + File Storage</span>
+        <span class="arch-tier-detail">Supabase Auth (email/Google/Apple) + Supabase Storage for photos/documents</span>
+      </div>
+    </div>
+
+    <div class="cost-breakdown">
+      <h4 style="color:white;margin-bottom:20px;font-size:15px">💰 Phase 1 Infrastructure Cost Estimate</h4>
+      <div class="cost-line"><span class="label">Backend (Render Starter or Railway)</span><span class="value">$7/mo</span></div>
+      <div class="cost-line"><span class="label">Database (Supabase Pro)</span><span class="value">$25/mo</span></div>
+      <div class="cost-line"><span class="label">Auth (Supabase included)</span><span class="value">$0/mo</span></div>
+      <div class="cost-line"><span class="label">File Storage (Supabase 100GB)</span><span class="value">$0/mo (included)</span></div>
+      <div class="cost-line"><span class="label">CDN/SSL (Cloudflare Free)</span><span class="value">$0/mo</span></div>
+      <div class="cost-line"><span class="label">Email (Resend free tier)</span><span class="value">$0/mo</span></div>
+      <div class="cost-line"><span class="label">Monitoring (UptimeRobot)</span><span class="value">$0/mo</span></div>
+      <div class="cost-line"><span class="label">AI API (OpenAI, 100 active users)</span><span class="value">$45–80/mo</span></div>
+      <div class="cost-line total"><span class="label">Phase 1 Total</span><span class="value">~$77–112/mo</span></div>
+    </div>
+
+    <h3 class="subsection">Backup & Disaster Recovery Strategy</h3>
+    <div class="card-grid card-grid-2">
+      <div class="card card-blue">
+        <h4>🗄️ Database Backups</h4>
+        <ul class="clean">
+          <li>Automated daily backups — Supabase includes daily snapshots with 7-day retention</li>
+          <li>Point-in-time recovery — Supabase Pro supports PITR to any point in last 7 days</li>
+          <li>Weekly exports — Cron job dumps full database to AWS S3 / Cloudflare R2 every Sunday</li>
+          <li>Test restores monthly — Verify backup integrity by restoring to staging environment</li>
+        </ul>
+      </div>
+      <div class="card card-orange">
+        <h4>🔄 Application Backups</h4>
+        <ul class="clean">
+          <li>Git is your source backup — All code in GitHub. Every deploy is a snapshot.</li>
+          <li>Environment variables — Securely stored in hosting provider + encrypted local copy</li>
+          <li>User file backups — Photos/documents in Supabase Storage with cross-region replication</li>
+          <li>Rollback capability — Render/Railway support one-click rollback to any previous deploy</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout callout-blue">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-content">
+        <h5>Recovery Time Objectives (RTO)</h5>
+        <p><strong>Critical failure (full service down):</strong> Target <15 minutes — automated alerts via UptimeRobot, Render auto-restart, Cloudflare failover. <strong>Data loss scenario:</strong> Target <24 hours data loss maximum (daily backup schedule). <strong>Planned maintenance:</strong> Zero-downtime deploys via rolling restarts.</p>
+      </div>
+    </div>
+
+    <h3 class="subsection">Scaling Roadmap</h3>
+    <div class="phase-timeline">
+      <div class="phase-block">
+        <div class="phase-circle phase-circle-1">1</div>
+        <div class="phase-content">
+          <h4>Phase 1 — Production Baseline (Month 1–2)</h4>
+          <p class="phase-duration">~$77–112/month — Supports up to ~500 users</p>
+          <div class="phase-items">
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>Migrate from localStorage to Supabase PostgreSQL</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>Add Supabase Auth (email + social login)</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>Deploy FastAPI to Render Starter (always-on)</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>Cloudflare for CDN + DDoS protection</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>UptimeRobot monitoring + email alerts</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#22c55e"></div>Automated daily database backups</div>
+          </div>
+        </div>
+      </div>
+      <div class="phase-block">
+        <div class="phase-circle phase-circle-2">2</div>
+        <div class="phase-content">
+          <h4>Phase 2 — Growth Infrastructure (Month 4–6)</h4>
+          <p class="phase-duration">~$200–400/month — Supports up to ~5,000 users</p>
+          <div class="phase-items">
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>Upgrade to Render Standard or Railway Pro</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>Add Redis caching (Upstash free tier)</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>Add background job queue (BullMQ/Celery)</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>Rate limiting + API abuse protection</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>Staging environment (mirrors production)</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#3b82f6"></div>Application performance monitoring (Sentry)</div>
+          </div>
+        </div>
+      </div>
+      <div class="phase-block">
+        <div class="phase-circle phase-circle-3">3</div>
+        <div class="phase-content">
+          <h4>Phase 3 — Enterprise Scale (Month 9–12)</h4>
+          <p class="phase-duration">~$500–2,000/month — 10,000+ users, enterprise SLAs</p>
+          <div class="phase-items">
+            <div class="phase-item"><div class="phase-item-dot" style="background:#8b5cf6"></div>Multi-region deployment (US East + West)</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#8b5cf6"></div>Database read replicas for performance</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#8b5cf6"></div>SOC 2 Type II compliance audit</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#8b5cf6"></div>SSO/SAML for enterprise clients</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#8b5cf6"></div>Dedicated infrastructure option for large GCs</div>
+            <div class="phase-item"><div class="phase-item-dot" style="background:#8b5cf6"></div>99.99% SLA with incident response playbook</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: COMPETITIVE ANALYSIS -->
+<div id="section-competitive">
+  <div class="section-header">
+    <div class="section-num">Section 05</div>
+    <h2>📊 Competitive Feature Analysis</h2>
+    <p>Deep-dive comparison of QuickBooks, ADP, and BuilderTrend vs. The Foreman AI — identifying feature gaps, pricing opportunities, and differentiation strategy.</p>
+  </div>
+  <div class="section-body">
+
+    <h3 class="subsection">Competitor Profiles</h3>
+    <div class="card-grid card-grid-3">
+      <div class="card card-blue">
+        <div class="card-icon">📊</div>
+        <h4>QuickBooks Online (Intuit)</h4>
+        <p>Most widely used accounting software among contractors. Strong invoicing, job costing, and payroll. Used by 7M+ small businesses. Pricing: $35–235/month.</p>
+        <div style="margin-top:10px">
+          <span class="tag tag-green">Invoicing</span>
+          <span class="tag tag-green">Job Costing</span>
+          <span class="tag tag-blue">Payroll (add-on)</span>
+          <span class="tag tag-gray">No Field PM</span>
+        </div>
+      </div>
+      <div class="card card-purple">
+        <div class="card-icon">💼</div>
+        <h4>ADP Workforce Now</h4>
+        <p>Enterprise HR and payroll giant. Construction module (CCOE) is an add-on. Handles certified payroll, union payroll, prevailing wages, and multi-state processing. Pricing: ~$160+/month.</p>
+        <div style="margin-top:10px">
+          <span class="tag tag-green">Payroll</span>
+          <span class="tag tag-green">HR</span>
+          <span class="tag tag-blue">Certified PR</span>
+          <span class="tag tag-gray">No PM</span>
+        </div>
+      </div>
+      <div class="card card-orange">
+        <div class="card-icon">🏗️</div>
+        <h4>BuilderTrend</h4>
+        <p>Leading construction project management software. Used by 1M+ contractors. Strong on scheduling, client portal, selections, and daily logs. Pricing: $899–$1,549/month.</p>
+        <div style="margin-top:10px">
+          <span class="tag tag-green">Project Mgmt</span>
+          <span class="tag tag-green">Scheduling</span>
+          <span class="tag tag-blue">Client Portal</span>
+          <span class="tag tag-gray">No AI</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h3 class="subsection">Head-to-Head Feature Comparison</h3>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th style="width:25%">Feature</th>
+          <th>The Foreman AI</th>
+          <th>QuickBooks</th>
+          <th>ADP</th>
+          <th>BuilderTrend</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="5" style="background:#f8fafc;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#64748b;padding:8px 16px">PROJECT MANAGEMENT</td></tr>
+        <tr>
+          <td>Kanban Board</td>
+          <td class="highlight-col"><span class="check">✅</span> Built-in</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="check">✅</span></td>
+        </tr>
+        <tr>
+          <td>Gantt Chart / Scheduling</td>
+          <td class="highlight-col"><span class="check">✅</span> Built-in</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="check">✅</span> Advanced</td>
+        </tr>
+        <tr>
+          <td>Risk Matrix</td>
+          <td class="highlight-col"><span class="check">✅</span> Built-in</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+        </tr>
+        <tr>
+          <td>Daily Logs</td>
+          <td class="highlight-col"><span class="partial">🔶</span> Planned Ph2</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="check">✅</span> Advanced</td>
+        </tr>
+        <tr>
+          <td>Client Portal</td>
+          <td class="highlight-col"><span class="check">✅</span> Built-in</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="check">✅</span> Advanced</td>
+        </tr>
+        <tr>
+          <td>RFIs & Submittals</td>
+          <td class="highlight-col"><span class="partial">🔶</span> Planned Ph3</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="check">✅</span></td>
+        </tr>
+        <tr><td colspan="5" style="background:#f8fafc;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#64748b;padding:8px 16px">FINANCIAL</td></tr>
+        <tr>
+          <td>Invoicing</td>
+          <td class="highlight-col"><span class="partial">🔶</span> Planned Ph2</td>
+          <td><span class="check">✅</span> Best-in-class</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="check">✅</span></td>
+        </tr>
+        <tr>
+          <td>Job Costing</td>
+          <td class="highlight-col"><span class="check">✅</span> Via projects</td>
+          <td><span class="check">✅</span> Advanced</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="check">✅</span></td>
+        </tr>
+        <tr>
+          <td>Payment Processing (CC)</td>
+          <td class="highlight-col"><span class="partial">🔶</span> Planned Ph2</td>
+          <td><span class="check">✅</span> 2.9%+30¢</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="check">✅</span> 2.95%</td>
+        </tr>
+        <tr><td colspan="5" style="background:#f8fafc;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#64748b;padding:8px 16px">HR & PAYROLL</td></tr>
+        <tr>
+          <td>Payroll Processing</td>
+          <td class="highlight-col"><span class="partial">🔶</span> Via integration</td>
+          <td><span class="check">✅</span> Add-on</td>
+          <td><span class="check">✅</span> Best-in-class</td>
+          <td><span class="check">✅</span> Via Gusto</td>
+        </tr>
+        <tr>
+          <td>Certified Payroll (WH-347)</td>
+          <td class="highlight-col"><span class="partial">🔶</span> Planned Ph3</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="check">✅</span> Via CCOE</td>
+          <td><span class="cross">❌</span></td>
+        </tr>
+        <tr>
+          <td>GPS Time Tracking</td>
+          <td class="highlight-col"><span class="partial">🔶</span> Planned Ph2</td>
+          <td><span class="partial">🔶</span> Via add-on</td>
+          <td><span class="partial">🔶</span> Via add-on</td>
+          <td><span class="check">✅</span></td>
+        </tr>
+        <tr><td colspan="5" style="background:#f8fafc;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#64748b;padding:8px 16px">AI & INTELLIGENCE</td></tr>
+        <tr>
+          <td>AI Assistant</td>
+          <td class="highlight-col"><span class="check">✅</span> Core feature</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+        </tr>
+        <tr>
+          <td>AI Task Generation</td>
+          <td class="highlight-col"><span class="check">✅</span> By trade type</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+        </tr>
+        <tr>
+          <td>AI Risk Detection</td>
+          <td class="highlight-col"><span class="check">✅</span> Built-in</td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+          <td><span class="cross">❌</span></td>
+        </tr>
+        <tr><td colspan="5" style="background:#f8fafc;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#64748b;padding:8px 16px">PRICING</td></tr>
+        <tr>
+          <td>Starting Price</td>
+          <td class="highlight-col" style="color:var(--green);font-weight:700">$0 (Free tier)</td>
+          <td>$35/month</td>
+          <td>~$160/month</td>
+          <td>$899/month</td>
+        </tr>
+        <tr>
+          <td>Target Market</td>
+          <td class="highlight-col">Small–Medium GCs</td>
+          <td>All small biz</td>
+          <td>50+ employees</td>
+          <td>Medium–Large GCs</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-orange">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-content">
+        <h5>Key Competitive Insight: The $0–$899/month Gap</h5>
+        <p>BuilderTrend's lowest tier is $899/month — an enormous barrier for small contractors. QuickBooks lacks any project management. ADP has no PM at all. <strong>The Foreman AI's sweet spot is the 1–25 person contractor</strong> who needs project management + time tracking + basic invoicing in one affordable platform with AI assistance. Target price: <strong>$49–149/month</strong> — 10x cheaper than BuilderTrend with 80% of the core functionality.</p>
+      </div>
+    </div>
+
+    <h3 class="subsection">Differentiation Strategy</h3>
+    <div class="card-grid card-grid-2">
+      <div class="card card-orange">
+        <h4>🤖 AI-First (Unfair Advantage)</h4>
+        <p>None of the major competitors have AI built into their core workflow. The Foreman AI's ability to auto-generate project tasks, detect schedule risks, answer OSHA questions, and create reports via natural language is a genuine market differentiator. Lead with AI in all marketing.</p>
+      </div>
+      <div class="card card-green">
+        <h4>💰 Price Disruption</h4>
+        <p>Position at 10x less than BuilderTrend for small contractors. Free tier with 1 project + unlimited team members (drives virality). Paid tiers: $49/mo (5 projects), $99/mo (unlimited), $199/mo (teams + API access).</p>
+      </div>
+      <div class="card card-blue">
+        <h4>📱 Mobile-First for Field</h4>
+        <p>BuilderTrend is desktop-centric. The Foreman AI should be mobile-first — GPS clock-in, daily photo logs, voice-to-task entry, and offline mode for job sites with poor connectivity.</p>
+      </div>
+      <div class="card card-purple">
+        <h4>🔗 Integration Hub</h4>
+        <p>Don't try to replace QuickBooks or ADP — integrate with them. Be the central hub that makes existing tools smarter. Contractor already uses QB? Connect it and pull job costs directly.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6: INVOICING & PAYMENTS -->
+<div id="section-invoicing">
+  <div class="section-header">
+    <div class="section-num">Section 06</div>
+    <h2>💳 Invoicing & Payments System Design</h2>
+    <p>A complete construction billing system covering progress invoicing, lien waivers, AIA billing, payment processing, and client-facing invoice portal.</p>
+  </div>
+  <div class="section-body">
+
+    <h3 class="subsection">Invoice Types for Construction</h3>
+    <div class="card-grid card-grid-3">
+      <div class="card card-orange">
+        <div class="card-icon">📄</div>
+        <h4>Standard Invoice</h4>
+        <p>Line-item invoices for completed work. Auto-populate from time entries and materials. Customizable header/footer with contractor license number, insurance info. PDF generation.</p>
+        <div style="margin-top:10px"><span class="phase-badge phase-1">Phase 1</span></div>
+      </div>
+      <div class="card card-blue">
+        <div class="card-icon">📊</div>
+        <h4>Progress Billing</h4>
+        <p>Bill based on % complete by scope item or CSI division. Track retainage (standard 5–10%). Running balance shows billed vs. contract vs. remaining. Ideal for larger projects.</p>
+        <div style="margin-top:10px"><span class="phase-badge phase-2">Phase 2</span></div>
+      </div>
+      <div class="card card-purple">
+        <div class="card-icon">🏛️</div>
+        <h4>AIA G702/G703 Format</h4>
+        <p>Industry-standard AIA Application for Payment format. Schedule of Values (G703), Application & Certificate (G702). Required by many GCs and owners for payment approval.</p>
+        <div style="margin-top:10px"><span class="phase-badge phase-2">Phase 2</span></div>
+      </div>
+      <div class="card card-green">
+        <div class="card-icon">⏱️</div>
+        <h4>Time & Materials (T&M)</h4>
+        <p>Auto-generate invoices from approved time entries + material receipts. Markup percentages by cost category. Perfect for service calls and change orders.</p>
+        <div style="margin-top:10px"><span class="phase-badge phase-2">Phase 2</span></div>
+      </div>
+      <div class="card card-teal">
+        <div class="card-icon">✍️</div>
+        <h4>Change Order Billing</h4>
+        <p>Link change orders directly to invoices. Track COs as separate line items. Get client approval on CO before billing. Running change order log per project.</p>
+        <div style="margin-top:10px"><span class="phase-badge phase-2">Phase 2</span></div>
+      </div>
+      <div class="card card-red">
+        <div class="card-icon">🔒</div>
+        <h4>Lien Waiver Management</h4>
+        <p>Generate conditional/unconditional lien waivers upon payment. Track waiver status by subcontractor. Protect contractors from lien risk. State-specific waiver templates.</p>
+        <div style="margin-top:10px"><span class="phase-badge phase-3">Phase 3</span></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h3 class="subsection">Payment Processing Options</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Provider</th><th>Card Rate</th><th>ACH Rate</th><th>Construction Features</th><th>Recommendation</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Stripe</strong></td>
+          <td>2.9% + 30¢</td>
+          <td>0.8% (max $5)</td>
+          <td>Invoicing API, payment links, recurring, multi-currency, Connect for platforms</td>
+          <td><span class="tag tag-green">⭐ Primary Choice</span></td>
+        </tr>
+        <tr>
+          <td><strong>Square</strong></td>
+          <td>2.6% + 10¢</td>
+          <td>1% (min $1)</td>
+          <td>Contractor invoicing, deposit requests, payment plans</td>
+          <td><span class="tag tag-blue">Alternative</span></td>
+        </tr>
+        <tr>
+          <td><strong>QuickBooks Payments</strong></td>
+          <td>2.9% + 25¢</td>
+          <td>1%</td>
+          <td>Seamless QB integration, contractor e-invoicing</td>
+          <td><span class="tag tag-gray">If QB integrated</span></td>
+        </tr>
+        <tr>
+          <td><strong>Jobber / Lendio</strong></td>
+          <td>2.9% + 30¢</td>
+          <td>1%</td>
+          <td>Construction-specific, client financing options</td>
+          <td><span class="tag tag-purple">Phase 3</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="subsection">Invoice Workflow</h3>
+    <div class="payment-flow">
+      <div class="flow-step"><div class="flow-step-icon">🏗️</div><div class="flow-step-label">Work Completed</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">⏱️</div><div class="flow-step-label">Time/Materials Logged</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">🤖</div><div class="flow-step-label">AI Drafts Invoice</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">✏️</div><div class="flow-step-label">Contractor Reviews</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">📧</div><div class="flow-step-label">Sent to Client</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">💳</div><div class="flow-step-label">Client Pays Online</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">🏦</div><div class="flow-step-label">Stripe Deposit</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-icon">📊</div><div class="flow-step-label">QB Updated</div></div>
+    </div>
+
+    <div class="callout callout-green">
+      <span class="callout-icon">💡</span>
+      <div class="callout-content">
+        <h5>Technical Implementation: Stripe Connect</h5>
+        <p>Use <strong>Stripe Connect (Standard)</strong> to enable payment processing for contractors. Each contractor creates their own Stripe account linked to The Foreman AI. Stripe handles PCI compliance, fraud detection, and payouts. You collect a platform fee on each transaction. At 100 users × $5,000 avg invoice × 2/month = $1M in monthly payment volume. A 0.5% platform fee = $5,000/month in additional revenue.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 7: USER DOCUMENTATION -->
+<div id="section-docs">
+  <div class="section-header">
+    <div class="section-num">Section 07</div>
+    <h2>📖 User Documentation & In-App Tutorial System</h2>
+    <p>A multi-layered onboarding and documentation strategy to ensure every contractor can use The Foreman AI effectively — from day one through advanced features.</p>
+  </div>
+  <div class="section-body">
+
+    <h3 class="subsection">Documentation Layers</h3>
+    <div class="card-grid card-grid-2">
+      <div class="card card-orange">
+        <div class="card-icon">🎯</div>
+        <h4>Layer 1: In-App Onboarding</h4>
+        <p>Contextual, interactive walkthroughs triggered on first visit to each section. Uses a lightweight tooltip library (Shepherd.js or custom-built). No external docs needed to get started.</p>
+        <div style="margin-top:10px"><span class="phase-badge phase-1">Phase 1</span></div>
+      </div>
+      <div class="card card-blue">
+        <div class="card-icon">❓</div>
+        <h4>Layer 2: Contextual Help Icons</h4>
+        <p>Question mark (?) icons next to every feature open a popover with a short explanation. AI-powered help: "Ask Foreman AI" button in every section that answers questions contextually.</p>
+        <div style="margin-top:10px"><span class="phase-badge phase-1">Phase 1</span></div>
+      </div>
+      <div class="card card-green">
+        <div class="card-icon">📚</div>
+        <h4>Layer 3: Knowledge Base</h4>
+        <p>Hosted knowledge base with articles, screenshots, and videos for every feature. Search-indexed. Embedded in app as a slide-out panel. Built with Notion, GitBook, or custom static site.</p>
+        <div style="margin-top:10px"><span class="phase-badge phase-2">Phase 2</span></div>
+      </div>
+      <div class="card card-purple">
+        <div class="card-icon">🎬</div>
+        <h4>Layer 4: Video Library</h4>
+        <p>Short (2–5 min) feature walkthrough videos embedded in onboarding flow and knowledge base. Host on YouTube (free) or Loom for easy updates. Linked from each feature's help icon.</p>
+        <div style="margin-top:10px"><span class="phase-badge phase-2">Phase 2</span></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h3 class="subsection">New User Onboarding Flow</h3>
+    <div class="card-grid card-grid-2">
+      <div class="card card-orange">
+        <h4>🚀 Welcome Flow (First Login)</h4>
+        <ul class="clean">
+          <li><strong>Step 1:</strong> "What type of contractor are you?" — Personalizes AI and task templates</li>
+          <li><strong>Step 2:</strong> "Tell us about your business" — Company name, team size, typical project value</li>
+          <li><strong>Step 3:</strong> "Add your first project" — Guided form with minimal required fields</li>
+          <li><strong>Step 4:</strong> Watch AI generate default tasks automatically — the "wow" moment</li>
+          <li><strong>Step 5:</strong> Interactive 5-step tooltip tour of key features</li>
+        </ul>
+      </div>
+      <div class="card card-blue">
+        <h4>📋 Getting Started Checklist</h4>
+        <ul class="clean">
+          <li>Persistent checklist in sidebar (collapses once complete)</li>
+          <li>☐ Add your first project (unlocks PM tab)</li>
+          <li>☐ Add your crew / employees (unlocks Resources)</li>
+          <li>☐ Set up your first invoice (unlocks Billing)</li>
+          <li>☐ Ask the AI a question (demonstrates AI power)</li>
+          <li>☐ Invite a team member (drives viral growth)</li>
+          <li>Progress bar shows % complete. 100% unlocks Pro Tips.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h3 class="subsection">Feature Documentation Plan</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Feature</th><th>Documentation Type</th><th>Priority</th><th>Phase</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Creating a Project</strong></td><td>Tooltip + Article + 3min video</td><td>Critical</td><td><span class="phase-badge phase-1">Phase 1</span></td></tr>
+        <tr><td><strong>Project Management Tab</strong></td><td>Interactive tour + Full article + 5min video</td><td>Critical</td><td><span class="phase-badge phase-1">Phase 1</span></td></tr>
+        <tr><td><strong>Kanban & Tasks</strong></td><td>Tooltip walkthrough + Article</td><td>High</td><td><span class="phase-badge phase-1">Phase 1</span></td></tr>
+        <tr><td><strong>Gantt Chart</strong></td><td>Interactive tour + Article + Video</td><td>High</td><td><span class="phase-badge phase-1">Phase 1</span></td></tr>
+        <tr><td><strong>AI Assistant</strong></td><td>Prompt examples + FAQ + Video demo</td><td>Critical (differentiator)</td><td><span class="phase-badge phase-1">Phase 1</span></td></tr>
+        <tr><td><strong>Payroll Tab</strong></td><td>Full article + Compliance notes + Video</td><td>High</td><td><span class="phase-badge phase-1">Phase 1</span></td></tr>
+        <tr><td><strong>Time Tracking</strong></td><td>Mobile walkthrough + GPS setup guide</td><td>High</td><td><span class="phase-badge phase-2">Phase 2</span></td></tr>
+        <tr><td><strong>Invoicing</strong></td><td>Step-by-step article + Video + Template gallery</td><td>High</td><td><span class="phase-badge phase-2">Phase 2</span></td></tr>
+        <tr><td><strong>Client Portal</strong></td><td>Client-facing PDF guide + Contractor setup article</td><td>Medium</td><td><span class="phase-badge phase-2">Phase 2</span></td></tr>
+        <tr><td><strong>Risk Matrix</strong></td><td>Tooltip + "What is a risk matrix?" article</td><td>Medium</td><td><span class="phase-badge phase-2">Phase 2</span></td></tr>
+        <tr><td><strong>Certified Payroll</strong></td><td>Compliance guide + Davis-Bacon explainer</td><td>Medium</td><td><span class="phase-badge phase-3">Phase 3</span></td></tr>
+        <tr><td><strong>API Access</strong></td><td>Full API docs (OpenAPI/Swagger) + Postman collection</td><td>Low (enterprise)</td><td><span class="phase-badge phase-3">Phase 3</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-purple">
+      <span class="callout-icon">🤖</span>
+      <div class="callout-content">
+        <h5>The Foreman AI as its Own Help Desk</h5>
+        <p>Embed a persistent "Ask Foreman AI" button (keyboard shortcut Cmd+K / Ctrl+K) that opens a search/chat panel. Users ask questions like "How do I add a change order?" or "What does the risk score mean?" and receive instant, contextual answers. The AI knows which page the user is on and tailors responses accordingly. This <strong>eliminates 80% of support tickets</strong> and is a unique feature no competitor offers.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 8: MASTER ROADMAP -->
+<div id="section-roadmap">
+  <div class="section-header">
+    <div class="section-num">Section 08</div>
+    <h2>🗺️ Master Development Roadmap</h2>
+    <p>Consolidated 12-month plan with all features organized by phase, with dependency mapping and success metrics.</p>
+  </div>
+  <div class="section-body">
+
+    <div class="roadmap-grid">
+      <div class="roadmap-col">
+        <div class="roadmap-col-header roadmap-col-header-1">✅ Phase 1 — Foundation (Months 1–3)</div>
+        <div class="roadmap-items">
+          <div class="roadmap-item roadmap-item-1">🎨 Design tokens CSS file</div>
+          <div class="roadmap-item roadmap-item-1">🎨 Fix all empty states</div>
+          <div class="roadmap-item roadmap-item-1">🎨 Standardize forms & buttons</div>
+          <div class="roadmap-item roadmap-item-1">🤖 OpenAI GPT-4o mini integration</div>
+          <div class="roadmap-item roadmap-item-1">🤖 AI chat panel (Cmd+K)</div>
+          <div class="roadmap-item roadmap-item-1">🏗️ Migrate to Supabase DB</div>
+          <div class="roadmap-item roadmap-item-1">🏗️ Add authentication (Supabase Auth)</div>
+          <div class="roadmap-item roadmap-item-1">🏗️ Always-on hosting (Render Starter)</div>
+          <div class="roadmap-item roadmap-item-1">🏗️ Daily automated backups</div>
+          <div class="roadmap-item roadmap-item-1">💳 Basic invoice generation + PDF</div>
+          <div class="roadmap-item roadmap-item-1">📊 CSV timesheet export</div>
+          <div class="roadmap-item roadmap-item-1">📖 In-app onboarding tooltips</div>
+          <div class="roadmap-item roadmap-item-1">📖 Welcome flow (5 steps)</div>
+          <div class="roadmap-item roadmap-item-1">📖 Getting Started checklist</div>
+        </div>
+      </div>
+      <div class="roadmap-col">
+        <div class="roadmap-col-header roadmap-col-header-2">🔵 Phase 2 — Growth (Months 4–7)</div>
+        <div class="roadmap-items">
+          <div class="roadmap-item roadmap-item-2">🎨 Custom SVG logo + icon</div>
+          <div class="roadmap-item roadmap-item-2">🎨 Skeleton loaders</div>
+          <div class="roadmap-item roadmap-item-2">🎨 Light mode toggle</div>
+          <div class="roadmap-item roadmap-item-2">🎨 Accessibility audit (ARIA)</div>
+          <div class="roadmap-item roadmap-item-2">🤖 Gemini Flash for photo analysis</div>
+          <div class="roadmap-item roadmap-item-2">⏱️ GPS clock-in/out mobile</div>
+          <div class="roadmap-item roadmap-item-2">⏱️ Daily job logs</div>
+          <div class="roadmap-item roadmap-item-2">⏱️ OT tracking + alerts</div>
+          <div class="roadmap-item roadmap-item-2">⏱️ QB + ADP payroll export API</div>
+          <div class="roadmap-item roadmap-item-2">🏗️ Redis caching layer</div>
+          <div class="roadmap-item roadmap-item-2">🏗️ Staging environment</div>
+          <div class="roadmap-item roadmap-item-2">💳 Stripe Connect payments</div>
+          <div class="roadmap-item roadmap-item-2">💳 Progress billing + AIA format</div>
+          <div class="roadmap-item roadmap-item-2">💳 T&M invoicing from timesheets</div>
+          <div class="roadmap-item roadmap-item-2">📖 Knowledge base launch</div>
+          <div class="roadmap-item roadmap-item-2">📖 Video tutorial library</div>
+        </div>
+      </div>
+      <div class="roadmap-col">
+        <div class="roadmap-col-header roadmap-col-header-3">🟣 Phase 3 — Scale (Months 8–12)</div>
+        <div class="roadmap-items">
+          <div class="roadmap-item roadmap-item-3">🎨 Redesigned landing page</div>
+          <div class="roadmap-item roadmap-item-3">🎨 Brand style guide</div>
+          <div class="roadmap-item roadmap-item-3">🤖 Construction RAG knowledge base</div>
+          <div class="roadmap-item roadmap-item-3">🤖 Voice input from job sites</div>
+          <div class="roadmap-item roadmap-item-3">🤖 Predictive delay analytics</div>
+          <div class="roadmap-item roadmap-item-3">⏱️ Certified payroll WH-347</div>
+          <div class="roadmap-item roadmap-item-3">⏱️ Prevailing wage compliance</div>
+          <div class="roadmap-item roadmap-item-3">⏱️ Union payroll support</div>
+          <div class="roadmap-item roadmap-item-3">🏗️ Multi-region deployment</div>
+          <div class="roadmap-item roadmap-item-3">🏗️ SOC 2 Type II audit</div>
+          <div class="roadmap-item roadmap-item-3">🏗️ SSO/SAML enterprise login</div>
+          <div class="roadmap-item roadmap-item-3">💳 Lien waiver management</div>
+          <div class="roadmap-item roadmap-item-3">💳 RFIs & submittals</div>
+          <div class="roadmap-item roadmap-item-3">💳 Client financing options</div>
+          <div class="roadmap-item roadmap-item-3">📖 API docs (OpenAPI/Swagger)</div>
+          <div class="roadmap-item roadmap-item-3">📖 Developer portal</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h3 class="subsection">Success Metrics by Phase</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Metric</th><th>Phase 1 Target</th><th>Phase 2 Target</th><th>Phase 3 Target</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Active Users</strong></td><td>50–100</td><td>500–1,000</td><td>5,000–10,000</td></tr>
+        <tr><td><strong>MRR</strong></td><td>$500–2,000</td><td>$10,000–30,000</td><td>$100,000+</td></tr>
+        <tr><td><strong>Infrastructure Cost</strong></td><td>~$112/mo</td><td>~$400/mo</td><td>~$2,000/mo</td></tr>
+        <tr><td><strong>AI Cost per User</strong></td><td><$1/mo</td><td><$0.75/mo</td><td><$0.50/mo (RAG)</td></tr>
+        <tr><td><strong>App Uptime</strong></td><td>99.9%</td><td>99.95%</td><td>99.99%</td></tr>
+        <tr><td><strong>Onboarding Completion</strong></td><td>40%+</td><td>60%+</td><td>75%+</td></tr>
+        <tr><td><strong>Support Tickets / User</strong></td><td>Baseline</td><td>-30% (AI help)</td><td>-60% (full docs)</td></tr>
+        <tr><td><strong>Payment Volume</strong></td><td>$0 (pre-launch)</td><td>$100K–500K/mo</td><td>$1M–5M/mo</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-orange">
+      <span class="callout-icon">🏆</span>
+      <div class="callout-content">
+        <h5>The Big Picture: Why This Plan Works</h5>
+        <p>The construction industry is underserved by technology — BuilderTrend is priced out of reach for most small contractors, QuickBooks lacks field management, and ADP lacks any project visibility. <strong>The Foreman AI uniquely combines AI-powered project management + time tracking + invoicing in one platform at 1/10th the price of BuilderTrend.</strong> With a free tier to drive virality and a phased build that prioritizes the highest-value features first, this is a credible path to $1M+ ARR within 12 months.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="doc-footer">
+  <p>📋 <span>The Foreman AI</span> — Comprehensive Development Plan v1.0 | April 2026</p>
+  <p style="margin-top:8px">Confidential & Proprietary — For Internal Use Only</p>
+</div>
+
+</body>
+</html>
