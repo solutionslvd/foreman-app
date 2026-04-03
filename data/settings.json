@@ -1,7 +1,7 @@
 {
   "branding": {
-    "app_name": "BuildAI Alberta",
-    "tagline": "Your AI-Powered Construction Assistant",
+    "app_name": "The Foreman AI",
+    "tagline": "Your Construction Command Centre",
     "logo_url": "",
     "primary_color": "#FF6B35",
     "secondary_color": "#1a1a2e",
@@ -26,7 +26,7 @@
     "logo_url": ""
   },
   "ai": {
-    "assistant_name": "BuildAI",
+    "assistant_name": "The Foreman AI",
     "personality": "professional",
     "trade_focus": "framing",
     "language": "en",

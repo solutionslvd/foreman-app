@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   BuildAI Alberta - App JavaScript v2.0
+   The Foreman AI - App JavaScript v2.7
    Full mobile-first PWA with admin settings, RBAC, QB financials
 ═══════════════════════════════════════════════════════════ */
 
@@ -213,8 +213,11 @@ async function loadPublicSettings() {
 
 function applyBranding(s) {
   if (!s) return;
-  // App name
-  const appName = s.app_name || 'BuildAI';
+  // App name — migrate legacy names
+  let appName = s.app_name || 'The Foreman AI';
+  if (appName === 'BuildAI' || appName === 'BuildAI Alberta' || appName === 'Foreman') {
+    appName = 'The Foreman AI';
+  }
   document.querySelectorAll('#header-app-name, #sidebar-app-name').forEach(el => el.textContent = appName);
   document.title = appName;
 
@@ -469,9 +472,11 @@ function navigateTo(page) {
   else if (page === 'documents') initDocuments();
   else if (page === 'projects') renderProjects();
   else if (page === 'time-tracking') initTimeTracking();
-  else if (page === 'ai-chat') renderDynamicChatSuggestions();
+  else if (page === 'ai-chat') { renderDynamicChatSuggestions(); }
   else if (page === 'compliance') loadCompliance();
   else if (page === 'billing') loadBilling();
+  else if (page === 'delays') renderDelaysPage();
+  else if (page === 'safety-forms') { switchSafetyTab('sf-flha'); populateSafetyFormProjects(); }
 
   // Scroll to top
   document.getElementById('app-main').scrollTop = 0;
@@ -646,7 +651,7 @@ function renderDynamicChatSuggestions() {
   if ([1, 4, 7, 10].includes(month) && day <= 31) {
     suggestions.push({ icon: '🧾', label: 'GST Remittance', prompt: 'Help me calculate my GST remittance for this quarter' });
   } else {
-    suggestions.push({ icon: '🧾', label: 'GST Help', prompt: 'How do I calculate GST on an invoice in Alberta?' });
+    suggestions.push({ icon: '🧾', label: 'GST Help', prompt: 'How do I calculate GST on a construction invoice?' });
   }
 
   if (day <= 15) {
@@ -655,7 +660,7 @@ function renderDynamicChatSuggestions() {
     suggestions.push({ icon: '⚠️', label: 'WCB Info', prompt: 'What WCB requirements do I need for my workers?' });
   }
 
-  suggestions.push({ icon: '🏗️', label: 'Permits', prompt: 'What permits do I need for construction in Alberta?' });
+  suggestions.push({ icon: '🏗️', label: 'Permits', prompt: 'What permits do I need for this construction project?' });
 
   // --- Render ---
   container.innerHTML = suggestions.slice(0, 6).map(s =>
@@ -1565,7 +1570,7 @@ function savePayrollStore() {
   syncStore().catch(() => {});
 }
 
-// WCB rates by trade (Alberta 2024)
+// WCB rates by trade (2024)
 const WCB_RATES = {
   framing: 0.0320, carpentry: 0.0280, electrical: 0.0210,
   plumbing: 0.0210, hvac: 0.0240, roofing: 0.0480,
@@ -5024,7 +5029,7 @@ function appendMessage(text, role, actions) {
   const container = document.getElementById('chat-messages');
   const div = document.createElement('div');
   div.className = `chat-message ${role}`;
-  const avatar = role === 'ai' ? '🤖' : (currentUser?.contact_name?.charAt(0)?.toUpperCase() || 'U');
+  const avatar = role === 'ai' ? '🪖' : (currentUser?.contact_name?.charAt(0)?.toUpperCase() || 'U');
   
   let actionsHtml = '';
   if (actions && actions.length > 0) {
@@ -5102,7 +5107,7 @@ async function sendMessage() {
     }
   } catch(e) {
     hideTyping();
-    appendMessage('I\'m here to help! For Alberta construction questions, compliance, invoicing, and more — just ask.', 'ai');
+    appendMessage('I\'m here to help! For construction questions, compliance, invoicing, and more — just ask.', 'ai');
   }
 }
 
@@ -6891,14 +6896,12 @@ function renderPMOverview() {
   const done       = tasks.filter(t => t.status === 'done').length;
   const inProgress = tasks.filter(t => t.status === 'inprogress').length;
   const todo       = tasks.filter(t => t.status === 'todo').length;
-  const review     = tasks.filter(t => t.status === 'review').length;
   const overdue    = tasks.filter(t => t.dueDate && new Date(t.dueDate) < now && t.status !== 'done').length;
   const pctDone    = total > 0 ? Math.round((done / total) * 100) : 0;
 
   // ── Budget stats ─────────────────────────────────────────────
   const totalBudget  = projects.reduce((s, p) => s + (parseFloat(p.budget || p.contract_value) || 0), 0);
   const totalSpent   = projects.reduce((s, p) => s + (parseFloat(p.spent) || 0), 0);
-  const taskCosts    = tasks.reduce((s, t) => s + (parseFloat(t.cost) || 0), 0);
   const budgetUsed   = totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0;
 
   // ── Risk stats ───────────────────────────────────────────────
@@ -6906,63 +6909,63 @@ function renderPMOverview() {
   const criticalR    = activeRisks.filter(r => (r.score || getRiskScore(r.impact, r.likelihood)) >= 9).length;
   const highR        = activeRisks.filter(r => { const s = r.score || getRiskScore(r.impact, r.likelihood); return s >= 6 && s < 9; }).length;
   const mediumR      = activeRisks.filter(r => { const s = r.score || getRiskScore(r.impact, r.likelihood); return s >= 4 && s < 6; }).length;
-  const lowR         = activeRisks.filter(r => { const s = r.score || getRiskScore(r.impact, r.likelihood); return s < 4; }).length;
 
   // ── Health score ─────────────────────────────────────────────
   const scheduleHealth = total > 0 ? Math.max(0, Math.round(100 - (overdue / total) * 100)) : 100;
   const budgetHealth   = totalBudget > 0 ? Math.max(0, 100 - budgetUsed) : 100;
-  const qualityHealth  = total > 0 ? Math.round(((done + review) / total) * 100) : 100;
+  const qualityHealth  = total > 0 ? Math.round(((done + tasks.filter(t=>t.status==='review').length) / total) * 100) : 100;
   const riskHealth     = Math.max(0, 100 - (criticalR * 20 + highR * 10 + mediumR * 5));
   const healthScore    = Math.round((scheduleHealth + budgetHealth + qualityHealth + riskHealth) / 4);
-  const healthClass    = healthScore >= 75 ? 'good' : healthScore >= 50 ? 'warning' : 'critical';
-  const healthLabel    = healthScore >= 75 ? 'On Track' : healthScore >= 50 ? 'At Risk' : 'Critical';
   const healthBadge    = healthScore >= 75 ? 'healthy' : healthScore >= 50 ? 'warning' : 'critical';
+  const healthColor    = healthScore >= 75 ? '#10b981' : healthScore >= 50 ? '#f59e0b' : '#ef4444';
 
-  // ── Activity feed ────────────────────────────────────────────
-  const activities = store.pmActivities || [];
-  const recentActivity = activities.slice(-8).reverse();
+  // ── Activity feed ─────────────────────────────────────────────
+  const recentActivity = (store.pmActivities || []).slice(-5).reverse();
 
-  // ── PM Notifications ─────────────────────────────────────────
+  // ── Alerts ───────────────────────────────────────────────────
   const pmNotifs = [];
   tasks.forEach(t => {
-    if (t.status === 'done') return;
-    if (!t.dueDate) return;
+    if (t.status === 'done' || !t.dueDate) return;
     const diff = Math.floor((now - new Date(t.dueDate)) / 86400000);
-    if (diff > 0) {
-      pmNotifs.push({ icon: '🚨', text: `Task "${t.title}" is ${diff}d overdue`, cls: 'critical' });
-    } else if (diff >= -1) {
-      pmNotifs.push({ icon: '⏰', text: `Task "${t.title}" is due ${diff === 0 ? 'today' : 'tomorrow'}`, cls: 'warning' });
-    }
+    if (diff > 0)       pmNotifs.push({ icon: '🚨', text: `"${t.title}" is ${diff}d overdue`, cls: 'critical' });
+    else if (diff >= -1) pmNotifs.push({ icon: '⏰', text: `"${t.title}" due ${diff === 0 ? 'today' : 'tomorrow'}`, cls: 'warning' });
   });
   issues.filter(i => i.status === 'open' && (i.priority === 'critical' || i.priority === 'high')).forEach(i => {
     pmNotifs.push({ icon: '🔴', text: `${capitalize(i.priority)} issue: "${i.title}"`, cls: 'high' });
   });
+  if (activeRisks.length > 0 && criticalR > 0) {
+    pmNotifs.push({ icon: '⚠️', text: `${criticalR} critical risk${criticalR > 1 ? 's' : ''} require attention`, cls: 'warning' });
+  }
 
-  // ── AI Insights (generated from real data) ───────────────────
+  // ── AI Insights ───────────────────────────────────────────────
   const insights = [];
   if (overdue > 0) {
-    insights.push({ icon: '📅', cls: 'schedule', title: 'Schedule Alert', text: `${overdue} task${overdue > 1 ? 's are' : ' is'} overdue. Review the Tasks tab to reassign or update deadlines.` });
+    insights.push({ icon: '📅', cls: 'schedule', title: 'Schedule Alert', text: `${overdue} task${overdue > 1 ? 's are' : ' is'} overdue. Review Tasks tab to reassign or update deadlines.` });
   } else if (total > 0) {
-    insights.push({ icon: '📅', cls: 'schedule', title: 'Schedule On Track', text: `All ${total} tasks are within their deadlines. ${inProgress} currently in progress.` });
+    insights.push({ icon: '📅', cls: 'schedule', title: 'On Schedule', text: `All ${total} tasks are within their deadlines. ${inProgress} currently in progress.` });
   }
   if (totalBudget > 0) {
-    const budgetMsg = budgetUsed > 90 ? `Budget is ${budgetUsed}% utilized — approaching limit. Review spend before adding new costs.`
-      : budgetUsed > 75 ? `Budget is ${budgetUsed}% utilized. Monitor upcoming expenses closely.`
-      : `Budget is ${budgetUsed}% utilized across ${projects.length} project${projects.length !== 1 ? 's' : ''}. Spend is healthy.`;
+    const budgetMsg = budgetUsed > 90 ? `Budget ${budgetUsed}% used — approaching limit. Review spend before adding costs.`
+      : budgetUsed > 75 ? `Budget ${budgetUsed}% used. Monitor upcoming expenses closely.`
+      : `Budget ${budgetUsed}% used across ${projects.length} project${projects.length !== 1 ? 's' : ''}. Spend is healthy.`;
     insights.push({ icon: '💰', cls: 'budget', title: 'Budget Forecast', text: budgetMsg });
   }
   if (activeRisks.length > 0) {
-    insights.push({ icon: '⚠️', cls: 'risk', title: 'Risk Monitor', text: `${activeRisks.length} active risk${activeRisks.length > 1 ? 's' : ''} on record${criticalR > 0 ? ` including ${criticalR} critical` : ''}. Review the Risks tab for mitigation actions.` });
+    insights.push({ icon: '⚠️', cls: 'risk', title: 'Risk Monitor', text: `${activeRisks.length} active risk${activeRisks.length > 1 ? 's' : ''}${criticalR > 0 ? ` including ${criticalR} critical` : ''}. Review Risks tab.` });
   }
   if (insights.length === 0) {
-    insights.push({ icon: '🤖', cls: 'info', title: 'All Systems Good', text: 'No active alerts. Add projects and tasks to get AI-powered insights on schedule, budget, and resource utilization.' });
+    insights.push({ icon: '🤖', cls: 'info', title: 'All Systems Good', text: 'No active alerts. Add projects and tasks to get AI-powered insights on schedule, budget, and risk.' });
   }
 
-  // ── No projects state ────────────────────────────────────────
+  const fmt$ = v => v >= 1000000 ? '$' + (v/1000000).toFixed(1) + 'M'
+    : v >= 1000 ? '$' + (v/1000).toFixed(0) + 'K'
+    : '$' + v.toFixed(0);
+
+  // ── Empty state ───────────────────────────────────────────────
   if (projects.length === 0 && tasks.length === 0) {
     container.innerHTML = `
       <div class="pm-empty-state">
-        <div class="pm-empty-icon">🏗️</div>
+        <div class="pm-empty-icon">🪖</div>
         <h3>No Projects Yet</h3>
         <p>Add a project from the <strong>Projects</strong> tab and it will automatically appear here with tasks, schedule, and tracking.</p>
         <button class="btn btn-primary" onclick="navigateTo('projects')">➕ Add Your First Project</button>
@@ -6970,179 +6973,126 @@ function renderPMOverview() {
     return;
   }
 
-  // ── Format helpers ───────────────────────────────────────────
-  const fmt$ = v => v >= 1000000 ? '$' + (v/1000000).toFixed(1) + 'M'
-    : v >= 1000 ? '$' + (v/1000).toFixed(0) + 'K'
-    : '$' + v.toFixed(0);
-
   container.innerHTML = `
-    <div class="pm-dashboard-grid">
-
-      <!-- Health Score -->
-      <div class="pm-widget health-score">
-        <div class="pm-widget-header">
-          <h3>Project Health</h3>
-          <span class="pm-widget-badge ${healthBadge}">${healthLabel}</span>
-        </div>
-        <div class="health-score-display">
-          <div class="health-ring">
-            <svg viewBox="0 0 36 36">
-              <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-              <path class="ring-fill ${healthClass}" stroke-dasharray="${healthScore}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-            </svg>
-            <div class="health-value">${healthScore}%</div>
-          </div>
-          <div class="health-breakdown">
-            <div class="health-item"><span class="health-label">Schedule</span><div class="mini-bar"><div class="mini-fill ${scheduleHealth < 60 ? 'warning' : ''}" style="width:${scheduleHealth}%"></div></div><span class="health-pct">${scheduleHealth}%</span></div>
-            <div class="health-item"><span class="health-label">Budget</span><div class="mini-bar"><div class="mini-fill ${budgetHealth < 20 ? 'warning' : 'good'}" style="width:${budgetHealth}%"></div></div><span class="health-pct">${budgetHealth}%</span></div>
-            <div class="health-item"><span class="health-label">Progress</span><div class="mini-bar"><div class="mini-fill good" style="width:${qualityHealth}%"></div></div><span class="health-pct">${qualityHealth}%</span></div>
-            <div class="health-item"><span class="health-label">Risk</span><div class="mini-bar"><div class="mini-fill ${riskHealth < 60 ? 'warning' : ''}" style="width:${riskHealth}%"></div></div><span class="health-pct">${riskHealth}%</span></div>
-          </div>
-        </div>
+    <!-- KPI Strip -->
+    <div class="pm-kpi-strip">
+      <div class="pm-kpi-card">
+        <div class="pm-kpi-icon" style="color:${healthColor}">🪖</div>
+        <div class="pm-kpi-value" style="color:${healthColor}">${healthScore}%</div>
+        <div class="pm-kpi-label">Project Health</div>
+        <div class="pm-kpi-badge ${healthBadge}">${healthScore >= 75 ? 'On Track' : healthScore >= 50 ? 'At Risk' : 'Critical'}</div>
       </div>
-
-      <!-- Schedule Performance -->
-      <div class="pm-widget">
-        <div class="pm-widget-header"><h3>📅 Schedule Performance</h3></div>
-        <div class="schedule-stats">
-          <div class="stat-item"><div class="stat-value">${done}</div><div class="stat-label">Completed</div></div>
-          <div class="stat-item"><div class="stat-value">${inProgress}</div><div class="stat-label">In Progress</div></div>
-          <div class="stat-item ${overdue > 0 ? 'warning' : ''}"><div class="stat-value">${overdue}</div><div class="stat-label">Overdue</div></div>
-          <div class="stat-item"><div class="stat-value">${todo}</div><div class="stat-label">To Do</div></div>
-        </div>
-        <div style="margin-top:12px;">
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:4px;">
-            <span>Overall Progress</span><span>${pctDone}%</span>
-          </div>
-          <div style="height:8px;background:#f3f4f6;border-radius:4px;overflow:hidden;">
-            <div style="height:100%;width:${pctDone}%;background:${pctDone >= 75 ? '#10b981' : pctDone >= 40 ? '#f59e0b' : '#2563eb'};border-radius:4px;transition:width 0.5s;"></div>
-          </div>
-        </div>
+      <div class="pm-kpi-card">
+        <div class="pm-kpi-icon">✅</div>
+        <div class="pm-kpi-value">${done}<span class="pm-kpi-sub">/${total}</span></div>
+        <div class="pm-kpi-label">Tasks Done</div>
+        <div class="pm-kpi-progress"><div style="width:${pctDone}%;background:#10b981"></div></div>
       </div>
-
-      <!-- Budget Status -->
-      <div class="pm-widget">
-        <div class="pm-widget-header">
-          <h3>💰 Budget Status</h3>
-          <span class="budget-total">${totalBudget > 0 ? fmt$(totalBudget) : '—'}</span>
-        </div>
-        ${totalBudget > 0 ? `
-        <div class="budget-breakdown">
-          <div class="budget-item">
-            <span class="budget-label">Spent</span>
-            <div class="budget-bar"><div class="budget-fill ${budgetUsed > 90 ? 'warning' : ''}" style="width:${Math.min(budgetUsed,100)}%"></div></div>
-            <span class="budget-value">${fmt$(totalSpent)} / ${fmt$(totalBudget)}</span>
-          </div>
-          <div class="budget-item">
-            <span class="budget-label">Remaining</span>
-            <div class="budget-bar"><div class="budget-fill good" style="width:${Math.max(0,100-budgetUsed)}%"></div></div>
-            <span class="budget-value">${fmt$(Math.max(0, totalBudget - totalSpent))}</span>
-          </div>
-          ${taskCosts > 0 ? `
-          <div class="budget-item">
-            <span class="budget-label">Task Costs</span>
-            <div class="budget-bar"><div class="budget-fill" style="width:${totalBudget > 0 ? Math.min(Math.round((taskCosts/totalBudget)*100),100) : 0}%"></div></div>
-            <span class="budget-value">${fmt$(taskCosts)}</span>
-          </div>` : ''}
-        </div>` : `
-        <div class="pm-empty-mini">
-          <p>No budget data yet. Set contract values on your projects.</p>
-          <button class="btn btn-sm btn-outline" onclick="navigateTo('projects')">Go to Projects</button>
-        </div>`}
+      <div class="pm-kpi-card ${inProgress > 0 ? 'active' : ''}">
+        <div class="pm-kpi-icon">🔨</div>
+        <div class="pm-kpi-value">${inProgress}</div>
+        <div class="pm-kpi-label">In Progress</div>
+        <div class="pm-kpi-progress"><div style="width:${total > 0 ? Math.round(inProgress/total*100) : 0}%;background:#2563eb"></div></div>
       </div>
-
-      <!-- Risk Overview -->
-      <div class="pm-widget">
-        <div class="pm-widget-header"><h3>⚠️ Risk Overview</h3>
-          <button class="btn btn-sm btn-outline" onclick="switchPMTab('risks')" style="font-size:11px;padding:2px 8px;">View All</button>
-        </div>
-        ${activeRisks.length > 0 ? `
-        <div class="risk-summary">
-          <div class="risk-stat critical" onclick="switchPMTab('risks')" style="cursor:pointer;"><span class="risk-count">${criticalR}</span><span class="risk-label">Critical</span></div>
-          <div class="risk-stat high" onclick="switchPMTab('risks')" style="cursor:pointer;"><span class="risk-count">${highR}</span><span class="risk-label">High</span></div>
-          <div class="risk-stat medium" onclick="switchPMTab('risks')" style="cursor:pointer;"><span class="risk-count">${mediumR}</span><span class="risk-label">Medium</span></div>
-          <div class="risk-stat low" onclick="switchPMTab('risks')" style="cursor:pointer;"><span class="risk-count">${lowR}</span><span class="risk-label">Low</span></div>
-        </div>` : `
-        <div class="pm-empty-mini"><p>No active risks logged. Use the <strong>Risks</strong> tab to track project risks.</p></div>`}
+      <div class="pm-kpi-card ${overdue > 0 ? 'danger' : ''}">
+        <div class="pm-kpi-icon">${overdue > 0 ? '🚨' : '📅'}</div>
+        <div class="pm-kpi-value" style="${overdue > 0 ? 'color:#ef4444' : ''}">${overdue}</div>
+        <div class="pm-kpi-label">Overdue</div>
+        ${overdue > 0 ? '<div class="pm-kpi-badge critical">Needs Attention</div>' : '<div class="pm-kpi-badge healthy">All Good</div>'}
+      </div>
+      <div class="pm-kpi-card">
+        <div class="pm-kpi-icon">💰</div>
+        <div class="pm-kpi-value">${totalBudget > 0 ? budgetUsed + '%' : '—'}</div>
+        <div class="pm-kpi-label">Budget Used</div>
+        ${totalBudget > 0 ? `<div class="pm-kpi-progress"><div style="width:${Math.min(budgetUsed,100)}%;background:${budgetUsed > 90 ? '#ef4444' : budgetUsed > 75 ? '#f59e0b' : '#10b981'}"></div></div>` : '<div class="pm-kpi-badge healthy">Not Set</div>'}
+      </div>
+      <div class="pm-kpi-card ${activeRisks.length > 0 ? (criticalR > 0 ? 'danger' : 'warn') : ''}">
+        <div class="pm-kpi-icon">${criticalR > 0 ? '🔴' : activeRisks.length > 0 ? '⚠️' : '🛡️'}</div>
+        <div class="pm-kpi-value" style="${criticalR > 0 ? 'color:#ef4444' : ''}">${activeRisks.length}</div>
+        <div class="pm-kpi-label">Active Risks</div>
+        ${criticalR > 0 ? `<div class="pm-kpi-badge critical">${criticalR} Critical</div>` : `<div class="pm-kpi-badge ${activeRisks.length === 0 ? 'healthy' : 'warning'}">${activeRisks.length === 0 ? 'Clear' : highR + ' High'}</div>`}
       </div>
     </div>
 
-    <!-- Projects Summary -->
-    ${projects.length > 0 ? `
-    <div class="pm-widget" style="margin-bottom:16px;">
-      <div class="pm-widget-header"><h3>🏗️ Active Projects</h3>
-        <button class="btn btn-sm btn-outline" onclick="navigateTo('projects')" style="font-size:11px;padding:2px 8px;">Manage Projects</button>
-      </div>
-      <div class="pm-projects-list">
-        ${projects.map(p => {
-          const pTasks = tasks.filter(t => String(t.projectId) === String(p.id));
-          const pDone  = pTasks.filter(t => t.status === 'done').length;
-          const pTotal = pTasks.length;
-          const pPct   = pTotal > 0 ? Math.round((pDone / pTotal) * 100) : 0;
-          const pBudget = parseFloat(p.budget || p.contract_value) || 0;
-          const statusCls = p.status === 'completed' ? 'done' : p.status === 'active' ? 'inprogress' : 'todo';
-          return `
-          <div class="pm-project-row" onclick="navigateTo('projects')">
-            <div class="pm-project-info">
-              <span class="pm-project-name">${p.name || 'Untitled Project'}</span>
-              <span class="pm-project-client">${p.client_name || ''}</span>
-            </div>
-            <div class="pm-project-progress">
-              <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:3px;">
-                <span>${pDone}/${pTotal} tasks</span><span>${pPct}%</span>
-              </div>
-              <div style="height:5px;background:#f3f4f6;border-radius:3px;overflow:hidden;">
-                <div style="height:100%;width:${pPct}%;background:${pPct >= 75 ? '#10b981' : '#2563eb'};border-radius:3px;"></div>
-              </div>
-            </div>
-            <div class="pm-project-meta">
-              ${pBudget > 0 ? `<span class="pm-project-budget">${fmt$(pBudget)}</span>` : ''}
-              <span class="status-badge ${statusCls}">${capitalize(p.status || 'active')}</span>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>` : ''}
-
-    <!-- Activity & Notifications -->
-    <div class="pm-two-col">
-      <div class="pm-widget activity-feed-widget">
-        <div class="pm-widget-header"><h3>📝 Recent Activity</h3></div>
-        <div class="activity-feed" id="pm-activity-feed">
-          ${recentActivity.length > 0
-            ? recentActivity.map(a => `
-              <div class="activity-item">
-                <div class="activity-avatar">${a.initials || '??'}</div>
-                <div class="activity-content">
-                  <div class="activity-text">${a.text || a.action || ''}</div>
-                  <div class="activity-time">${a.time || a.date || ''}</div>
-                </div>
-              </div>`).join('')
-            : `<div class="pm-empty-mini"><p>Activity will appear here as you manage tasks, risks, and issues.</p></div>`}
+    <!-- Projects + Alerts row -->
+    <div class="pm-overview-row">
+      <!-- Active Projects -->
+      <div class="pm-widget pm-projects-widget">
+        <div class="pm-widget-header">
+          <h3>🏗️ Active Projects</h3>
+          <button class="btn btn-sm btn-outline" onclick="navigateTo('projects')">Manage</button>
         </div>
+        ${projects.length > 0 ? `
+        <div class="pm-projects-list">
+          ${projects.slice(0, 5).map(p => {
+            const pTasks = tasks.filter(t => String(t.projectId) === String(p.id));
+            const pDone  = pTasks.filter(t => t.status === 'done').length;
+            const pTotal = pTasks.length;
+            const pPct   = pTotal > 0 ? Math.round((pDone / pTotal) * 100) : 0;
+            const pBudget = parseFloat(p.budget || p.contract_value) || 0;
+            const statusCls = p.status === 'completed' ? 'done' : p.status === 'active' ? 'inprogress' : 'todo';
+            return `
+            <div class="pm-project-row" onclick="navigateTo('projects')" style="cursor:pointer">
+              <div class="pm-project-info">
+                <span class="pm-project-name">${p.name || 'Untitled Project'}</span>
+                <span class="pm-project-client">${p.client_name || ''}</span>
+              </div>
+              <div class="pm-project-progress">
+                <div class="pm-proj-bar-row">
+                  <span class="pm-proj-tasks">${pDone}/${pTotal} tasks</span>
+                  <span class="pm-proj-pct">${pPct}%</span>
+                </div>
+                <div class="pm-proj-bar-bg">
+                  <div class="pm-proj-bar-fill" style="width:${pPct}%;background:${pPct >= 75 ? '#10b981' : '#2563eb'}"></div>
+                </div>
+              </div>
+              <div class="pm-project-meta">
+                ${pBudget > 0 ? `<span class="pm-project-budget">${fmt$(pBudget)}</span>` : ''}
+                <span class="status-badge ${statusCls}">${capitalize(p.status || 'active')}</span>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>` : `<div class="pm-empty-mini"><p>No projects yet. <button class="btn btn-sm btn-primary" onclick="navigateTo('projects')">Add Project</button></p></div>`}
       </div>
-      <div class="pm-widget notifications-widget">
+
+      <!-- Alerts column -->
+      <div class="pm-widget pm-alerts-widget">
         <div class="pm-widget-header">
           <h3>🔔 Alerts</h3>
           ${pmNotifs.length > 0 ? `<span class="notification-badge">${pmNotifs.length}</span>` : ''}
         </div>
-        <div class="notification-list" id="pm-notifications">
+        <div class="notification-list">
           ${pmNotifs.length > 0
-            ? pmNotifs.slice(0,8).map(n => `
-              <div class="notification-item unread">
+            ? pmNotifs.slice(0, 6).map(n => `
+              <div class="notification-item ${n.cls}">
                 <span class="notif-icon">${n.icon}</span>
-                <div class="notif-content">
-                  <div class="notif-text">${n.text}</div>
-                </div>
+                <div class="notif-text">${n.text}</div>
               </div>`).join('')
             : `<div class="pm-empty-mini"><p>✅ No active alerts. All tasks and issues are on track.</p></div>`}
         </div>
+        ${recentActivity.length > 0 ? `
+        <div class="pm-widget-header" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+          <h3>📝 Recent Activity</h3>
+        </div>
+        <div class="activity-feed">
+          ${recentActivity.slice(0, 3).map(a => `
+            <div class="activity-item">
+              <div class="activity-avatar">${a.initials || '?'}</div>
+              <div class="activity-content">
+                <div class="activity-text">${a.text || a.action || ''}</div>
+                <div class="activity-time">${a.time || a.date || ''}</div>
+              </div>
+            </div>`).join('')}
+        </div>` : ''}
       </div>
     </div>
 
     <!-- AI Insights -->
     <div class="pm-widget ai-insights-panel">
-      <div class="pm-widget-header"><h3>🤖 AI Insights</h3><span class="ai-badge">Powered by Foreman AI</span></div>
+      <div class="pm-widget-header">
+        <h3>🤖 AI Insights</h3>
+        <span class="ai-badge">Foreman AI</span>
+      </div>
       <div class="ai-insights-grid">
         ${insights.map(i => `
           <div class="ai-insight ${i.cls}">
@@ -7522,3 +7472,565 @@ function savePMClientUpdate(event) {
   document.getElementById('pm-client-update-form').reset();
   renderClientPortal();
 }
+
+// ═══════════════════════════════════════════════════════════
+//  MINI FLOATING CHAT POPUP
+// ═══════════════════════════════════════════════════════════
+
+let miniChatOpen = false;
+let miniChatHistory = [];
+
+function toggleMiniChat() {
+  miniChatOpen = !miniChatOpen;
+  const popup = document.getElementById('mini-chat-popup');
+  const fab   = document.getElementById('fab-ai-btn');
+  if (!popup) return;
+  if (miniChatOpen) {
+    popup.classList.remove('hidden');
+    popup.classList.add('mini-chat-visible');
+    if (fab) fab.classList.add('fab-active');
+    setTimeout(() => {
+      const inp = document.getElementById('mini-chat-input');
+      if (inp) inp.focus();
+    }, 150);
+  } else {
+    popup.classList.remove('mini-chat-visible');
+    popup.classList.add('mini-chat-hide');
+    if (fab) fab.classList.remove('fab-active');
+    setTimeout(() => {
+      popup.classList.add('hidden');
+      popup.classList.remove('mini-chat-hide');
+    }, 250);
+  }
+}
+
+function openFullChat() {
+  toggleMiniChat();
+  navigateTo('ai-chat');
+}
+
+function handleMiniChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMiniChat();
+  }
+}
+
+function sendMiniPrompt(text) {
+  const inp = document.getElementById('mini-chat-input');
+  if (inp) inp.value = text;
+  sendMiniChat();
+}
+
+async function sendMiniChat() {
+  const input = document.getElementById('mini-chat-input');
+  const msg = input ? input.value.trim() : '';
+  if (!msg) return;
+
+  input.value = '';
+  autoResize(input);
+
+  // Hide quick prompts after first message
+  const qp = document.getElementById('mini-quick-prompts');
+  if (qp) qp.style.display = 'none';
+
+  appendMiniMessage(msg, 'user');
+  appendMiniMessage('...', 'ai', true); // typing indicator
+
+  try {
+    const contextData = buildContextSummary();
+    const systemPrompt = `You are Foreman AI — a concise, practical construction management assistant. The user is a foreman or contractor on a job site. Give short, actionable answers. Current context: ${contextData}`;
+
+    const res = await fetch(`${API}/api/ai/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify({ message: msg, system: systemPrompt, history: miniChatHistory.slice(-6) })
+    });
+
+    removeMiniTyping();
+
+    if (res.ok) {
+      const data = await res.json();
+      const reply = data.response || data.message || 'Got it!';
+      appendMiniMessage(reply, 'ai');
+      miniChatHistory.push({ role: 'user', content: msg });
+      miniChatHistory.push({ role: 'assistant', content: reply });
+    } else {
+      appendMiniMessage('Sorry, I couldn\'t connect right now. Try opening the full chat.', 'ai');
+    }
+  } catch(e) {
+    removeMiniTyping();
+    appendMiniMessage('Connection error. <button class="btn btn-sm btn-outline" onclick="openFullChat()" style="font-size:11px;padding:2px 8px;margin-top:4px">Open Full Chat</button>', 'ai');
+  }
+}
+
+function appendMiniMessage(text, role, isTyping = false) {
+  const container = document.getElementById('mini-chat-messages');
+  if (!container) return;
+  const div = document.createElement('div');
+  div.className = `mini-msg ${role}${isTyping ? ' typing' : ''}`;
+  if (isTyping) {
+    div.innerHTML = `<div class="mini-msg-bubble"><span class="typing-dots"><span></span><span></span><span></span></span></div>`;
+  } else {
+    const content = role === 'ai' ? renderMarkdown(text) : escapeHtml(text);
+    div.innerHTML = `<div class="mini-msg-bubble">${content}</div>`;
+  }
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeMiniTyping() {
+  const container = document.getElementById('mini-chat-messages');
+  if (!container) return;
+  const typing = container.querySelector('.typing');
+  if (typing) typing.remove();
+}
+
+function buildContextSummary() {
+  const projects = store.projects || [];
+  const tasks = store.pmTasks || [];
+  const invoices = store.invoices || [];
+  const now = new Date();
+  const overdue = tasks.filter(t => t.dueDate && new Date(t.dueDate) < now && t.status !== 'done').length;
+  const outstanding = invoices.filter(i => i.status === 'sent' || i.status === 'overdue');
+  return `${projects.length} projects, ${tasks.length} tasks (${overdue} overdue), ${outstanding.length} outstanding invoices.`;
+}
+
+console.log('🪖 Foreman AI Mini Chat loaded');
+
+// ═══════════════════════════════════════════════════════════
+//  DELAYS & DEFICIENCIES SYSTEM
+// ═══════════════════════════════════════════════════════════
+
+function openDelayModal() {
+  // Populate projects dropdown
+  const projects = store.projects || [];
+  const sel = document.getElementById('delay-project');
+  if (sel) {
+    sel.innerHTML = '<option value="">Select project...</option>' +
+      projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  }
+  // Set today's date
+  const dateInput = document.getElementById('delay-date');
+  if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+  // Show/hide delay days row based on type
+  const typeSelect = document.getElementById('delay-type');
+  if (typeSelect) {
+    typeSelect.onchange = function() {
+      const daysRow = document.getElementById('delay-days-row');
+      if (daysRow) {
+        const showDays = ['delay', 'weather', 'material', 'labour', 'equipment', 'inspection'].includes(this.value);
+        daysRow.style.display = showDays ? 'flex' : 'none';
+      }
+    };
+  }
+  openModal('delay-modal');
+}
+
+function submitDelay(e) {
+  e.preventDefault();
+  const form = e.target;
+  const fd = new FormData(form);
+  const entry = {
+    id: 'del_' + Date.now(),
+    type: fd.get('type'),
+    severity: fd.get('severity'),
+    projectId: fd.get('project_id'),
+    title: fd.get('title'),
+    description: fd.get('description'),
+    delay_days: parseInt(fd.get('delay_days')) || 0,
+    auto_adjust: fd.get('auto_adjust') || 'no',
+    date: fd.get('date') || new Date().toISOString().split('T')[0],
+    responsible_party: fd.get('responsible_party'),
+    corrective_action: fd.get('corrective_action'),
+    status: fd.get('status') || 'open',
+    logged_by: currentUser?.contact_name || 'Foreman',
+    logged_at: new Date().toISOString()
+  };
+
+  if (!store.delays) store.delays = [];
+  store.delays.push(entry);
+
+  // Auto-adjust task dates if requested and it's a schedule delay
+  if (entry.delay_days > 0 && entry.auto_adjust === 'yes' && entry.projectId) {
+    adjustTaskDatesForDelay(entry.projectId, entry.delay_days, entry.date);
+  }
+
+  saveStore();
+  closeModal('delay-modal');
+  form.reset();
+  document.getElementById('delay-days-row').style.display = 'none';
+
+  const projectName = (store.projects || []).find(p => p.id === entry.projectId)?.name || 'project';
+  const daysMsg = entry.delay_days > 0 ? ` Task dates adjusted by ${entry.delay_days} day(s).` : '';
+  showToast(`⚠️ Issue logged for ${projectName}.${daysMsg}`, entry.severity === 'critical' ? 'error' : 'success');
+
+  logPMActivity(`Logged ${entry.type}: "${entry.title}" on ${projectName}`);
+
+  // If already on delays page, re-render
+  if (document.getElementById('page-delays')?.classList.contains('active')) {
+    renderDelaysPage();
+  }
+  // Also re-render PM overview if on that tab
+  const pmOverview = document.getElementById('pm-overview-content');
+  if (pmOverview && document.getElementById('page-pm-dashboard')?.classList.contains('active')) {
+    renderPMOverview();
+  }
+}
+
+function adjustTaskDatesForDelay(projectId, delayDays, fromDate) {
+  const tasks = store.pmTasks || [];
+  let adjusted = 0;
+  tasks.forEach(t => {
+    if (String(t.projectId) !== String(projectId)) return;
+    if (t.status === 'done') return;
+    // Push tasks that start on or after fromDate
+    if (t.startDate && t.startDate >= fromDate) {
+      const sd = new Date(t.startDate);
+      sd.setDate(sd.getDate() + delayDays);
+      t.startDate = sd.toISOString().split('T')[0];
+      adjusted++;
+    }
+    if (t.dueDate && t.dueDate >= fromDate) {
+      const dd = new Date(t.dueDate);
+      dd.setDate(dd.getDate() + delayDays);
+      t.dueDate = dd.toISOString().split('T')[0];
+    }
+  });
+  if (adjusted > 0) {
+    showToast(`📅 Adjusted ${adjusted} task date${adjusted > 1 ? 's' : ''} by ${delayDays} day${delayDays > 1 ? 's' : ''}`, 'info');
+  }
+}
+
+function renderDelaysPage() {
+  const delays = store.delays || [];
+  const projects = store.projects || [];
+
+  // Update KPIs
+  const total = delays.length;
+  const open = delays.filter(d => d.status === 'open').length;
+  const inprogress = delays.filter(d => d.status === 'inprogress').length;
+  const resolved = delays.filter(d => d.status === 'resolved').length;
+  const avgDays = total > 0 ? Math.round(delays.reduce((s,d) => s + (d.delay_days || 0), 0) / total) : 0;
+
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('dkpi-total', total);
+  setEl('dkpi-open', open);
+  setEl('dkpi-inprogress', inprogress);
+  setEl('dkpi-resolved', resolved);
+  setEl('dkpi-days', avgDays);
+
+  const container = document.getElementById('delays-list');
+  if (!container) return;
+
+  if (delays.length === 0) {
+    container.innerHTML = `
+      <div class="pm-empty-state">
+        <div class="pm-empty-icon">⚠️</div>
+        <h3>No Issues Logged</h3>
+        <p>Use the <strong>Log Issue</strong> button to record any delay, deficiency, or safety concern on your projects.</p>
+        <button class="btn btn-primary" onclick="openDelayModal()">+ Log First Issue</button>
+      </div>`;
+    return;
+  }
+
+  const typeIcons = { delay:'⏱', deficiency:'🔴', safety:'🦺', material:'📦', weather:'🌧', labour:'👷', equipment:'🔧', design:'📐', inspection:'🔍', other:'📋' };
+  const sevClass = { low:'severity-low', medium:'severity-medium', high:'severity-high', critical:'severity-critical' };
+  const sevLabel = { low:'Low', medium:'Medium', high:'High', critical:'Critical' };
+
+  container.innerHTML = delays.slice().reverse().map(d => {
+    const proj = projects.find(p => p.id === d.projectId);
+    const projName = proj?.name || 'Unknown Project';
+    return `
+    <div class="delay-card ${sevClass[d.severity] || ''}">
+      <div class="delay-card-header">
+        <div class="delay-type-icon">${typeIcons[d.type] || '📋'}</div>
+        <div class="delay-card-info">
+          <div class="delay-title">${d.title}</div>
+          <div class="delay-meta">${projName} · ${d.date} · Logged by ${d.logged_by || 'Foreman'}</div>
+        </div>
+        <div class="delay-card-badges">
+          <span class="delay-sev-badge ${sevClass[d.severity]}">${sevLabel[d.severity] || d.severity}</span>
+          <span class="delay-status-badge status-${d.status}">${d.status === 'open' ? '🔴 Open' : d.status === 'inprogress' ? '🔧 In Progress' : '✅ Resolved'}</span>
+        </div>
+        <div class="delay-card-actions">
+          <button class="btn btn-sm btn-outline" onclick="resolveDelay('${d.id}')">Resolve</button>
+          <button class="btn btn-sm btn-outline" onclick="deleteDelay('${d.id}')">Delete</button>
+        </div>
+      </div>
+      ${d.description ? `<div class="delay-description">${d.description}</div>` : ''}
+      ${d.delay_days > 0 ? `<div class="delay-days-badge">📅 ${d.delay_days} day${d.delay_days > 1 ? 's' : ''} schedule impact</div>` : ''}
+      ${d.corrective_action ? `<div class="delay-corrective">🔧 <strong>Corrective Action:</strong> ${d.corrective_action}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function filterDelays(filter, btn) {
+  document.querySelectorAll('.filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const delays = store.delays || [];
+  const projects = store.projects || [];
+  let filtered;
+
+  if (filter === 'all') filtered = delays;
+  else if (['open','inprogress','resolved'].includes(filter)) filtered = delays.filter(d => d.status === filter);
+  else filtered = delays.filter(d => d.type === filter);
+
+  const typeIcons = { delay:'⏱', deficiency:'🔴', safety:'🦺', material:'📦', weather:'🌧', labour:'👷', equipment:'🔧', design:'📐', inspection:'🔍', other:'📋' };
+  const sevClass = { low:'severity-low', medium:'severity-medium', high:'severity-high', critical:'severity-critical' };
+  const sevLabel = { low:'Low', medium:'Medium', high:'High', critical:'Critical' };
+
+  const container = document.getElementById('delays-list');
+  if (!container) return;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="pm-empty-mini"><p>No ${filter === 'all' ? '' : filter} issues found.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.slice().reverse().map(d => {
+    const proj = projects.find(p => p.id === d.projectId);
+    const projName = proj?.name || 'Unknown Project';
+    return `
+    <div class="delay-card ${sevClass[d.severity] || ''}">
+      <div class="delay-card-header">
+        <div class="delay-type-icon">${typeIcons[d.type] || '📋'}</div>
+        <div class="delay-card-info">
+          <div class="delay-title">${d.title}</div>
+          <div class="delay-meta">${projName} · ${d.date}</div>
+        </div>
+        <div class="delay-card-badges">
+          <span class="delay-sev-badge ${sevClass[d.severity]}">${sevLabel[d.severity] || d.severity}</span>
+          <span class="delay-status-badge status-${d.status}">${d.status === 'open' ? '🔴 Open' : d.status === 'inprogress' ? '🔧 In Progress' : '✅ Resolved'}</span>
+        </div>
+        <div class="delay-card-actions">
+          <button class="btn btn-sm btn-outline" onclick="resolveDelay('${d.id}')">Resolve</button>
+          <button class="btn btn-sm btn-outline" onclick="deleteDelay('${d.id}')">Delete</button>
+        </div>
+      </div>
+      ${d.description ? `<div class="delay-description">${d.description}</div>` : ''}
+      ${d.delay_days > 0 ? `<div class="delay-days-badge">📅 ${d.delay_days} day${d.delay_days > 1 ? 's' : ''} schedule impact</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function resolveDelay(id) {
+  const delay = (store.delays || []).find(d => d.id === id);
+  if (delay) {
+    delay.status = 'resolved';
+    delay.resolved_at = new Date().toISOString();
+    saveStore();
+    renderDelaysPage();
+    showToast('✅ Issue marked as resolved', 'success');
+  }
+}
+
+function deleteDelay(id) {
+  if (!confirm('Delete this issue log?')) return;
+  store.delays = (store.delays || []).filter(d => d.id !== id);
+  saveStore();
+  renderDelaysPage();
+  showToast('Deleted', 'info');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SAFETY FORMS SYSTEM
+// ═══════════════════════════════════════════════════════════
+
+function switchSafetyTab(tab) {
+  // Deactivate all safety tabs
+  document.querySelectorAll('.safety-tabs .pm-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.safety-form-tab').forEach(t => t.classList.remove('active'));
+
+  // Activate selected
+  const btn = document.querySelector(`.safety-tabs [data-tab="sf-${tab}"]`) ||
+              document.querySelector(`.safety-tabs [data-tab="${tab}"]`);
+  if (btn) btn.classList.add('active');
+
+  const tabId = tab.startsWith('sf-') ? `sf-tab-${tab}` : `sf-tab-sf-${tab}`;
+  const el = document.getElementById(tabId);
+  if (el) el.classList.add('active');
+
+  if (tab === 'sf-records' || tab === 'records') renderSafetyRecords();
+
+  // Populate project dropdowns in forms
+  populateSafetyFormProjects();
+}
+
+function populateSafetyFormProjects() {
+  const projects = store.projects || [];
+  const opts = '<option value="">Select project...</option>' +
+    projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  document.querySelectorAll('.safety-form select[name="project_id"]').forEach(sel => {
+    sel.innerHTML = opts;
+  });
+  // Set today's date on all date fields
+  const today = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('.safety-form input[type="date"][name="date"]').forEach(inp => {
+    if (!inp.value) inp.value = today;
+  });
+  document.querySelectorAll('.safety-form input[type="date"][name="incident_date"], .safety-form input[type="date"][name="reported_date"]').forEach(inp => {
+    if (!inp.value) inp.value = today;
+  });
+}
+
+function addHazardRow() {
+  const container = document.getElementById('flha-hazards');
+  if (!container) return;
+  const row = document.createElement('div');
+  row.className = 'sf-hazard-row';
+  row.innerHTML = `
+    <div class="sf-field flex-1"><input type="text" name="hazard[]" placeholder="e.g. Overhead work"></div>
+    <div class="sf-field flex-1"><input type="text" name="control[]" placeholder="e.g. Hard hat required, stay clear"></div>
+    <div class="sf-field w-120">
+      <select name="risk_level[]"><option>Low</option><option>Medium</option><option selected>High</option></select>
+    </div>
+    <button type="button" onclick="this.parentElement.remove()" class="btn btn-sm btn-outline" style="align-self:flex-end">✕</button>`;
+  container.appendChild(row);
+}
+
+function addSignatureRow(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const row = document.createElement('div');
+  row.className = 'sf-sig-row';
+  row.innerHTML = `
+    <input type="text" name="worker_name[]" placeholder="Worker name" class="sf-sig-name">
+    <input type="text" name="worker_trade[]" placeholder="Trade / Role">
+    <label class="sf-check compact"><input type="checkbox" name="worker_ack[]"> Acknowledged</label>
+    <button type="button" onclick="this.parentElement.remove()" class="btn btn-sm btn-outline">✕</button>`;
+  container.appendChild(row);
+}
+
+function submitSafetyForm(e, formType) {
+  e.preventDefault();
+  const form = e.target;
+  const fd = new FormData(form);
+  const data = {};
+  for (const [key, val] of fd.entries()) {
+    if (key.endsWith('[]')) {
+      const k = key.slice(0,-2);
+      if (!data[k]) data[k] = [];
+      data[k].push(val);
+    } else {
+      data[key] = val;
+    }
+  }
+
+  const formNames = { flha: 'FLHA', fall: 'Fall Arrest', toolbox: 'Tool Box Talk', incident: 'Incident Report', inspection: 'Site Inspection' };
+  const record = {
+    id: 'sf_' + Date.now(),
+    form_type: formType,
+    form_name: formNames[formType] || formType,
+    project_id: data.project_id || '',
+    project_name: (store.projects || []).find(p => p.id === data.project_id)?.name || 'General',
+    date: data.date || data.incident_date || new Date().toISOString().split('T')[0],
+    submitted_by: data.foreman || data.led_by || data.inspected_by || data.reported_by || data.worker_name || currentUser?.contact_name || 'Foreman',
+    submitted_at: new Date().toISOString(),
+    data: data
+  };
+
+  if (!store.safetyRecords) store.safetyRecords = [];
+  store.safetyRecords.push(record);
+  saveStore();
+
+  // Simulate email notification
+  const projectName = record.project_name;
+  showToast(`✅ ${record.form_name} submitted for ${projectName}. Email sent to company contacts.`, 'success');
+  form.reset();
+
+  // If incident, also log as a delay/deficiency
+  if (formType === 'incident') {
+    const incEntry = {
+      id: 'del_' + Date.now(),
+      type: 'safety',
+      severity: data.severity || 'high',
+      projectId: data.project_id,
+      title: `Incident Report: ${data.description ? data.description.substring(0, 60) : 'Site incident'}`,
+      date: data.incident_date || new Date().toISOString().split('T')[0],
+      status: 'open',
+      logged_by: record.submitted_by,
+      logged_at: new Date().toISOString()
+    };
+    if (!store.delays) store.delays = [];
+    store.delays.push(incEntry);
+    saveStore();
+  }
+
+  // Switch to records tab
+  setTimeout(() => switchSafetyTab('sf-records'), 500);
+}
+
+function previewSafetyForm(formType) {
+  const form = document.getElementById(`form-${formType}`);
+  if (!form) return;
+  const fd = new FormData(form);
+  const lines = [];
+  for (const [k, v] of fd.entries()) {
+    if (v) lines.push(`<strong>${k.replace(/_/g,' ')}:</strong> ${v}`);
+  }
+  alert(`Preview:\n\n${lines.slice(0,12).join('\n')}\n\n...and ${Math.max(0,lines.length-12)} more fields.`);
+}
+
+function renderSafetyRecords() {
+  const container = document.getElementById('sf-records-list');
+  if (!container) return;
+
+  const filter = document.getElementById('sf-records-filter')?.value || 'all';
+  let records = store.safetyRecords || [];
+  if (filter !== 'all') records = records.filter(r => r.form_type === filter);
+
+  if (records.length === 0) {
+    container.innerHTML = `
+      <div class="pm-empty-state">
+        <div class="pm-empty-icon">📂</div>
+        <h3>No Records Yet</h3>
+        <p>Submitted safety forms will appear here. Complete and submit a form from any of the tabs above.</p>
+      </div>`;
+    return;
+  }
+
+  const formIcons = { flha:'📋', fall:'🔒', toolbox:'🗣', incident:'🚨', inspection:'🔍' };
+  container.innerHTML = `
+    <div class="sf-records-grid">
+      ${records.slice().reverse().map(r => `
+      <div class="sf-record-card">
+        <div class="sf-record-header">
+          <span class="sf-record-icon">${formIcons[r.form_type] || '📄'}</span>
+          <div class="sf-record-info">
+            <div class="sf-record-name">${r.form_name}</div>
+            <div class="sf-record-meta">${r.project_name} · ${r.date}</div>
+          </div>
+          <div class="sf-record-actions">
+            <button class="btn btn-sm btn-outline" onclick="viewSafetyRecord('${r.id}')">View</button>
+            <button class="btn btn-sm btn-outline" onclick="deleteSafetyRecord('${r.id}')">Delete</button>
+          </div>
+        </div>
+        <div class="sf-record-meta-row">
+          <span>Submitted by: ${r.submitted_by}</span>
+          <span>${new Date(r.submitted_at).toLocaleString('en-CA', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
+        </div>
+      </div>`).join('')}
+    </div>`;
+}
+
+function viewSafetyRecord(id) {
+  const record = (store.safetyRecords || []).find(r => r.id === id);
+  if (!record) return;
+  const lines = Object.entries(record.data || {})
+    .filter(([k,v]) => v && v !== '' && !Array.isArray(v))
+    .map(([k,v]) => `${k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}: ${v}`)
+    .join('\n');
+  alert(`${record.form_name}\nProject: ${record.project_name}\nDate: ${record.date}\nSubmitted by: ${record.submitted_by}\n\n${lines}`);
+}
+
+function deleteSafetyRecord(id) {
+  if (!confirm('Delete this safety form record?')) return;
+  store.safetyRecords = (store.safetyRecords || []).filter(r => r.id !== id);
+  saveStore();
+  renderSafetyRecords();
+  showToast('Record deleted', 'info');
+}
+
+console.log('🦺 Safety Forms & Delays system loaded');
