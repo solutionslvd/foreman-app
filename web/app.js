@@ -6557,20 +6557,7 @@ function renderClientPortal() {
   }
 }
 
-function postClientUpdate() {
-  const title = prompt('Update title (e.g. "Framing Complete"):');
-  if (!title || !title.trim()) return;
-  const body = prompt('Update details:');
-  if (!body || !body.trim()) return;
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
-  if (!store.clientUpdates) store.clientUpdates = [];
-  store.clientUpdates.push({ date: dateStr, title: title.trim(), body: body.trim() });
-  saveStore();
-  logPMActivity('Posted client update: "' + title.trim() + '"');
-  renderClientPortal();
-  showToast('Client update posted!', 'success');
-}
+// postClientUpdate() → handled by pm-client-update-modal + savePMClientUpdate()
 
 function shareClientPortal() {
   const url = window.location.href;

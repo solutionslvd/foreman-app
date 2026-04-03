@@ -3235,6 +3235,53 @@ img { max-width: 100%; }
 .pm-stat-change.down { color: #ef4444; }
 
 /* ── Risk Management ─────────────────────────────────────────────────────── */
+/* Risk matrix rendered by renderRiskMatrix() in JS */
+#pm-risk-matrix {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+.matrix-y-axis {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 4px;
+  max-width: 148px;
+}
+.matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 44px);
+  grid-template-rows: repeat(3, 44px);
+  gap: 4px;
+}
+.matrix-cell {
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.matrix-cell:hover { transform: scale(1.08); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.matrix-cell .cell-count { font-size: 16px; font-weight: 700; color: rgba(255,255,255,0.9); }
+.matrix-cell.low    { background: rgba(76,175,80,0.2);  border: 1px solid rgba(76,175,80,0.4);  }
+.matrix-cell.medium { background: rgba(255,152,0,0.2);  border: 1px solid rgba(255,152,0,0.4);  }
+.matrix-cell.high   { background: rgba(244,67,54,0.2);  border: 1px solid rgba(244,67,54,0.4);  }
+.matrix-cell.critical { background: rgba(220,38,38,0.45); border: 1px solid rgba(220,38,38,0.7); }
+.matrix-x-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 4px 0;
+  max-width: 148px;
+}
+
 .risk-matrix {
   display: grid;
   grid-template-columns: 40px repeat(5, 1fr);
@@ -3261,10 +3308,10 @@ img { max-width: 100%; }
   transform: scale(1.05);
 }
 
-.risk-low { background: #d1fae5; color: #065f46; }
-.risk-medium { background: #fef3c7; color: #92400e; }
-.risk-high { background: #fee2e2; color: #991b1b; }
-.risk-critical { background: #dc2626; color: white; }
+.risk-low    { background: rgba(76,175,80,0.15);  color: var(--success); }
+.risk-medium { background: rgba(255,152,0,0.15);  color: var(--warning); }
+.risk-high   { background: rgba(244,67,54,0.15);  color: var(--danger);  }
+.risk-critical { background: rgba(220,38,38,0.35); color: #fff; }
 
 .risk-list {
   display: flex;
