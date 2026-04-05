@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/app.css?v=2.7"></link>
+<link rel="stylesheet" href="/static/app.css?v=2.8"></link>
 <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
 <body class="dark-theme">
@@ -25,8 +25,8 @@
 <div id="auth-screen" class="auth-screen">
   <div class="auth-container">
     <div class="auth-logo">
-      <div class="logo-icon">🪖</div>
-      <h1 class="auth-title">🪖 The Foreman AI</h1>
+      <div class="logo-icon">📋</div>
+      <h1 class="auth-title">📋 The Foreman AI</h1>
       <p class="auth-subtitle">Your Construction Command Centre</p>
     </div>
 
@@ -136,12 +136,12 @@
         <span></span><span></span><span></span>
       </button>
       <div class="header-brand">
-        <span class="brand-icon">🪖</span>
+        <span class="brand-icon">📋</span>
         <span class="brand-name" id="header-app-name">The Foreman AI</span>
       </div>
     </div>
     <div class="header-right">
-      <button class="header-btn delay-btn" onclick="openDelayModal()" title="Log Delay or Deficiency" id="global-delay-btn">
+      <button class="delay-btn" onclick="openDelayModal()" title="Log Delay or Deficiency" id="global-delay-btn">
         ⚠️ <span class="delay-btn-text">Log Issue</span>
       </button>
       <button class="header-btn" onclick="toggleAIPanel()" title="AI Assistant">🤖</button>
@@ -202,7 +202,7 @@
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <div class="sidebar-content">
       <div class="sidebar-header">
-        <span class="sidebar-logo">🪖</span>
+        <span class="sidebar-logo">📋</span>
         <span class="sidebar-title" id="sidebar-app-name">The Foreman AI</span>
         <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
       </div>
@@ -284,7 +284,7 @@
       </div>
 
       <div class="sidebar-footer">
-        <div class="app-version">v2.7.0 · The Foreman AI</div>
+        <div class="app-version">v2.8.0 · The Foreman AI</div>
       </div>
     </div>
   </nav>
@@ -409,7 +409,7 @@
       <!-- AI Hero Banner -->
       <div class="ai-page-hero">
         <div class="ai-hero-left">
-          <div class="ai-hero-avatar">🪖</div>
+          <div class="ai-hero-avatar">📋</div>
           <div class="ai-hero-info">
             <h1>Foreman AI Assistant</h1>
             <p>Your on-site construction co-pilot. Ask about projects, invoices, safety, scheduling, regulations — anything on your plate.</p>
@@ -479,7 +479,7 @@
       <div class="chat-container">
         <div class="chat-messages" id="chat-messages">
           <div class="chat-message ai">
-            <div class="msg-avatar">🪖</div>
+            <div class="msg-avatar">📋</div>
             <div class="msg-bubble">
               <div class="msg-content">
                 <p>Hi! I'm <strong>Foreman AI</strong> — your construction command assistant. I have full access to your live data including projects, tasks, invoices, expenses, payroll, and documents.</p>
@@ -534,7 +534,7 @@
     ═══════════════════════════════════════════════════════════════════════════ -->
     <div id="page-pm-dashboard" class="page">
       <div class="page-header">
-        <h1 class="page-title">🪖 Project Management</h1>
+        <h1 class="page-title">📋 Project Management</h1>
         <div class="page-actions">
           <button class="btn-secondary btn-sm" onclick="switchPMView('board')">📋 Board</button>
           <button class="btn-secondary btn-sm" onclick="switchPMView('gantt')">📅 Gantt</button>
@@ -2430,69 +2430,7 @@
       </div>
     </div>
 
-  </main>
 
-  <!-- Bottom Navigation (Mobile) -->
-  <nav class="bottom-nav" id="bottom-nav">
-    <a class="bn-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
-      <span class="bn-icon">📊</span>
-      <span class="bn-label">Home</span>
-    </a>
-    <a class="bn-item" data-page="ai-chat" onclick="navigateTo('ai-chat')">
-      <span class="bn-icon">🤖</span>
-      <span class="bn-label">AI</span>
-    </a>
-    <a class="bn-item" data-page="invoices" onclick="navigateTo('invoices')">
-      <span class="bn-icon">📄</span>
-      <span class="bn-label">Invoices</span>
-    </a>
-    <a class="bn-item" data-page="projects" onclick="navigateTo('projects')">
-      <span class="bn-icon">🏗️</span>
-      <span class="bn-label">Projects</span>
-    </a>
-    <a class="bn-item" data-page="safety-forms" onclick="navigateTo('safety-forms')">
-      <span class="bn-icon">🦺</span>
-      <span class="bn-label">Safety</span>
-    </a>
-  </nav>
-
-  <!-- Floating AI Chat Button + Mini Popup -->
-  <button class="fab-ai" onclick="toggleMiniChat()" title="Ask Foreman AI" id="fab-ai-btn">🪖</button>
-
-  <!-- Mini Floating Chat Popup -->
-  <div id="mini-chat-popup" class="mini-chat-popup hidden">
-    <div class="mini-chat-header">
-      <div class="mini-chat-title">
-        <span class="mini-chat-avatar">🪖</span>
-        <div>
-          <div class="mini-chat-name">Foreman AI</div>
-          <div class="mini-chat-status">● Online — Ask me anything</div>
-        </div>
-      </div>
-      <div class="mini-chat-header-actions">
-        <button onclick="openFullChat()" title="Open full chat" class="mini-chat-expand">⤢</button>
-        <button onclick="toggleMiniChat()" class="mini-chat-close">✕</button>
-      </div>
-    </div>
-    <div class="mini-chat-messages" id="mini-chat-messages">
-      <div class="mini-msg ai">
-        <div class="mini-msg-bubble">
-          Hi! I'm <strong>Foreman AI</strong> — your on-site construction assistant. Ask about your projects, safety, invoicing, or anything on your plate today.
-        </div>
-      </div>
-    </div>
-    <div class="mini-chat-quick-prompts" id="mini-quick-prompts">
-      <button onclick="sendMiniPrompt('Summarize my active projects')">📋 Projects</button>
-      <button onclick="sendMiniPrompt('What tasks are overdue?')">⏰ Overdue</button>
-      <button onclick="sendMiniPrompt('What safety forms do I need today?')">🦺 Safety</button>
-      <button onclick="sendMiniPrompt('Help me write a quick site note')">📝 Site Note</button>
-    </div>
-    <div class="mini-chat-input-row">
-      <textarea id="mini-chat-input" placeholder="Ask Foreman AI..." rows="1"
-        onkeydown="handleMiniChatKey(event)" oninput="autoResize(this)"></textarea>
-      <button onclick="sendMiniChat()" class="mini-send-btn">➤</button>
-    </div>
-  </div>
 
 
     <!-- ══════════════════════════════════════════════════════════
@@ -2543,536 +2481,410 @@
       <div class="page-header">
         <h1 class="page-title">🦺 Safety Forms</h1>
         <div class="page-actions">
-          <button class="btn btn-outline btn-sm" onclick="switchSafetyTab('records')">📂 Records</button>
+          <button class="btn btn-outline btn-sm" onclick="renderSafetyRecords(); switchSafetyTab('sf-records')">📂 Records</button>
         </div>
       </div>
 
-      <!-- Safety tabs -->
-      <div class="pm-tabs safety-tabs">
-        <button class="pm-tab active" data-tab="sf-flha" onclick="switchSafetyTab('sf-flha')">FLHA</button>
-        <button class="pm-tab" data-tab="sf-fall" onclick="switchSafetyTab('sf-fall')">Fall Arrest</button>
-        <button class="pm-tab" data-tab="sf-toolbox" onclick="switchSafetyTab('sf-toolbox')">Tool Box Talk</button>
-        <button class="pm-tab" data-tab="sf-incident" onclick="switchSafetyTab('sf-incident')">Incident Report</button>
-        <button class="pm-tab" data-tab="sf-inspection" onclick="switchSafetyTab('sf-inspection')">Site Inspection</button>
-        <button class="pm-tab" data-tab="sf-records" onclick="switchSafetyTab('sf-records')">📂 Records</button>
-      </div>
-
-      <!-- FLHA Tab -->
-      <div id="sf-tab-sf-flha" class="pm-tab-content safety-form-tab active">
-        <div class="sf-form-header">
-          <div>
-            <h2>Field Level Hazard Assessment (FLHA)</h2>
-            <p>OHS Act compliant — complete before starting work each day</p>
-          </div>
-          <div class="sf-compliance-badges">
-            <span class="sf-badge">✅ OHS Act</span>
-            <span class="sf-badge">✅ WCB</span>
-          </div>
-        </div>
-        <form id="form-flha" class="safety-form" onsubmit="submitSafetyForm(event,'flha')">
-          <div class="sf-section">
-            <h3>Job Information</h3>
-            <div class="sf-grid-2">
-              <div class="sf-field"><label>Date</label><input type="date" name="date" required></div>
-              <div class="sf-field"><label>Project / Site</label>
-                <select name="project_id">
-                  <option value="">Select project...</option>
-                </select>
-              </div>
-              <div class="sf-field"><label>Foreman / Supervisor</label><input type="text" name="foreman" placeholder="Your name" required></div>
-              <div class="sf-field"><label>Company</label><input type="text" name="company" placeholder="Company name"></div>
-              <div class="sf-field"><label>Work Location / Address</label><input type="text" name="location" placeholder="Site address" required></div>
-              <div class="sf-field"><label>Crew Size</label><input type="number" name="crew_size" min="1" value="1"></div>
+      <!-- Form Card Grid -->
+      <div id="sf-card-grid" class="sf-card-grid">
+        <div class="sf-form-card" onclick="openSafetyFormModal('sf-flha')">
+          <div class="sf-card-icon">📋</div>
+          <div class="sf-card-body">
+            <h3>Field Level Hazard Assessment</h3>
+            <p>FLHA — Complete before starting work each day</p>
+            <div class="sf-card-badges">
+              <span class="sf-badge">✅ OHS Act</span>
+              <span class="sf-badge">✅ WCB</span>
             </div>
           </div>
-
-          <div class="sf-section">
-            <h3>Tasks to be Performed</h3>
-            <textarea name="tasks" rows="3" placeholder="List all tasks to be performed today..." required class="sf-textarea"></textarea>
+          <div class="sf-card-arrow">→</div>
+        </div>
+        <div class="sf-form-card" onclick="openSafetyFormModal('sf-fall')">
+          <div class="sf-card-icon">🪝</div>
+          <div class="sf-card-body">
+            <h3>Fall Arrest / Working at Heights</h3>
+            <p>Pre-work inspection & harness checklist</p>
+            <div class="sf-card-badges">
+              <span class="sf-badge">✅ OHS 9.3</span>
+              <span class="sf-badge">✅ WCB</span>
+            </div>
           </div>
+          <div class="sf-card-arrow">→</div>
+        </div>
+        <div class="sf-form-card" onclick="openSafetyFormModal('sf-toolbox')">
+          <div class="sf-card-icon">🔧</div>
+          <div class="sf-card-body">
+            <h3>Tool Box Talk</h3>
+            <p>Weekly safety meeting record & sign-off</p>
+            <div class="sf-card-badges">
+              <span class="sf-badge">✅ OHS Act</span>
+            </div>
+          </div>
+          <div class="sf-card-arrow">→</div>
+        </div>
+        <div class="sf-form-card" onclick="openSafetyFormModal('sf-incident')">
+          <div class="sf-card-icon">🚨</div>
+          <div class="sf-card-body">
+            <h3>Incident / Near Miss Report</h3>
+            <p>Document workplace incidents for WCB reporting</p>
+            <div class="sf-card-badges">
+              <span class="sf-badge">✅ WCB Required</span>
+              <span class="sf-badge">✅ OHS Act</span>
+            </div>
+          </div>
+          <div class="sf-card-arrow">→</div>
+        </div>
+        <div class="sf-form-card" onclick="openSafetyFormModal('sf-inspection')">
+          <div class="sf-card-icon">🔍</div>
+          <div class="sf-card-body">
+            <h3>Site Safety Inspection</h3>
+            <p>Scheduled site walkthrough and compliance check</p>
+            <div class="sf-card-badges">
+              <span class="sf-badge">✅ OHS Act</span>
+              <span class="sf-badge">✅ Monthly</span>
+            </div>
+          </div>
+          <div class="sf-card-arrow">→</div>
+        </div>
+      </div>
 
-          <div class="sf-section">
-            <h3>Hazard Identification & Controls</h3>
-            <p class="sf-help-text">For each hazard identified, describe the control measure to eliminate or reduce the risk.</p>
-            <div id="flha-hazards">
-              <div class="sf-hazard-row">
-                <div class="sf-field flex-1"><label>Hazard</label><input type="text" name="hazard[]" placeholder="e.g. Working at heights"></div>
-                <div class="sf-field flex-1"><label>Control Measure</label><input type="text" name="control[]" placeholder="e.g. Fall arrest system, guardrails"></div>
-                <div class="sf-field w-120"><label>Risk Level</label>
-                  <select name="risk_level[]">
-                    <option>Low</option><option>Medium</option><option selected>High</option>
-                  </select>
+      <!-- Records Tab Content (shown when Records button clicked) -->
+      <div id="sf-tab-sf-records" class="sf-records-section hidden">
+        <div class="sf-records-header">
+          <h2>📂 Submitted Forms</h2>
+          <button class="btn btn-outline btn-sm" onclick="hideSafetyRecords()">← Back to Forms</button>
+        </div>
+        <div id="sf-records-list" class="sf-records-grid"></div>
+      </div>
+
+      <!-- FLHA Modal -->
+      <div id="sf-modal-sf-flha" class="modal-overlay hidden" onclick="closeSafetyFormModal('sf-flha', event)">
+        <div class="modal-box sf-modal-box" onclick="event.stopPropagation()">
+          <div class="modal-header">
+            <h2>📋 Field Level Hazard Assessment (FLHA)</h2>
+            <button class="modal-close" onclick="closeSafetyFormModal('sf-flha')">✕</button>
+          </div>
+          <div class="modal-body sf-modal-body">
+            <div class="sf-compliance-badges" style="margin-bottom:12px">
+              <span class="sf-badge">✅ OHS Act</span>
+              <span class="sf-badge">✅ WCB</span>
+            </div>
+            <form id="form-sf-flha" class="safety-form" onsubmit="submitSafetyForm(event,'flha')">
+              <div class="sf-section">
+                <h3>Job Information</h3>
+                <div class="sf-grid-2">
+                  <div class="sf-field"><label>DATE</label><input type="date" name="date" required></div>
+                  <div class="sf-field"><label>PROJECT / SITE</label>
+                    <select name="project" id="sf-flha-project" required>
+                      <option value="">Select project...</option>
+                    </select>
+                  </div>
+                  <div class="sf-field"><label>FOREMAN / SUPERVISOR</label><input type="text" name="foreman" placeholder="Name"></div>
+                  <div class="sf-field"><label>COMPANY</label><input type="text" name="company" placeholder="Company name"></div>
+                  <div class="sf-field"><label>WORK LOCATION / ADDRESS</label><input type="text" name="location" placeholder="Site address or area"></div>
+                  <div class="sf-field"><label>CREW SIZE</label><input type="number" name="crew_size" value="1" min="1"></div>
+                </div>
+                <div class="sf-field"><label>Tasks to be Performed</label><textarea name="tasks" rows="2" placeholder="List all tasks planned for today..."></textarea></div>
+              </div>
+              <div class="sf-section">
+                <h3>Hazard Identification & Controls</h3>
+                <p class="sf-hint">For each hazard identified, describe the control measure to eliminate or reduce the risk.</p>
+                <div id="flha-hazard-rows">
+                  <div class="sf-hazard-row">
+                    <input type="text" placeholder="HAZARD" name="hazard[]">
+                    <input type="text" placeholder="CONTROL MEASURE" name="control[]">
+                    <select name="risk_level[]"><option>Low</option><option>Medium</option><option>High</option></select>
+                    <button type="button" class="btn-icon-remove" onclick="this.closest('.sf-hazard-row').remove()">✕</button>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline" onclick="addHazardRow()">+ Add Hazard</button>
+              </div>
+              <div class="sf-section">
+                <h3>PPE Required</h3>
+                <div class="sf-checkbox-grid">
+                  <label class="sf-check"><input type="checkbox" name="ppe" value="hard_hat" checked> 🪖 Hard Hat</label>
+                  <label class="sf-check"><input type="checkbox" name="ppe" value="safety_vest" checked> 🦺 Safety Vest</label>
+                  <label class="sf-check"><input type="checkbox" name="ppe" value="safety_boots" checked> 👢 Safety Boots</label>
+                  <label class="sf-check"><input type="checkbox" name="ppe" value="safety_glasses"> 🥽 Safety Glasses</label>
+                  <label class="sf-check"><input type="checkbox" name="ppe" value="gloves"> 🧤 Gloves</label>
+                  <label class="sf-check"><input type="checkbox" name="ppe" value="hearing_protection"> 🎧 Hearing Protection</label>
+                  <label class="sf-check"><input type="checkbox" name="ppe" value="fall_arrest"> 🔒 Fall Arrest Harness</label>
+                  <label class="sf-check"><input type="checkbox" name="ppe" value="respirator"> 😷 Respirator / Mask</label>
+                  <label class="sf-check"><input type="checkbox" name="ppe" value="face_shield"> 🛡 Face Shield</label>
                 </div>
               </div>
-            </div>
-            <button type="button" class="btn btn-outline btn-sm" onclick="addHazardRow()">+ Add Hazard</button>
-          </div>
-
-          <div class="sf-section">
-            <h3>PPE Required</h3>
-            <div class="sf-checkbox-grid">
-              <label class="sf-check"><input type="checkbox" name="ppe" value="hard_hat" checked> 🪖 Hard Hat</label>
-              <label class="sf-check"><input type="checkbox" name="ppe" value="safety_vest" checked> 🦺 Safety Vest</label>
-              <label class="sf-check"><input type="checkbox" name="ppe" value="safety_boots" checked> 👢 Safety Boots</label>
-              <label class="sf-check"><input type="checkbox" name="ppe" value="safety_glasses"> 🥽 Safety Glasses</label>
-              <label class="sf-check"><input type="checkbox" name="ppe" value="gloves"> 🧤 Gloves</label>
-              <label class="sf-check"><input type="checkbox" name="ppe" value="hearing_protection"> 🎧 Hearing Protection</label>
-              <label class="sf-check"><input type="checkbox" name="ppe" value="fall_arrest"> 🔒 Fall Arrest Harness</label>
-              <label class="sf-check"><input type="checkbox" name="ppe" value="respirator"> 😷 Respirator / Mask</label>
-              <label class="sf-check"><input type="checkbox" name="ppe" value="face_shield"> 🛡 Face Shield</label>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Emergency Information</h3>
-            <div class="sf-grid-2">
-              <div class="sf-field"><label>Nearest Hospital</label><input type="text" name="hospital" placeholder="Hospital name / address"></div>
-              <div class="sf-field"><label>Emergency Contact</label><input type="text" name="emergency_contact" placeholder="Name and phone number"></div>
-              <div class="sf-field"><label>First Aid Kit Location</label><input type="text" name="first_aid_location" placeholder="Where is the first aid kit?"></div>
-              <div class="sf-field"><label>Muster Point</label><input type="text" name="muster_point" placeholder="Emergency assembly point"></div>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Worker Acknowledgment</h3>
-            <p class="sf-help-text">All workers have been briefed on the hazards and controls listed above.</p>
-            <div id="flha-signatures">
-              <div class="sf-sig-row">
-                <input type="text" name="worker_name[]" placeholder="Worker name" class="sf-sig-name">
-                <input type="text" name="worker_trade[]" placeholder="Trade / Role">
-                <label class="sf-check compact"><input type="checkbox" name="worker_ack[]"> Acknowledged</label>
+              <div class="sf-section">
+                <h3>Emergency Information</h3>
+                <div class="sf-grid-2">
+                  <div class="sf-field"><label>NEAREST HOSPITAL</label><input type="text" name="hospital" placeholder="Hospital name & address"></div>
+                  <div class="sf-field"><label>EMERGENCY CONTACT</label><input type="text" name="emergency_contact" placeholder="Name & phone"></div>
+                  <div class="sf-field"><label>FIRST AID KIT LOCATION</label><input type="text" name="first_aid" placeholder="Location on site"></div>
+                  <div class="sf-field"><label>MUSTER POINT</label><input type="text" name="muster_point" placeholder="Assembly point"></div>
+                </div>
               </div>
-            </div>
-            <button type="button" class="btn btn-outline btn-sm" onclick="addSignatureRow('flha-signatures')">+ Add Worker</button>
-          </div>
-
-          <div class="sf-section">
-            <h3>Additional Notes</h3>
-            <textarea name="notes" rows="2" class="sf-textarea" placeholder="Any additional safety notes or site conditions..."></textarea>
-          </div>
-
-          <div class="sf-submit-row">
-            <div class="sf-email-note">📧 Form will be emailed to company contacts and saved to Records.</div>
-            <div class="sf-submit-actions">
-              <button type="button" class="btn btn-outline" onclick="previewSafetyForm('flha')">👁 Preview</button>
-              <button type="submit" class="btn btn-primary">✅ Submit FLHA</button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <!-- Fall Arrest Tab -->
-      <div id="sf-tab-sf-fall" class="pm-tab-content safety-form-tab">
-        <div class="sf-form-header">
-          <div>
-            <h2>Fall Arrest / Working at Heights Inspection</h2>
-            <p>Complete before any work at heights over 3 metres (OHS Regulation Part 9)</p>
-          </div>
-          <div class="sf-compliance-badges">
-            <span class="sf-badge">✅ OHS Part 9</span>
-            <span class="sf-badge">✅ WCB</span>
+              <div class="sf-section">
+                <h3>Worker Acknowledgment</h3>
+                <p class="sf-hint">All workers have been briefed on the hazards and controls listed above.</p>
+                <div id="flha-signature-rows">
+                  <div class="sf-sig-row">
+                    <input type="text" placeholder="Worker Name" name="worker_name[]">
+                    <input type="text" placeholder="Signature / Initials" name="worker_sig[]">
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline" onclick="addSignatureRow('flha-signature-rows')">+ Add Worker</button>
+              </div>
+              <div class="sf-field"><label>Additional Notes</label><textarea name="notes" rows="2" placeholder="Any additional safety notes..."></textarea></div>
+              <div class="sf-submit-row">
+                <p class="sf-hint">📧 Form will be emailed to company contacts and saved to Records.</p>
+                <button type="button" class="btn btn-outline" onclick="previewSafetyForm('flha')">👁 Preview</button>
+                <button type="submit" class="btn btn-primary">✅ Submit FLHA</button>
+              </div>
+            </form>
           </div>
         </div>
-        <form id="form-fall" class="safety-form" onsubmit="submitSafetyForm(event,'fall')">
-          <div class="sf-section">
-            <h3>Job Information</h3>
-            <div class="sf-grid-2">
-              <div class="sf-field"><label>Date</label><input type="date" name="date" required></div>
-              <div class="sf-field"><label>Project / Site</label><select name="project_id"><option value="">Select project...</option></select></div>
-              <div class="sf-field"><label>Worker Name</label><input type="text" name="worker_name" required></div>
-              <div class="sf-field"><label>Supervisor</label><input type="text" name="supervisor"></div>
-              <div class="sf-field"><label>Work Height (metres)</label><input type="number" name="height" step="0.1" min="0"></div>
-              <div class="sf-field"><label>Type of Work</label><input type="text" name="work_type" placeholder="e.g. Roof framing, scaffold erection"></div>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Fall Protection Equipment Inspection</h3>
-            <div class="sf-inspection-list">
-              <label class="sf-inspect-item"><input type="checkbox" name="harness_inspect" value="pass"> Full body harness — inspected, no damage, correct fit</label>
-              <label class="sf-inspect-item"><input type="checkbox" name="lanyard_inspect" value="pass"> Lanyard / SRL — inspected, no fraying or damage</label>
-              <label class="sf-inspect-item"><input type="checkbox" name="anchor_inspect" value="pass"> Anchor point — rated min. 5,000 lbs, properly installed</label>
-              <label class="sf-inspect-item"><input type="checkbox" name="connectors_inspect" value="pass"> Connectors / carabiners — no damage, gates function properly</label>
-              <label class="sf-inspect-item"><input type="checkbox" name="rescue_inspect" value="pass"> Rescue plan in place and communicated to crew</label>
-              <label class="sf-inspect-item"><input type="checkbox" name="ladder_inspect" value="pass"> Ladders secured, 3-point contact maintained (if applicable)</label>
-              <label class="sf-inspect-item"><input type="checkbox" name="scaffold_inspect" value="pass"> Scaffolding guardrails installed and secured (if applicable)</label>
-              <label class="sf-inspect-item"><input type="checkbox" name="perimeter_inspect" value="pass"> Perimeter protection / safety nets in place (if applicable)</label>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Equipment Details</h3>
-            <div class="sf-grid-2">
-              <div class="sf-field"><label>Harness Manufacturer / Model</label><input type="text" name="harness_model"></div>
-              <div class="sf-field"><label>Harness Serial #</label><input type="text" name="harness_serial"></div>
-              <div class="sf-field"><label>Last Inspection Date</label><input type="date" name="last_inspection"></div>
-              <div class="sf-field"><label>Next Due Date</label><input type="date" name="next_inspection"></div>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Deficiencies Found</h3>
-            <textarea name="deficiencies" rows="3" class="sf-textarea" placeholder="Describe any deficiencies found and corrective actions taken..."></textarea>
-          </div>
-
-          <div class="sf-section">
-            <h3>Worker Declaration</h3>
-            <p class="sf-help-text">I confirm I have inspected my fall protection equipment and found it to be in good working condition. I understand the fall protection plan and rescue procedure.</p>
-            <div class="sf-grid-2">
-              <div class="sf-field"><label>Worker Signature (type name)</label><input type="text" name="worker_sig" placeholder="Type full name as signature" required></div>
-              <div class="sf-field"><label>Supervisor Signature</label><input type="text" name="supervisor_sig" placeholder="Type full name as signature"></div>
-            </div>
-          </div>
-
-          <div class="sf-submit-row">
-            <div class="sf-email-note">📧 Form will be emailed to company contacts and saved to Records.</div>
-            <div class="sf-submit-actions">
-              <button type="button" class="btn btn-outline" onclick="previewSafetyForm('fall')">👁 Preview</button>
-              <button type="submit" class="btn btn-primary">✅ Submit Fall Arrest Form</button>
-            </div>
-          </div>
-        </form>
       </div>
 
-      <!-- Tool Box Talk Tab -->
-      <div id="sf-tab-sf-toolbox" class="pm-tab-content safety-form-tab">
-        <div class="sf-form-header">
-          <div>
-            <h2>Tool Box Talk / Safety Meeting</h2>
-            <p>Document your daily/weekly safety briefing with crew</p>
+      <!-- Fall Arrest Modal -->
+      <div id="sf-modal-sf-fall" class="modal-overlay hidden" onclick="closeSafetyFormModal('sf-fall', event)">
+        <div class="modal-box sf-modal-box" onclick="event.stopPropagation()">
+          <div class="modal-header">
+            <h2>🪝 Fall Arrest / Working at Heights</h2>
+            <button class="modal-close" onclick="closeSafetyFormModal('sf-fall')">✕</button>
           </div>
-          <div class="sf-compliance-badges">
-            <span class="sf-badge">✅ OHS Act</span>
+          <div class="modal-body sf-modal-body">
+            <div class="sf-compliance-badges" style="margin-bottom:12px">
+              <span class="sf-badge">✅ OHS Section 9.3</span>
+              <span class="sf-badge">✅ WCB</span>
+            </div>
+            <form id="form-sf-fall" class="safety-form" onsubmit="submitSafetyForm(event,'fall_arrest')">
+              <div class="sf-section">
+                <h3>Job Information</h3>
+                <div class="sf-grid-2">
+                  <div class="sf-field"><label>DATE</label><input type="date" name="date" required></div>
+                  <div class="sf-field"><label>PROJECT / SITE</label>
+                    <select name="project" id="sf-fall-project" required>
+                      <option value="">Select project...</option>
+                    </select>
+                  </div>
+                  <div class="sf-field"><label>WORKER NAME</label><input type="text" name="worker_name" required placeholder="Full name"></div>
+                  <div class="sf-field"><label>SUPERVISOR</label><input type="text" name="supervisor" placeholder="Supervisor name"></div>
+                  <div class="sf-field"><label>WORK AREA</label><input type="text" name="work_area" placeholder="Specific area / elevation"></div>
+                  <div class="sf-field"><label>HEIGHT (metres)</label><input type="number" name="height" step="0.1" placeholder="3.0"></div>
+                </div>
+              </div>
+              <div class="sf-section">
+                <h3>Equipment Inspection Checklist</h3>
+                <div class="sf-checkbox-grid">
+                  <label class="sf-check"><input type="checkbox" name="equip" value="harness_inspect"> Full body harness — no fraying/damage</label>
+                  <label class="sf-check"><input type="checkbox" name="equip" value="lanyard_inspect"> Lanyard / shock absorber — intact</label>
+                  <label class="sf-check"><input type="checkbox" name="equip" value="anchor_inspect"> Anchor point rated ≥ 22kN</label>
+                  <label class="sf-check"><input type="checkbox" name="equip" value="connector_inspect"> Connectors / snap hooks — gate locks</label>
+                  <label class="sf-check"><input type="checkbox" name="equip" value="rescue_plan"> Rescue plan in place</label>
+                  <label class="sf-check"><input type="checkbox" name="equip" value="training_current"> Worker training current</label>
+                </div>
+              </div>
+              <div class="sf-section">
+                <h3>Hazards Identified</h3>
+                <div id="fall-hazard-rows">
+                  <div class="sf-hazard-row">
+                    <input type="text" placeholder="HAZARD" name="hazard[]">
+                    <input type="text" placeholder="CONTROL MEASURE" name="control[]">
+                    <button type="button" class="btn-icon-remove" onclick="this.closest('.sf-hazard-row').remove()">✕</button>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline" onclick="addHazardRow('fall-hazard-rows')">+ Add Hazard</button>
+              </div>
+              <div class="sf-section">
+                <h3>Acknowledgment</h3>
+                <div id="fall-signature-rows">
+                  <div class="sf-sig-row">
+                    <input type="text" placeholder="Worker Name" name="worker_name[]">
+                    <input type="text" placeholder="Signature / Initials" name="worker_sig[]">
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline" onclick="addSignatureRow('fall-signature-rows')">+ Add Worker</button>
+              </div>
+              <div class="sf-submit-row">
+                <p class="sf-hint">📧 Form will be saved to Records and emailed to safety contacts.</p>
+                <button type="submit" class="btn btn-primary">✅ Submit Fall Arrest Form</button>
+              </div>
+            </form>
           </div>
         </div>
-        <form id="form-toolbox" class="safety-form" onsubmit="submitSafetyForm(event,'toolbox')">
-          <div class="sf-section">
-            <h3>Meeting Information</h3>
-            <div class="sf-grid-2">
-              <div class="sf-field"><label>Date</label><input type="date" name="date" required></div>
-              <div class="sf-field"><label>Time</label><input type="time" name="time"></div>
-              <div class="sf-field"><label>Project / Site</label><select name="project_id"><option value="">Select project...</option></select></div>
-              <div class="sf-field"><label>Meeting Led By</label><input type="text" name="led_by" required></div>
-              <div class="sf-field"><label>Duration (minutes)</label><input type="number" name="duration" min="1" value="15"></div>
-              <div class="sf-field"><label>Number of Attendees</label><input type="number" name="attendees" min="1" value="1"></div>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Topic(s) Discussed</h3>
-            <div class="sf-checkbox-grid">
-              <label class="sf-check"><input type="checkbox" name="topics" value="fall_protection"> Fall Protection</label>
-              <label class="sf-check"><input type="checkbox" name="topics" value="ppe_use"> PPE Use & Inspection</label>
-              <label class="sf-check"><input type="checkbox" name="topics" value="electrical_safety"> Electrical Safety</label>
-              <label class="sf-check"><input type="checkbox" name="topics" value="housekeeping"> Site Housekeeping</label>
-              <label class="sf-check"><input type="checkbox" name="topics" value="near_miss"> Near Miss Review</label>
-              <label class="sf-check"><input type="checkbox" name="topics" value="emergency_procedures"> Emergency Procedures</label>
-              <label class="sf-check"><input type="checkbox" name="topics" value="equipment_safety"> Equipment Safety</label>
-              <label class="sf-check"><input type="checkbox" name="topics" value="whmis"> WHMIS / Chemical Handling</label>
-              <label class="sf-check"><input type="checkbox" name="topics" value="new_hazard"> New Site Hazard</label>
-              <label class="sf-check"><input type="checkbox" name="topics" value="weather_conditions"> Weather Conditions</label>
-            </div>
-            <div class="sf-field" style="margin-top:8px">
-              <label>Additional Topic(s)</label>
-              <input type="text" name="other_topics" placeholder="Other topics discussed...">
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Key Points Discussed</h3>
-            <textarea name="key_points" rows="4" class="sf-textarea" placeholder="Summarize the key safety points, reminders, and any corrective actions discussed..." required></textarea>
-          </div>
-
-          <div class="sf-section">
-            <h3>Action Items / Follow-ups</h3>
-            <textarea name="action_items" rows="2" class="sf-textarea" placeholder="Any action items or follow-ups required..."></textarea>
-          </div>
-
-          <div class="sf-section">
-            <h3>Attendee Sign-Off</h3>
-            <div id="toolbox-signatures">
-              <div class="sf-sig-row">
-                <input type="text" name="worker_name[]" placeholder="Worker name" class="sf-sig-name">
-                <input type="text" name="worker_trade[]" placeholder="Trade / Role">
-                <label class="sf-check compact"><input type="checkbox" name="worker_ack[]"> Present</label>
-              </div>
-            </div>
-            <button type="button" class="btn btn-outline btn-sm" onclick="addSignatureRow('toolbox-signatures')">+ Add Attendee</button>
-          </div>
-
-          <div class="sf-submit-row">
-            <div class="sf-email-note">📧 Form will be emailed to company contacts and saved to Records.</div>
-            <div class="sf-submit-actions">
-              <button type="button" class="btn btn-outline" onclick="previewSafetyForm('toolbox')">👁 Preview</button>
-              <button type="submit" class="btn btn-primary">✅ Submit Tool Box Talk</button>
-            </div>
-          </div>
-        </form>
       </div>
 
-      <!-- Incident Report Tab -->
-      <div id="sf-tab-sf-incident" class="pm-tab-content safety-form-tab">
-        <div class="sf-form-header incident-header">
-          <div>
-            <h2>Incident / Injury Report</h2>
-            <p>WCB reportable — submit within 24 hours of incident</p>
+      <!-- Tool Box Talk Modal -->
+      <div id="sf-modal-sf-toolbox" class="modal-overlay hidden" onclick="closeSafetyFormModal('sf-toolbox', event)">
+        <div class="modal-box sf-modal-box" onclick="event.stopPropagation()">
+          <div class="modal-header">
+            <h2>🔧 Tool Box Talk</h2>
+            <button class="modal-close" onclick="closeSafetyFormModal('sf-toolbox')">✕</button>
           </div>
-          <div class="sf-compliance-badges">
-            <span class="sf-badge critical">⚠️ WCB Reportable</span>
-            <span class="sf-badge">✅ OHS Act</span>
+          <div class="modal-body sf-modal-body">
+            <form id="form-sf-toolbox" class="safety-form" onsubmit="submitSafetyForm(event,'toolbox_talk')">
+              <div class="sf-section">
+                <div class="sf-grid-2">
+                  <div class="sf-field"><label>DATE</label><input type="date" name="date" required></div>
+                  <div class="sf-field"><label>PROJECT / SITE</label>
+                    <select name="project" id="sf-toolbox-project" required>
+                      <option value="">Select project...</option>
+                    </select>
+                  </div>
+                  <div class="sf-field"><label>CONDUCTED BY</label><input type="text" name="conductor" placeholder="Name" required></div>
+                  <div class="sf-field"><label>DURATION (minutes)</label><input type="number" name="duration" value="15" min="5"></div>
+                </div>
+                <div class="sf-field"><label>TOPIC / SAFETY SUBJECT</label><input type="text" name="topic" required placeholder="e.g. Fall Protection, WHMIS, PPE Usage"></div>
+                <div class="sf-field"><label>DISCUSSION POINTS</label><textarea name="discussion" rows="4" placeholder="Key points discussed during the meeting..."></textarea></div>
+                <div class="sf-field"><label>ACTION ITEMS</label><textarea name="action_items" rows="2" placeholder="Any follow-up actions required..."></textarea></div>
+              </div>
+              <div class="sf-section">
+                <h3>Attendance</h3>
+                <div id="toolbox-signature-rows">
+                  <div class="sf-sig-row">
+                    <input type="text" placeholder="Worker Name" name="worker_name[]">
+                    <input type="text" placeholder="Signature / Initials" name="worker_sig[]">
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline" onclick="addSignatureRow('toolbox-signature-rows')">+ Add Attendee</button>
+              </div>
+              <div class="sf-submit-row">
+                <button type="submit" class="btn btn-primary">✅ Submit Tool Box Talk</button>
+              </div>
+            </form>
           </div>
         </div>
-        <form id="form-incident" class="safety-form" onsubmit="submitSafetyForm(event,'incident')">
-          <div class="sf-section">
-            <h3>Incident Details</h3>
-            <div class="sf-grid-2">
-              <div class="sf-field"><label>Date of Incident</label><input type="date" name="incident_date" required></div>
-              <div class="sf-field"><label>Time of Incident</label><input type="time" name="incident_time" required></div>
-              <div class="sf-field"><label>Project / Site</label><select name="project_id"><option value="">Select project...</option></select></div>
-              <div class="sf-field"><label>Location on Site</label><input type="text" name="location" placeholder="Specific location" required></div>
-              <div class="sf-field"><label>Type of Incident</label>
-                <select name="incident_type" required>
-                  <option value="">Select type...</option>
-                  <option>Injury — Lost Time</option>
-                  <option>Injury — Medical Aid</option>
-                  <option>Injury — First Aid Only</option>
-                  <option>Near Miss</option>
-                  <option>Property Damage</option>
-                  <option>Environmental Release</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div class="sf-field"><label>Severity</label>
-                <select name="severity">
-                  <option>Minor</option><option>Moderate</option><option>Serious</option><option>Critical</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Injured / Involved Person</h3>
-            <div class="sf-grid-2">
-              <div class="sf-field"><label>Full Name</label><input type="text" name="person_name" required></div>
-              <div class="sf-field"><label>Trade / Position</label><input type="text" name="person_trade"></div>
-              <div class="sf-field"><label>Company / Employer</label><input type="text" name="person_company"></div>
-              <div class="sf-field"><label>Years of Experience</label><input type="number" name="person_experience" min="0"></div>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Description of Incident</h3>
-            <textarea name="description" rows="4" class="sf-textarea" placeholder="Describe exactly what happened, in chronological order..." required></textarea>
-          </div>
-
-          <div class="sf-section">
-            <h3>Body Parts Affected (if injury)</h3>
-            <div class="sf-checkbox-grid">
-              <label class="sf-check"><input type="checkbox" name="body_parts" value="head"> Head / Skull</label>
-              <label class="sf-check"><input type="checkbox" name="body_parts" value="eyes"> Eyes</label>
-              <label class="sf-check"><input type="checkbox" name="body_parts" value="neck"> Neck</label>
-              <label class="sf-check"><input type="checkbox" name="body_parts" value="shoulder"> Shoulder</label>
-              <label class="sf-check"><input type="checkbox" name="body_parts" value="arm_hand"> Arm / Hand / Wrist</label>
-              <label class="sf-check"><input type="checkbox" name="body_parts" value="back"> Back / Spine</label>
-              <label class="sf-check"><input type="checkbox" name="body_parts" value="torso"> Chest / Torso</label>
-              <label class="sf-check"><input type="checkbox" name="body_parts" value="leg_foot"> Leg / Foot / Ankle</label>
-              <label class="sf-check"><input type="checkbox" name="body_parts" value="multiple"> Multiple Areas</label>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Immediate Actions Taken</h3>
-            <div class="sf-checkbox-grid">
-              <label class="sf-check"><input type="checkbox" name="actions" value="first_aid"> First Aid Applied</label>
-              <label class="sf-check"><input type="checkbox" name="actions" value="911"> 911 Called</label>
-              <label class="sf-check"><input type="checkbox" name="actions" value="hospital"> Transported to Hospital</label>
-              <label class="sf-check"><input type="checkbox" name="actions" value="area_secured"> Area Secured / Isolated</label>
-              <label class="sf-check"><input type="checkbox" name="actions" value="wcb_notified"> WCB Notified</label>
-              <label class="sf-check"><input type="checkbox" name="actions" value="ohs_notified"> OHS Notified</label>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Root Cause Analysis</h3>
-            <textarea name="root_cause" rows="3" class="sf-textarea" placeholder="What was the root cause? Contributing factors?"></textarea>
-          </div>
-
-          <div class="sf-section">
-            <h3>Corrective / Preventive Actions</h3>
-            <textarea name="corrective_actions" rows="3" class="sf-textarea" placeholder="What steps will be taken to prevent recurrence?"></textarea>
-          </div>
-
-          <div class="sf-section">
-            <h3>Witnesses</h3>
-            <div class="sf-grid-2">
-              <div class="sf-field"><label>Witness 1</label><input type="text" name="witness1" placeholder="Name and contact"></div>
-              <div class="sf-field"><label>Witness 2</label><input type="text" name="witness2" placeholder="Name and contact"></div>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Report Completed By</h3>
-            <div class="sf-grid-2">
-              <div class="sf-field"><label>Supervisor / Foreman</label><input type="text" name="reported_by" required></div>
-              <div class="sf-field"><label>Date Reported</label><input type="date" name="reported_date" required></div>
-            </div>
-          </div>
-
-          <div class="sf-submit-row">
-            <div class="sf-email-note">⚠️ This form will be emailed to all registered company contacts immediately.</div>
-            <div class="sf-submit-actions">
-              <button type="button" class="btn btn-outline" onclick="previewSafetyForm('incident')">👁 Preview</button>
-              <button type="submit" class="btn btn-danger">🚨 Submit Incident Report</button>
-            </div>
-          </div>
-        </form>
       </div>
 
-      <!-- Site Inspection Tab -->
-      <div id="sf-tab-sf-inspection" class="pm-tab-content safety-form-tab">
-        <div class="sf-form-header">
-          <div>
-            <h2>Site Safety Inspection</h2>
-            <p>Weekly site safety walkthrough — document and track hazards</p>
+      <!-- Incident Report Modal -->
+      <div id="sf-modal-sf-incident" class="modal-overlay hidden" onclick="closeSafetyFormModal('sf-incident', event)">
+        <div class="modal-box sf-modal-box" onclick="event.stopPropagation()">
+          <div class="modal-header">
+            <h2>🚨 Incident / Near Miss Report</h2>
+            <button class="modal-close" onclick="closeSafetyFormModal('sf-incident')">✕</button>
           </div>
-          <div class="sf-compliance-badges">
-            <span class="sf-badge">✅ OHS Act</span>
+          <div class="modal-body sf-modal-body">
+            <div class="sf-compliance-badges" style="margin-bottom:12px">
+              <span class="sf-badge">✅ WCB Required</span>
+              <span class="sf-badge">✅ OHS Act</span>
+            </div>
+            <form id="form-sf-incident" class="safety-form" onsubmit="submitSafetyForm(event,'incident_report')">
+              <div class="sf-section">
+                <h3>Incident Details</h3>
+                <div class="sf-grid-2">
+                  <div class="sf-field"><label>DATE OF INCIDENT</label><input type="date" name="date" required></div>
+                  <div class="sf-field"><label>TIME</label><input type="time" name="time" required></div>
+                  <div class="sf-field"><label>PROJECT / SITE</label>
+                    <select name="project" id="sf-incident-project" required>
+                      <option value="">Select project...</option>
+                    </select>
+                  </div>
+                  <div class="sf-field"><label>LOCATION ON SITE</label><input type="text" name="location" placeholder="Specific area"></div>
+                  <div class="sf-field"><label>INCIDENT TYPE</label>
+                    <select name="incident_type" required>
+                      <option value="">Select...</option>
+                      <option>Injury</option>
+                      <option>Near Miss</option>
+                      <option>Property Damage</option>
+                      <option>Environmental</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  <div class="sf-field"><label>SEVERITY</label>
+                    <select name="severity" required>
+                      <option value="">Select...</option>
+                      <option>Minor / First Aid</option>
+                      <option>Medical Treatment</option>
+                      <option>Lost Time</option>
+                      <option>Critical</option>
+                      <option>Fatality</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="sf-section">
+                <h3>Persons Involved</h3>
+                <div class="sf-grid-2">
+                  <div class="sf-field"><label>INJURED PERSON NAME</label><input type="text" name="injured_name" placeholder="Full name"></div>
+                  <div class="sf-field"><label>TRADE / POSITION</label><input type="text" name="injured_trade" placeholder="e.g. Framer, Electrician"></div>
+                  <div class="sf-field"><label>EMPLOYER</label><input type="text" name="injured_employer" placeholder="Company name"></div>
+                  <div class="sf-field"><label>DAYS LOST (estimated)</label><input type="number" name="days_lost" value="0" min="0"></div>
+                </div>
+              </div>
+              <div class="sf-section">
+                <h3>Description</h3>
+                <div class="sf-field"><label>DESCRIBE WHAT HAPPENED</label><textarea name="description" rows="4" required placeholder="Detailed description of the incident..."></textarea></div>
+                <div class="sf-field"><label>IMMEDIATE CAUSE</label><textarea name="immediate_cause" rows="2" placeholder="Direct cause of the incident..."></textarea></div>
+                <div class="sf-field"><label>ROOT CAUSE</label><textarea name="root_cause" rows="2" placeholder="Underlying cause (training, procedure, equipment...)..."></textarea></div>
+                <div class="sf-field"><label>CORRECTIVE ACTIONS TAKEN</label><textarea name="corrective_action" rows="3" placeholder="Steps taken immediately after the incident..."></textarea></div>
+                <div class="sf-field"><label>PREVENTIVE MEASURES</label><textarea name="preventive" rows="2" placeholder="Steps to prevent recurrence..."></textarea></div>
+              </div>
+              <div class="sf-section">
+                <h3>Witnesses</h3>
+                <div id="incident-signature-rows">
+                  <div class="sf-sig-row">
+                    <input type="text" placeholder="Witness Name" name="worker_name[]">
+                    <input type="text" placeholder="Contact / Initials" name="worker_sig[]">
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline" onclick="addSignatureRow('incident-signature-rows')">+ Add Witness</button>
+              </div>
+              <div class="sf-grid-2">
+                <div class="sf-field"><label>REPORTED BY</label><input type="text" name="reported_by" placeholder="Your name"></div>
+                <div class="sf-field"><label>WCB CLAIM NUMBER (if applicable)</label><input type="text" name="wcb_claim" placeholder="WCB #"></div>
+              </div>
+              <div class="sf-submit-row">
+                <p class="sf-hint">⚠️ This form must be submitted to WCB within 72 hours of a lost-time injury.</p>
+                <button type="submit" class="btn btn-danger">🚨 Submit Incident Report</button>
+              </div>
+            </form>
           </div>
         </div>
-        <form id="form-inspection" class="safety-form" onsubmit="submitSafetyForm(event,'inspection')">
-          <div class="sf-section">
-            <h3>Inspection Details</h3>
-            <div class="sf-grid-2">
-              <div class="sf-field"><label>Date</label><input type="date" name="date" required></div>
-              <div class="sf-field"><label>Project / Site</label><select name="project_id"><option value="">Select project...</option></select></div>
-              <div class="sf-field"><label>Inspected By</label><input type="text" name="inspected_by" required></div>
-              <div class="sf-field"><label>Weather Conditions</label><input type="text" name="weather" placeholder="e.g. Clear, -5°C, windy"></div>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Inspection Checklist</h3>
-            <div class="sf-inspection-table">
-              <div class="sf-inspect-header">
-                <span>Item</span><span>Pass</span><span>Fail</span><span>N/A</span><span>Notes</span>
-              </div>
-              <div class="sf-inspect-row">
-                <span>Housekeeping — site clean, materials stored safely</span>
-                <input type="radio" name="inspect_housekeeping" value="pass">
-                <input type="radio" name="inspect_housekeeping" value="fail">
-                <input type="radio" name="inspect_housekeeping" value="na">
-                <input type="text" name="note_housekeeping" placeholder="Notes">
-              </div>
-              <div class="sf-inspect-row">
-                <span>PPE — workers wearing required equipment</span>
-                <input type="radio" name="inspect_ppe" value="pass">
-                <input type="radio" name="inspect_ppe" value="fail">
-                <input type="radio" name="inspect_ppe" value="na">
-                <input type="text" name="note_ppe" placeholder="Notes">
-              </div>
-              <div class="sf-inspect-row">
-                <span>Fall protection — guardrails, openings covered</span>
-                <input type="radio" name="inspect_fall" value="pass">
-                <input type="radio" name="inspect_fall" value="fail">
-                <input type="radio" name="inspect_fall" value="na">
-                <input type="text" name="note_fall" placeholder="Notes">
-              </div>
-              <div class="sf-inspect-row">
-                <span>Electrical — cords protected, panels covered</span>
-                <input type="radio" name="inspect_electrical" value="pass">
-                <input type="radio" name="inspect_electrical" value="fail">
-                <input type="radio" name="inspect_electrical" value="na">
-                <input type="text" name="note_electrical" placeholder="Notes">
-              </div>
-              <div class="sf-inspect-row">
-                <span>Tools & equipment — in good condition, guarded</span>
-                <input type="radio" name="inspect_tools" value="pass">
-                <input type="radio" name="inspect_tools" value="fail">
-                <input type="radio" name="inspect_tools" value="na">
-                <input type="text" name="note_tools" placeholder="Notes">
-              </div>
-              <div class="sf-inspect-row">
-                <span>Ladders — secured, correct angle, not overloaded</span>
-                <input type="radio" name="inspect_ladders" value="pass">
-                <input type="radio" name="inspect_ladders" value="fail">
-                <input type="radio" name="inspect_ladders" value="na">
-                <input type="text" name="note_ladders" placeholder="Notes">
-              </div>
-              <div class="sf-inspect-row">
-                <span>Fire extinguishers — accessible, charged, not blocked</span>
-                <input type="radio" name="inspect_fire" value="pass">
-                <input type="radio" name="inspect_fire" value="fail">
-                <input type="radio" name="inspect_fire" value="na">
-                <input type="text" name="note_fire" placeholder="Notes">
-              </div>
-              <div class="sf-inspect-row">
-                <span>First aid kit — fully stocked, accessible</span>
-                <input type="radio" name="inspect_firstaid" value="pass">
-                <input type="radio" name="inspect_firstaid" value="fail">
-                <input type="radio" name="inspect_firstaid" value="na">
-                <input type="text" name="note_firstaid" placeholder="Notes">
-              </div>
-              <div class="sf-inspect-row">
-                <span>Signage — hazard signs posted, site secured from public</span>
-                <input type="radio" name="inspect_signage" value="pass">
-                <input type="radio" name="inspect_signage" value="fail">
-                <input type="radio" name="inspect_signage" value="na">
-                <input type="text" name="note_signage" placeholder="Notes">
-              </div>
-              <div class="sf-inspect-row">
-                <span>Emergency procedures — posted, crew aware of muster point</span>
-                <input type="radio" name="inspect_emergency" value="pass">
-                <input type="radio" name="inspect_emergency" value="fail">
-                <input type="radio" name="inspect_emergency" value="na">
-                <input type="text" name="note_emergency" placeholder="Notes">
-              </div>
-            </div>
-          </div>
-
-          <div class="sf-section">
-            <h3>Deficiencies Found</h3>
-            <textarea name="deficiencies" rows="3" class="sf-textarea" placeholder="List all deficiencies found and corrective actions required..."></textarea>
-          </div>
-
-          <div class="sf-section">
-            <h3>Overall Inspection Rating</h3>
-            <div class="sf-rating-row">
-              <label class="sf-rating-opt"><input type="radio" name="overall_rating" value="satisfactory"> ✅ Satisfactory</label>
-              <label class="sf-rating-opt"><input type="radio" name="overall_rating" value="needs_improvement"> ⚠️ Needs Improvement</label>
-              <label class="sf-rating-opt"><input type="radio" name="overall_rating" value="unsatisfactory"> 🔴 Unsatisfactory — Stop Work</label>
-            </div>
-          </div>
-
-          <div class="sf-submit-row">
-            <div class="sf-email-note">📧 Form will be emailed to company contacts and saved to Records.</div>
-            <div class="sf-submit-actions">
-              <button type="button" class="btn btn-outline" onclick="previewSafetyForm('inspection')">👁 Preview</button>
-              <button type="submit" class="btn btn-primary">✅ Submit Inspection</button>
-            </div>
-          </div>
-        </form>
       </div>
 
-      <!-- Records Tab -->
-      <div id="sf-tab-sf-records" class="pm-tab-content safety-form-tab">
-        <div class="page-header" style="padding:0;margin-bottom:16px">
-          <h2 style="margin:0">📂 Safety Form Records</h2>
-          <div class="page-actions">
-            <select id="sf-records-filter" onchange="renderSafetyRecords()" class="btn btn-outline btn-sm" style="cursor:pointer">
-              <option value="all">All Forms</option>
-              <option value="flha">FLHA</option>
-              <option value="fall">Fall Arrest</option>
-              <option value="toolbox">Tool Box Talk</option>
-              <option value="incident">Incident Reports</option>
-              <option value="inspection">Site Inspections</option>
-            </select>
+      <!-- Site Inspection Modal -->
+      <div id="sf-modal-sf-inspection" class="modal-overlay hidden" onclick="closeSafetyFormModal('sf-inspection', event)">
+        <div class="modal-box sf-modal-box" onclick="event.stopPropagation()">
+          <div class="modal-header">
+            <h2>🔍 Site Safety Inspection</h2>
+            <button class="modal-close" onclick="closeSafetyFormModal('sf-inspection')">✕</button>
           </div>
-        </div>
-        <div id="sf-records-list">
-          <div class="pm-empty-state">
-            <div class="pm-empty-icon">📂</div>
-            <h3>No Records Yet</h3>
-            <p>Submitted safety forms will appear here. Complete and submit a form from any of the tabs above.</p>
+          <div class="modal-body sf-modal-body">
+            <form id="form-sf-inspection" class="safety-form" onsubmit="submitSafetyForm(event,'site_inspection')">
+              <div class="sf-section">
+                <div class="sf-grid-2">
+                  <div class="sf-field"><label>DATE</label><input type="date" name="date" required></div>
+                  <div class="sf-field"><label>PROJECT / SITE</label>
+                    <select name="project" id="sf-inspection-project" required>
+                      <option value="">Select project...</option>
+                    </select>
+                  </div>
+                  <div class="sf-field"><label>INSPECTOR NAME</label><input type="text" name="inspector" required placeholder="Full name"></div>
+                  <div class="sf-field"><label>WEATHER CONDITIONS</label><input type="text" name="weather" placeholder="e.g. Sunny, -5°C"></div>
+                </div>
+              </div>
+              <div class="sf-section">
+                <h3>Inspection Checklist</h3>
+                <table class="sf-inspection-table">
+                  <thead><tr><th>Item</th><th>Pass</th><th>Fail</th><th>N/A</th><th>Notes</th></tr></thead>
+                  <tbody>
+                    <tr><td>Site perimeter / fencing secure</td><td><input type="radio" name="insp1" value="pass"></td><td><input type="radio" name="insp1" value="fail"></td><td><input type="radio" name="insp1" value="na" checked></td><td><input type="text" name="insp1_note" placeholder="Notes..."></td></tr>
+                    <tr><td>Signage / traffic control adequate</td><td><input type="radio" name="insp2" value="pass"></td><td><input type="radio" name="insp2" value="fail"></td><td><input type="radio" name="insp2" value="na" checked></td><td><input type="text" name="insp2_note"></td></tr>
+                    <tr><td>Housekeeping / waste management</td><td><input type="radio" name="insp3" value="pass"></td><td><input type="radio" name="insp3" value="fail"></td><td><input type="radio" name="insp3" value="na" checked></td><td><input type="text" name="insp3_note"></td></tr>
+                    <tr><td>Fall protection in place (>3m)</td><td><input type="radio" name="insp4" value="pass"></td><td><input type="radio" name="insp4" value="fail"></td><td><input type="radio" name="insp4" value="na" checked></td><td><input type="text" name="insp4_note"></td></tr>
+                    <tr><td>Ladders / scaffolding — safe</td><td><input type="radio" name="insp5" value="pass"></td><td><input type="radio" name="insp5" value="fail"></td><td><input type="radio" name="insp5" value="na" checked></td><td><input type="text" name="insp5_note"></td></tr>
+                    <tr><td>Tools / equipment — guarded</td><td><input type="radio" name="insp6" value="pass"></td><td><input type="radio" name="insp6" value="fail"></td><td><input type="radio" name="insp6" value="na" checked></td><td><input type="text" name="insp6_note"></td></tr>
+                    <tr><td>Electrical — GFCI / temp power</td><td><input type="radio" name="insp7" value="pass"></td><td><input type="radio" name="insp7" value="fail"></td><td><input type="radio" name="insp7" value="na" checked></td><td><input type="text" name="insp7_note"></td></tr>
+                    <tr><td>WHMIS labels / SDS available</td><td><input type="radio" name="insp8" value="pass"></td><td><input type="radio" name="insp8" value="fail"></td><td><input type="radio" name="insp8" value="na" checked></td><td><input type="text" name="insp8_note"></td></tr>
+                    <tr><td>First aid kit stocked</td><td><input type="radio" name="insp9" value="pass"></td><td><input type="radio" name="insp9" value="fail"></td><td><input type="radio" name="insp9" value="na" checked></td><td><input type="text" name="insp9_note"></td></tr>
+                    <tr><td>PPE worn by all workers</td><td><input type="radio" name="insp10" value="pass"></td><td><input type="radio" name="insp10" value="fail"></td><td><input type="radio" name="insp10" value="na" checked></td><td><input type="text" name="insp10_note"></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="sf-field"><label>DEFICIENCIES NOTED</label><textarea name="deficiencies" rows="3" placeholder="List any deficiencies found and required corrective actions..."></textarea></div>
+              <div class="sf-submit-row">
+                <button type="submit" class="btn btn-primary">✅ Submit Inspection</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -4156,8 +3968,71 @@
     </div>
   </div>
 </div>
+  </main>  </main>
 
-<script src="/static/app.js?v=2.7"></script>
+  <!-- Bottom Navigation (Mobile) -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <a class="bn-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+      <span class="bn-icon">📊</span>
+      <span class="bn-label">Home</span>
+    </a>
+    <a class="bn-item" data-page="ai-chat" onclick="navigateTo('ai-chat')">
+      <span class="bn-icon">🤖</span>
+      <span class="bn-label">AI</span>
+    </a>
+    <a class="bn-item" data-page="invoices" onclick="navigateTo('invoices')">
+      <span class="bn-icon">📄</span>
+      <span class="bn-label">Invoices</span>
+    </a>
+    <a class="bn-item" data-page="projects" onclick="navigateTo('projects')">
+      <span class="bn-icon">🏗️</span>
+      <span class="bn-label">Projects</span>
+    </a>
+    <a class="bn-item" data-page="safety-forms" onclick="navigateTo('safety-forms')">
+      <span class="bn-icon">🦺</span>
+      <span class="bn-label">Safety</span>
+    </a>
+  </nav>
+
+  <!-- Floating AI Chat Button + Mini Popup -->
+  <button class="fab-ai" onclick="toggleMiniChat()" title="Ask Foreman AI" id="fab-ai-btn">📋</button>
+
+  <!-- Mini Floating Chat Popup -->
+  <div id="mini-chat-popup" class="mini-chat-popup hidden">
+    <div class="mini-chat-header">
+      <div class="mini-chat-title">
+        <span class="mini-chat-avatar">📋</span>
+        <div>
+          <div class="mini-chat-name">Foreman AI</div>
+          <div class="mini-chat-status">● Online — Ask me anything</div>
+        </div>
+      </div>
+      <div class="mini-chat-header-actions">
+        <button onclick="openFullChat()" title="Open full chat" class="mini-chat-expand">⤢</button>
+        <button onclick="toggleMiniChat()" class="mini-chat-close">✕</button>
+      </div>
+    </div>
+    <div class="mini-chat-messages" id="mini-chat-messages">
+      <div class="mini-msg ai">
+        <div class="mini-msg-bubble">
+          Hi! I'm <strong>Foreman AI</strong> — your on-site construction assistant. Ask about your projects, safety, invoicing, or anything on your plate today.
+        </div>
+      </div>
+    </div>
+    <div class="mini-chat-quick-prompts" id="mini-quick-prompts">
+      <button onclick="sendMiniPrompt('Summarize my active projects')">📋 Projects</button>
+      <button onclick="sendMiniPrompt('What tasks are overdue?')">⏰ Overdue</button>
+      <button onclick="sendMiniPrompt('What safety forms do I need today?')">🦺 Safety</button>
+      <button onclick="sendMiniPrompt('Help me write a quick site note')">📝 Site Note</button>
+    </div>
+    <div class="mini-chat-input-row">
+      <textarea id="mini-chat-input" placeholder="Ask Foreman AI..." rows="1"
+        onkeydown="handleMiniChatKey(event)" oninput="autoResize(this)"></textarea>
+      <button onclick="sendMiniChat()" class="mini-send-btn">➤</button>
+    </div>
+  </div>
+
+<script src="/static/app.js?v=2.8"></script>
 
 <!-- Edit Project Modal -->
 <div id="modal-edit-project" class="modal-overlay hidden">

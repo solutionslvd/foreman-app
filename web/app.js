@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   The Foreman AI - App JavaScript v2.7
+   The Foreman AI - App JavaScript v2.8
    Full mobile-first PWA with admin settings, RBAC, QB financials
 ═══════════════════════════════════════════════════════════ */
 
@@ -476,10 +476,14 @@ function navigateTo(page) {
   else if (page === 'compliance') loadCompliance();
   else if (page === 'billing') loadBilling();
   else if (page === 'delays') renderDelaysPage();
-  else if (page === 'safety-forms') { switchSafetyTab('sf-flha'); populateSafetyFormProjects(); }
+  else if (page === 'safety-forms') { populateSafetyFormProjects(); }
 
   // Scroll to top
-  document.getElementById('app-main').scrollTop = 0;
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  const appMain = document.getElementById('app-main');
+  if (appMain) appMain.scrollTop = 0;
 }
 
 function toggleSidebar() {
@@ -3324,6 +3328,17 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Close modals on ESC key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    // Close any open standard modal-overlay
+    document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(m => {
+      m.classList.add('hidden');
+    });
+    document.body.style.overflow = '';
+  }
+});
+
 // ═══════════════════════════════════════════════════════════
 // NOTIFICATIONS
 // ═══════════════════════════════════════════════════════════
@@ -5029,7 +5044,7 @@ function appendMessage(text, role, actions) {
   const container = document.getElementById('chat-messages');
   const div = document.createElement('div');
   div.className = `chat-message ${role}`;
-  const avatar = role === 'ai' ? '🪖' : (currentUser?.contact_name?.charAt(0)?.toUpperCase() || 'U');
+  const avatar = role === 'ai' ? '📋' : (currentUser?.contact_name?.charAt(0)?.toUpperCase() || 'U');
   
   let actionsHtml = '';
   if (actions && actions.length > 0) {
@@ -7596,7 +7611,7 @@ function buildContextSummary() {
   return `${projects.length} projects, ${tasks.length} tasks (${overdue} overdue), ${outstanding.length} outstanding invoices.`;
 }
 
-console.log('🪖 Foreman AI Mini Chat loaded');
+console.log('📋 Foreman AI Mini Chat loaded');
 
 // ═══════════════════════════════════════════════════════════
 //  DELAYS & DEFICIENCIES SYSTEM
@@ -7839,54 +7854,62 @@ function deleteDelay(id) {
 // ═══════════════════════════════════════════════════════════
 
 function switchSafetyTab(tab) {
-  // Deactivate all safety tabs
-  document.querySelectorAll('.safety-tabs .pm-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.safety-form-tab').forEach(t => t.classList.remove('active'));
-
-  // Activate selected
-  const btn = document.querySelector(`.safety-tabs [data-tab="sf-${tab}"]`) ||
-              document.querySelector(`.safety-tabs [data-tab="${tab}"]`);
-  if (btn) btn.classList.add('active');
-
-  const tabId = tab.startsWith('sf-') ? `sf-tab-${tab}` : `sf-tab-sf-${tab}`;
-  const el = document.getElementById(tabId);
-  if (el) el.classList.add('active');
-
-  if (tab === 'sf-records' || tab === 'records') renderSafetyRecords();
-
-  // Populate project dropdowns in forms
-  populateSafetyFormProjects();
+  // Legacy support - if called with old tab names, just show records
+  if (tab === 'sf-records' || tab === 'records') {
+    renderSafetyRecords();
+  }
 }
 
-function populateSafetyFormProjects() {
+function openSafetyFormModal(formId) {
+  const modal = document.getElementById('sf-modal-' + formId);
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  populateSafetyFormProjects(formId);
+  // Set today's date
+  const today = new Date().toISOString().split('T')[0];
+  modal.querySelectorAll('input[type="date"]').forEach(inp => {
+    if (!inp.value) inp.value = today;
+  });
+}
+
+function closeSafetyFormModal(formId, event) {
+  if (event && event.target !== event.currentTarget) return;
+  const modal = document.getElementById('sf-modal-' + formId);
+  if (!modal) return;
+  modal.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function hideSafetyRecords() {
+  const records = document.getElementById('sf-tab-sf-records');
+  const grid = document.getElementById('sf-card-grid');
+  if (records) records.classList.add('hidden');
+  if (grid) grid.style.display = '';
+}
+
+function populateSafetyFormProjects(formId) {
   const projects = store.projects || [];
   const opts = '<option value="">Select project...</option>' +
-    projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-  document.querySelectorAll('.safety-form select[name="project_id"]').forEach(sel => {
-    sel.innerHTML = opts;
-  });
-  // Set today's date on all date fields
-  const today = new Date().toISOString().split('T')[0];
-  document.querySelectorAll('.safety-form input[type="date"][name="date"]').forEach(inp => {
-    if (!inp.value) inp.value = today;
-  });
-  document.querySelectorAll('.safety-form input[type="date"][name="incident_date"], .safety-form input[type="date"][name="reported_date"]').forEach(inp => {
-    if (!inp.value) inp.value = today;
+    projects.map(p => '<option value="' + p.id + '">' + p.name + '</option>').join('');
+  // Update all project selects in all safety form modals
+  const selectors = ['sf-flha-project','sf-fall-project','sf-toolbox-project','sf-incident-project','sf-inspection-project'];
+  selectors.forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = opts;
   });
 }
 
-function addHazardRow() {
-  const container = document.getElementById('flha-hazards');
+function addHazardRow(containerId) {
+  const id = containerId || 'flha-hazard-rows';
+  const container = document.getElementById(id);
   if (!container) return;
   const row = document.createElement('div');
   row.className = 'sf-hazard-row';
-  row.innerHTML = `
-    <div class="sf-field flex-1"><input type="text" name="hazard[]" placeholder="e.g. Overhead work"></div>
-    <div class="sf-field flex-1"><input type="text" name="control[]" placeholder="e.g. Hard hat required, stay clear"></div>
-    <div class="sf-field w-120">
-      <select name="risk_level[]"><option>Low</option><option>Medium</option><option selected>High</option></select>
-    </div>
-    <button type="button" onclick="this.parentElement.remove()" class="btn btn-sm btn-outline" style="align-self:flex-end">✕</button>`;
+  row.innerHTML = '<input type="text" placeholder="HAZARD" name="hazard[]">' +
+    '<input type="text" placeholder="CONTROL MEASURE" name="control[]">' +
+    '<select name="risk_level[]"><option>Low</option><option>Medium</option><option>High</option></select>' +
+    '<button type="button" class="btn-icon-remove" onclick="this.closest(\'.sf-hazard-row\').remove()">✕</button>';
   container.appendChild(row);
 }
 
@@ -7895,11 +7918,8 @@ function addSignatureRow(containerId) {
   if (!container) return;
   const row = document.createElement('div');
   row.className = 'sf-sig-row';
-  row.innerHTML = `
-    <input type="text" name="worker_name[]" placeholder="Worker name" class="sf-sig-name">
-    <input type="text" name="worker_trade[]" placeholder="Trade / Role">
-    <label class="sf-check compact"><input type="checkbox" name="worker_ack[]"> Acknowledged</label>
-    <button type="button" onclick="this.parentElement.remove()" class="btn btn-sm btn-outline">✕</button>`;
+  row.innerHTML = '<input type="text" name="worker_name[]" placeholder="Worker Name">' +
+    '<input type="text" name="worker_sig[]" placeholder="Signature / Initials">';
   container.appendChild(row);
 }
 
@@ -7918,15 +7938,18 @@ function submitSafetyForm(e, formType) {
     }
   }
 
-  const formNames = { flha: 'FLHA', fall: 'Fall Arrest', toolbox: 'Tool Box Talk', incident: 'Incident Report', inspection: 'Site Inspection' };
+  const formNames = { flha: 'FLHA', fall_arrest: 'Fall Arrest', toolbox_talk: 'Tool Box Talk', incident_report: 'Incident Report', site_inspection: 'Site Inspection' };
+  // Also support old short names
+  const formNamesFallback = { flha: 'FLHA', fall: 'Fall Arrest', toolbox: 'Tool Box Talk', incident: 'Incident Report', inspection: 'Site Inspection' };
+  const projectId = data.project || data.project_id || '';
   const record = {
     id: 'sf_' + Date.now(),
     form_type: formType,
-    form_name: formNames[formType] || formType,
-    project_id: data.project_id || '',
-    project_name: (store.projects || []).find(p => p.id === data.project_id)?.name || 'General',
+    form_name: formNames[formType] || formNamesFallback[formType] || formType,
+    project_id: projectId,
+    project_name: (store.projects || []).find(p => String(p.id) === String(projectId))?.name || 'General',
     date: data.date || data.incident_date || new Date().toISOString().split('T')[0],
-    submitted_by: data.foreman || data.led_by || data.inspected_by || data.reported_by || data.worker_name || currentUser?.contact_name || 'Foreman',
+    submitted_by: data.foreman || data.conductor || data.inspector || data.reported_by || data.worker_name || currentUser?.name || 'Foreman',
     submitted_at: new Date().toISOString(),
     data: data
   };
@@ -7936,19 +7959,18 @@ function submitSafetyForm(e, formType) {
   saveStore();
 
   // Simulate email notification
-  const projectName = record.project_name;
-  showToast(`✅ ${record.form_name} submitted for ${projectName}. Email sent to company contacts.`, 'success');
+  showToast('✅ ' + record.form_name + ' submitted for ' + record.project_name + '. Saved to Records.', 'success');
   form.reset();
 
   // If incident, also log as a delay/deficiency
-  if (formType === 'incident') {
+  if (formType === 'incident_report') {
     const incEntry = {
       id: 'del_' + Date.now(),
       type: 'safety',
       severity: data.severity || 'high',
-      projectId: data.project_id,
-      title: `Incident Report: ${data.description ? data.description.substring(0, 60) : 'Site incident'}`,
-      date: data.incident_date || new Date().toISOString().split('T')[0],
+      projectId: projectId,
+      title: 'Incident Report: ' + (data.description ? data.description.substring(0, 60) : 'Site incident'),
+      date: data.date || new Date().toISOString().split('T')[0],
       status: 'open',
       logged_by: record.submitted_by,
       logged_at: new Date().toISOString()
@@ -7958,8 +7980,13 @@ function submitSafetyForm(e, formType) {
     saveStore();
   }
 
-  // Switch to records tab
-  setTimeout(() => switchSafetyTab('sf-records'), 500);
+  // Close the modal and show records
+  const modalMap = { flha: 'sf-flha', fall_arrest: 'sf-fall', toolbox_talk: 'sf-toolbox', incident_report: 'sf-incident', site_inspection: 'sf-inspection' };
+  const modalId = modalMap[formType];
+  if (modalId) closeSafetyFormModal(modalId);
+
+  // Show records after a brief delay
+  setTimeout(() => renderSafetyRecords(), 300);
 }
 
 function previewSafetyForm(formType) {
@@ -7974,45 +8001,47 @@ function previewSafetyForm(formType) {
 }
 
 function renderSafetyRecords() {
+  // Show records section, hide card grid
+  const grid = document.getElementById('sf-card-grid');
+  const recordsSection = document.getElementById('sf-tab-sf-records');
+  if (grid) grid.style.display = 'none';
+  if (recordsSection) recordsSection.classList.remove('hidden');
+
   const container = document.getElementById('sf-records-list');
   if (!container) return;
 
-  const filter = document.getElementById('sf-records-filter')?.value || 'all';
   let records = store.safetyRecords || [];
-  if (filter !== 'all') records = records.filter(r => r.form_type === filter);
 
   if (records.length === 0) {
     container.innerHTML = `
-      <div class="pm-empty-state">
+      <div class="pm-empty-state" style="grid-column:1/-1">
         <div class="pm-empty-icon">📂</div>
         <h3>No Records Yet</h3>
-        <p>Submitted safety forms will appear here. Complete and submit a form from any of the tabs above.</p>
+        <p>Submitted safety forms will appear here. Fill out and submit a form using the cards on the forms page.</p>
+        <button class="btn btn-primary" onclick="hideSafetyRecords()">← Back to Forms</button>
       </div>`;
     return;
   }
 
-  const formIcons = { flha:'📋', fall:'🔒', toolbox:'🗣', incident:'🚨', inspection:'🔍' };
-  container.innerHTML = `
-    <div class="sf-records-grid">
-      ${records.slice().reverse().map(r => `
-      <div class="sf-record-card">
-        <div class="sf-record-header">
-          <span class="sf-record-icon">${formIcons[r.form_type] || '📄'}</span>
-          <div class="sf-record-info">
-            <div class="sf-record-name">${r.form_name}</div>
-            <div class="sf-record-meta">${r.project_name} · ${r.date}</div>
-          </div>
-          <div class="sf-record-actions">
-            <button class="btn btn-sm btn-outline" onclick="viewSafetyRecord('${r.id}')">View</button>
-            <button class="btn btn-sm btn-outline" onclick="deleteSafetyRecord('${r.id}')">Delete</button>
-          </div>
+  const formIcons = { flha:'📋', fall_arrest:'🪝', toolbox_talk:'🔧', incident_report:'🚨', site_inspection:'🔍' };
+  container.innerHTML = records.slice().reverse().map(r => `
+    <div class="sf-record-card">
+      <div class="sf-record-header">
+        <span class="sf-record-icon">${formIcons[r.form_type] || '📄'}</span>
+        <div class="sf-record-info">
+          <div class="sf-record-name">${r.form_name}</div>
+          <div class="sf-record-meta">${r.project_name || 'No Project'} · ${r.date || ''}</div>
         </div>
-        <div class="sf-record-meta-row">
-          <span>Submitted by: ${r.submitted_by}</span>
-          <span>${new Date(r.submitted_at).toLocaleString('en-CA', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
+        <div class="sf-record-actions">
+          <button class="btn btn-sm btn-outline" onclick="viewSafetyRecord('${r.id}')">View</button>
+          <button class="btn btn-sm btn-outline" style="color:#ef4444;border-color:#ef4444" onclick="deleteSafetyRecord('${r.id}')">Delete</button>
         </div>
-      </div>`).join('')}
-    </div>`;
+      </div>
+      <div class="sf-record-meta-row">
+        <span>By: ${r.submitted_by || 'Unknown'}</span>
+        <span>${new Date(r.submitted_at).toLocaleString('en-CA', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
+      </div>
+    </div>`).join('');
 }
 
 function viewSafetyRecord(id) {
