@@ -8578,8 +8578,7 @@ function renderContactCard(c) {
 function openAddContactModal(preType) {
   initCRMStore();
   crmCurrentEditContactId = null;
-  const form = document.querySelector('#crm-contact-modal form');
-  if (form) form.reset();
+  document.querySelectorAll('#crm-contact-modal input:not([type=hidden]), #crm-contact-modal select, #crm-contact-modal textarea').forEach(el => { el.value = el.tagName === 'SELECT' ? el.options[0]?.value || '' : ''; });
   if (preType) { const t = document.getElementById('crm-contact-type'); if(t) t.value = preType; }
   document.getElementById('crm-contact-modal-title').textContent = 'Add Contact';
   openModal('crm-contact-modal');
@@ -8759,8 +8758,8 @@ function openContactDetail(contactId) {
 function openAddLeadModal(stage, contactId) {
   initCRMStore();
   crmCurrentEditLeadId = null;
-  const form = document.querySelector('#crm-lead-modal form');
-  if (form) form.reset();
+  document.querySelectorAll('#crm-lead-modal input:not([type=hidden]), #crm-lead-modal select, #crm-lead-modal textarea').forEach(el => { el.value = el.tagName === 'SELECT' ? el.options[0]?.value || '' : ''; });
+  const leadProb = document.getElementById('crm-lead-probability'); if (leadProb) leadProb.value = '50';
   if (stage) { const s = document.getElementById('crm-lead-stage'); if(s) s.value = stage; }
   if (contactId) { const c = document.getElementById('crm-lead-contact'); if(c) c.value = contactId; }
   document.getElementById('crm-lead-modal-title').textContent = 'Add Lead';
@@ -8979,8 +8978,8 @@ function renderCRMDeals() {
 function openAddDealModal() {
   initCRMStore();
   crmCurrentEditDealId = null;
-  const form = document.querySelector('#crm-deal-modal form');
-  if (form) form.reset();
+  document.querySelectorAll('#crm-deal-modal input:not([type=hidden]), #crm-deal-modal select, #crm-deal-modal textarea').forEach(el => { el.value = el.tagName === 'SELECT' ? el.options[0]?.value || '' : ''; });
+  const dealProb = document.getElementById('crm-deal-prob'); if (dealProb) dealProb.value = '50';
   document.getElementById('crm-deal-modal-title').textContent = 'Add Deal';
   populateCRMContactDropdowns();
   openModal('crm-deal-modal');
@@ -9125,8 +9124,7 @@ function openLogActivityModal(contactId, leadId) {
   initCRMStore();
   crmCurrentActivityContactId = contactId || null;
   crmCurrentActivityLeadId = leadId || null;
-  const form = document.querySelector('#crm-activity-modal form');
-  if (form) form.reset();
+  document.querySelectorAll('#crm-activity-modal input:not([type=hidden]), #crm-activity-modal select, #crm-activity-modal textarea').forEach(el => { el.value = el.tagName === 'SELECT' ? el.options[0]?.value || '' : ''; });
   selectedActivityType = 'call';
   document.querySelectorAll('.activity-type-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.type === 'call');
@@ -9223,8 +9221,7 @@ function logAutoActivity(data) {
 
 function openScheduleFollowupModal(contactId) {
   initCRMStore();
-  const form = document.querySelector('#crm-followup-modal form');
-  if (form) form.reset();
+  document.querySelectorAll('#crm-followup-modal input:not([type=hidden]), #crm-followup-modal select, #crm-followup-modal textarea').forEach(el => { el.value = el.tagName === 'SELECT' ? el.options[0]?.value || '' : ''; });
   if (contactId) setField('crm-followup-contact', contactId);
   const dateField = document.getElementById('crm-followup-date');
   if (dateField) {
@@ -9448,6 +9445,23 @@ function filterActivities() { renderCRMActivities(); }
 // showCRMTab handles active state via id="crm-tab-pipeline" pattern
 // Override showCRMTab to use both approaches:
 const _origShowCRMTab = typeof showCRMTab !== 'undefined' ? showCRMTab : null;
+
+
+// ── Contact detail modal footer button handlers ───────────────────────────
+function editCurrentContact() {
+  if (crmCurrentContactId) {
+    closeModal('crm-contact-detail-modal');
+    editCRMContact(crmCurrentContactId);
+  }
+}
+
+function logActivityForContact() {
+  if (crmCurrentContactId) {
+    openLogActivityModal(crmCurrentContactId);
+  } else {
+    openLogActivityModal();
+  }
+}
 
 console.log('👥 CRM Module loaded');
 
@@ -10092,15 +10106,9 @@ console.log('💱 Quote-to-Invoice conversion loaded');
 // PATCH navigateTo FOR CRM
 // ═══════════════════════════════════════════════════════════════════════════
 
-(function patchNavigateToForCRM() {
-  const _orig = navigateTo;
-  navigateTo = function(page) {
-    _orig(page);
-    if (page === 'crm') {
-      setTimeout(() => initCRM(), 50);
-    }
-  };
-  // Also patch loadUnifiedStore to ensure CRM fields
+// CRM is already routed in navigateTo() at the main function.
+// Patch loadUnifiedStore to ensure CRM fields are always initialized.
+(function patchLoadUnifiedStoreForCRM() {
   const _origLoad = loadUnifiedStore;
   loadUnifiedStore = function() {
     _origLoad();

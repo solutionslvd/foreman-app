@@ -709,6 +709,7 @@
         <h1 class="page-title">Invoices &amp; Estimates</h1>
         <div class="page-actions">
           <button class="btn-secondary btn-sm" onclick="openEstimateModal()">📋 New Estimate</button>
+          <button class="btn-secondary btn-sm" onclick="previewInvoice()">👁 Preview</button>
           <button class="btn-primary btn-sm" onclick="openInvoiceModal()">+ New Invoice</button>
         </div>
       </div>
@@ -3273,6 +3274,7 @@
 
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('new-invoice-modal')">Cancel</button>
+      <button class="btn-secondary" onclick="previewInvoice()">👁 Preview</button>
       <button class="btn-primary" onclick="createInvoice()">💾 Create Invoice</button>
     </div>
   </div>
