@@ -4668,5 +4668,58 @@
   </div>
 </div>
 
+
+
+<!-- Edit Time Entry Modal -->
+<div id="edit-time-entry-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:400px;width:95vw">
+    <div class="modal-header">
+      <h3>Edit Time Entry</h3>
+      <span class="close-modal" onclick="closeModal('edit-time-entry-modal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-time-id">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="edit-time-date">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Hours</label>
+          <input type="number" id="edit-time-hours" min="0" max="24" value="0">
+        </div>
+        <div class="form-group">
+          <label>Minutes</label>
+          <input type="number" id="edit-time-minutes" min="0" max="59" value="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Project</label>
+        <select id="edit-time-project">
+          <option value="">No Project</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Work Type</label>
+        <select id="edit-time-type">
+          <option value="framing">Framing</option>
+          <option value="carpentry">Carpentry</option>
+          <option value="cleanup">Cleanup</option>
+          <option value="travel">Travel</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <input type="text" id="edit-time-notes" placeholder="What did you work on?">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('edit-time-entry-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditedTimeEntry()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

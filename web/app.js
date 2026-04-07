@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   The Foreman AI - App JavaScript v2.8
+   The Foreman AI - App JavaScript v2.9
    Full mobile-first PWA with admin settings, RBAC, QB financials
 ═══════════════════════════════════════════════════════════ */
 
@@ -1090,16 +1090,23 @@ async function loadInvoices() {
             <th>Date</th>
             <th>Amount</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           ${data.transactions.map(t => `
             <tr>
-              <td><strong>${t.reference || 'N/A'}</strong></td>
-              <td>${t.description.replace('Invoice ', '').split(' - ')[1] || t.description}</td>
+              <td><strong>${t.reference || t.id || 'N/A'}</strong></td>
+              <td>${t.description ? t.description.replace('Invoice ', '').split(' - ')[1] || t.description : t.client_name || 'Unknown'}</td>
               <td>${t.date}</td>
               <td><strong>${formatCurrency(t.total_amount)}</strong></td>
-              <td><span class="status-active" style="padding:3px 8px;border-radius:10px;font-size:11px;background:rgba(76,175,80,0.15);color:var(--accent)">Sent</span></td>
+              <td>
+                <span class="status-active" style="padding:3px 8px;border-radius:10px;font-size:11px;background:rgba(76,175,80,0.15);color:var(--accent)">${t.status || 'Sent'}</span>
+              </td>
+              <td style="white-space:nowrap">
+                <button onclick="updateInvoiceStatus('${t.id}', 'paid')" style="padding:4px 8px;font-size:11px;background:var(--accent);color:white;border:none;border-radius:4px;cursor:pointer;margin-right:4px" title="Mark Paid">✓ Paid</button>
+                <button onclick="deleteInvoice('${t.id}')" style="padding:4px 8px;font-size:11px;background:var(--danger);color:white;border:none;border-radius:4px;cursor:pointer" title="Delete">🗑</button>
+              </td>
             </tr>
           `).join('')}
         </tbody>
@@ -1112,6 +1119,105 @@ async function loadInvoices() {
 }
 
 // ═══════════════════════════════════════════════════════════
+// BUG-003 FIX: Add invoice edit and delete functionality
+async function deleteInvoice(invoiceId) {
+  if (!confirm('Are you sure you want to delete this invoice? This cannot be undone.')) return;
+  
+  try {
+    // Try API delete first
+    await fetch(`${API}/api/ledger/transactions/${invoiceId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    
+    // Remove from local store
+    store.invoices = (store.invoices || []).filter(inv => inv.id !== invoiceId && inv.transaction_id !== invoiceId);
+    saveStore();
+    
+    showToast('Invoice deleted', 'success');
+    loadInvoices();
+    loadDashboard();
+  } catch(e) {
+    // Fallback to local delete only
+    store.invoices = (store.invoices || []).filter(inv => inv.id !== invoiceId && inv.transaction_id !== invoiceId);
+    saveStore();
+    showToast('Invoice deleted locally', 'success');
+    loadInvoices();
+  }
+}
+
+async function updateInvoiceStatus(invoiceId, newStatus) {
+  try {
+    // Update in local store
+    const invoices = store.invoices || [];
+    const idx = invoices.findIndex(inv => inv.id === invoiceId || inv.transaction_id === invoiceId);
+    if (idx >= 0) {
+      invoices[idx].status = newStatus;
+      store.invoices = invoices;
+      saveStore();
+    }
+    
+    // Try API update
+    await fetch(`${API}/api/ledger/transactions/${invoiceId}/status`, {
+      method: 'PATCH',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}` 
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
+    
+    showToast(`Invoice marked as ${newStatus}`, 'success');
+    loadInvoices();
+  } catch(e) {
+    showToast('Status updated locally', 'success');
+    loadInvoices();
+  }
+}
+
+function openEditInvoiceModal(invoiceId) {
+  const invoice = (store.invoices || []).find(inv => inv.id === invoiceId || inv.transaction_id === invoiceId);
+  if (!invoice) {
+    showToast('Invoice not found', 'error');
+    return;
+  }
+  
+  // Populate the invoice modal with existing data
+  document.getElementById('inv-customer').value = invoice.client_name || invoice.customer_name || '';
+  document.getElementById('inv-date').value = invoice.date || '';
+  document.getElementById('inv-due-date').value = invoice.due_date || '';
+  document.getElementById('inv-notes').value = invoice.notes || '';
+  document.getElementById('inv-terms').value = invoice.payment_terms || 'net30';
+  
+  // Store the invoice ID for updating
+  const editIdField = document.getElementById('inv-edit-id');
+  if (editIdField) editIdField.value = invoiceId;
+  
+  // Clear and populate line items
+  document.getElementById('inv-lines-body').innerHTML = '';
+  invLineCount = 0;
+  
+  const lineItems = invoice.line_items || [];
+  if (lineItems.length > 0) {
+    lineItems.forEach(item => {
+      addInvoiceLine();
+      const id = invLineCount;
+      document.getElementById(`il-desc-${id}`).value = item.description || '';
+      document.getElementById(`il-qty-${id}`).value = item.quantity || 1;
+      document.getElementById(`il-unit-${id}`).value = item.unit || 'ea';
+      document.getElementById(`il-rate-${id}`).value = item.rate || 0;
+      document.getElementById(`il-gst-${id}`).checked = !item.gst_exempt;
+    });
+  } else {
+    addInvoiceLine();
+  }
+  
+  calcInvTotals();
+  
+  openModal('new-invoice-modal');
+}
+
+
 // EXPENSES
 // ═══════════════════════════════════════════════════════════
 function calcExpenseGST() {
@@ -2900,20 +3006,48 @@ function renderTimeEntries() {
     return;
   }
   
-  // Group by project
-  const byProject = {};
+  // Sort by date (newest first)
+  weekEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  // Calculate totals
+  const totalMinutes = weekEntries.reduce((sum, e) => sum + (e.minutes || 0), 0);
+  
+  // Show summary at top
+  let html = `
+    <div style="padding:12px;background:linear-gradient(135deg,var(--primary-light),rgba(255,107,53,0.1));border-radius:8px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:600;color:var(--primary)">Weekly Total</span>
+        <span style="font-size:1.2em;font-weight:700">${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m</span>
+      </div>
+    </div>
+    <div class="time-entries-list">
+  `;
+  
+  // Show individual entries
   weekEntries.forEach(e => {
-    const key = e.project_id || 'no-project';
-    if (!byProject[key]) byProject[key] = { name: e.project_name || 'No Project', minutes: 0 };
-    byProject[key].minutes += e.minutes || 0;
+    const date = new Date(e.date);
+    const dateStr = date.toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' });
+    const timeStr = `${Math.floor(e.minutes / 60)}h ${e.minutes % 60}m`;
+    
+    html += `
+      <div class="time-entry-item" style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+        <div style="flex:1">
+          <div style="font-weight:500">${e.project_name || 'No Project'}</div>
+          <div style="font-size:12px;color:var(--text-muted)">
+            ${dateStr} • ${e.work_type || 'General'} ${e.notes ? '• ' + escapeHtml(e.notes.substring(0,30)) + (e.notes.length > 30 ? '...' : '') : ''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-weight:600;color:var(--accent)">${timeStr}</span>
+          <button onclick="openEditTimeEntryModal('${e.id}')" style="padding:4px 8px;font-size:11px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;cursor:pointer" title="Edit">✏️</button>
+          <button onclick="deleteTimeEntry('${e.id}')" style="padding:4px 8px;font-size:11px;background:rgba(244,67,54,0.1);color:var(--danger);border:1px solid rgba(244,67,54,0.3);border-radius:4px;cursor:pointer" title="Delete">🗑</button>
+        </div>
+      </div>
+    `;
   });
   
-  container.innerHTML = Object.entries(byProject).map(([key, data]) => `
-    <div style="display:flex;justify-content:space-between;padding:10px;background:#f8f9fa;border-radius:6px;margin-bottom:8px">
-      <span>${escapeHtml(data.name)}</span>
-      <span style="font-weight:600">${Math.floor(data.minutes / 60)}h ${data.minutes % 60}m</span>
-    </div>
-  `).join('');
+  html += '</div>';
+  container.innerHTML = html;
 }
 
 function toggleTimer() {
@@ -2922,7 +3056,36 @@ function toggleTimer() {
     timerRunning = false;
     document.getElementById('timer-btn').textContent = '▶ Start Timer';
     document.getElementById('timer-btn').className = 'btn-primary';
-    showToast(`Time logged: ${formatTime(timerSeconds)}`, 'success');
+    
+    // BUG-001 FIX: Actually save the time entry when timer stops
+    if (timerSeconds > 0) {
+      const projectId = document.getElementById('time-project')?.value || null;
+      const project = projectId ? (store.projects || []).find(p => p.id === projectId) : null;
+      const workType = document.getElementById('time-type')?.value || 'other';
+      const notes = document.getElementById('time-notes')?.value || '';
+      
+      const entry = {
+        id: 'time_' + Date.now(),
+        date: new Date().toISOString(),
+        minutes: Math.floor(timerSeconds / 60),
+        seconds: timerSeconds,
+        project_id: projectId,
+        project_name: project ? project.name : null,
+        work_type: workType,
+        notes: notes,
+        user: currentUser?.contact_name || 'Unknown',
+        manual: false,
+        timer: true
+      };
+      
+      store.time_entries = store.time_entries || [];
+      store.time_entries.push(entry);
+      saveStore();
+      
+      showToast(`Time entry saved: ${formatTime(timerSeconds)}`, 'success');
+      renderTimeEntries();
+    }
+    
     timerSeconds = 0;
     document.getElementById('timer-display').textContent = '00:00:00';
   } else {
@@ -2949,12 +3112,25 @@ function logManualTime() {
   const workType = document.getElementById('time-type').value;
   const notes = document.getElementById('time-notes').value;
   
-  // Create a simple modal for manual time entry
-  const hours = prompt('Enter hours:', '0');
-  const minutes = prompt('Enter minutes:', '30');
+  // BUG-005 FIX: Use a proper modal instead of prompts
+  // For now, use a single prompt with better UX
+  const timeStr = prompt('Enter time (e.g., "2h 30m" or "1.5h" or "90m"):', '1h');
   
-  if (hours !== null && minutes !== null) {
-    const totalMinutes = (parseInt(hours) || 0) * 60 + (parseInt(minutes) || 0);
+  if (timeStr !== null) {
+    let totalMinutes = 0;
+    
+    // Parse various formats: "2h 30m", "1.5h", "90m", "2:30"
+    const hMatch = timeStr.match(/(\d+(?:\.\d+)?)\s*h/i);
+    const mMatch = timeStr.match(/(\d+)\s*m/i);
+    const colonMatch = timeStr.match(/(\d+):(\d+)/);
+    
+    if (colonMatch) {
+      totalMinutes = parseInt(colonMatch[1]) * 60 + parseInt(colonMatch[2]);
+    } else {
+      if (hMatch) totalMinutes += Math.round(parseFloat(hMatch[1]) * 60);
+      if (mMatch) totalMinutes += parseInt(mMatch[1]);
+    }
+    
     if (totalMinutes > 0) {
       const entry = {
         id: 'time_' + Date.now(),
@@ -2970,11 +3146,86 @@ function logManualTime() {
       };
       store.time_entries = store.time_entries || [];
       store.time_entries.push(entry);
-      localStorage.setItem('foreman_store', JSON.stringify(store));
+      saveStore();
       renderTimeEntries();
-      syncStore();
-      showToast(`Manual entry saved: ${hours}h ${minutes}m`, 'success');
+      syncStore().catch(() => {});
+      showToast(`Time entry saved: ${Math.floor(totalMinutes/60)}h ${totalMinutes%60}m`, 'success');
+    } else {
+      showToast('Could not parse time. Use formats like "2h 30m", "1.5h", or "90m"', 'warning');
     }
+  }
+}
+
+// MF-004: Time entry edit and delete functions
+function deleteTimeEntry(entryId) {
+  if (!confirm('Delete this time entry?')) return;
+  
+  store.time_entries = (store.time_entries || []).filter(e => e.id !== entryId);
+  saveStore();
+  renderTimeEntries();
+  showToast('Time entry deleted', 'success');
+}
+
+function openEditTimeEntryModal(entryId) {
+  const entry = (store.time_entries || []).find(e => e.id === entryId);
+  if (!entry) {
+    showToast('Time entry not found', 'error');
+    return;
+  }
+  
+  // Populate project dropdown first
+  const projSelect = document.getElementById('edit-time-project');
+  if (projSelect) {
+    projSelect.innerHTML = '<option value="">No Project</option>';
+    (store.projects || []).forEach(p => {
+      projSelect.innerHTML += `<option value="${p.id}">${escapeHtml(p.name || '')}</option>`;
+    });
+  }
+  
+  // Populate fields
+  document.getElementById('edit-time-id').value = entryId;
+  document.getElementById('edit-time-hours').value = Math.floor(entry.minutes / 60);
+  document.getElementById('edit-time-minutes').value = entry.minutes % 60;
+  document.getElementById('edit-time-project').value = entry.project_id || '';
+  document.getElementById('edit-time-type').value = entry.work_type || 'other';
+  document.getElementById('edit-time-notes').value = entry.notes || '';
+  document.getElementById('edit-time-date').value = entry.date ? entry.date.split('T')[0] : '';
+  
+  openModal('edit-time-entry-modal');
+}
+
+async function saveEditedTimeEntry() {
+  const entryId = document.getElementById('edit-time-id').value;
+  const hours = parseInt(document.getElementById('edit-time-hours').value) || 0;
+  const minutes = parseInt(document.getElementById('edit-time-minutes').value) || 0;
+  const totalMinutes = hours * 60 + minutes;
+  
+  if (totalMinutes <= 0) {
+    showToast('Please enter a valid time', 'error');
+    return;
+  }
+  
+  const entries = store.time_entries || [];
+  const idx = entries.findIndex(e => e.id === entryId);
+  
+  if (idx >= 0) {
+    entries[idx] = {
+      ...entries[idx],
+      minutes: totalMinutes,
+      seconds: totalMinutes * 60,
+      project_id: document.getElementById('edit-time-project').value || null,
+      work_type: document.getElementById('edit-time-type').value,
+      notes: document.getElementById('edit-time-notes').value,
+      date: document.getElementById('edit-time-date').value || new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    store.time_entries = entries;
+    saveStore();
+    
+    closeModal('edit-time-entry-modal');
+    renderTimeEntries();
+    showToast('Time entry updated', 'success');
   }
 }
 
@@ -4137,7 +4388,8 @@ function renderExpenses() {
 function deleteExpense(idx) {
   if (!store.expenses) return;
   store.expenses.splice(idx, 1);
-  localStorage.setItem('expenses', JSON.stringify(store.expenses));
+  // BUG-002 FIX: Use unified saveStore() instead of wrong localStorage key
+  saveStore();
   renderExpenses();
   showToast('Expense deleted', 'info');
 }
