@@ -144,6 +144,7 @@
       <button class="delay-btn" onclick="openDelayModal()" title="Log Delay or Deficiency" id="global-delay-btn">
         ⚠️ <span class="delay-btn-text">Log Issue</span>
       </button>
+      <button class="theme-toggle-btn" onclick="toggleTheme()" id="theme-toggle-btn" title="Toggle Dark/Light Mode">🌙</button>
       <button class="header-btn" onclick="toggleAIPanel()" title="AI Assistant">🤖</button>
       <button class="header-btn notification-btn" onclick="showNotifications()" title="Notifications">
         🔔<span class="notif-badge hidden" id="notif-count">0</span>
@@ -232,6 +233,13 @@
       </div>
 
       <div class="nav-section">
+        <div class="nav-label">CRM</div>
+        <a class="nav-item" data-page="crm" onclick="navigateTo('crm')">
+          <span class="nav-icon">👥</span><span>CRM</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
         <div class="nav-label">Finance</div>
         <a class="nav-item" data-page="invoices" onclick="navigateTo('invoices')">
           <span class="nav-icon">📄</span><span>Invoices</span>
@@ -284,7 +292,7 @@
       </div>
 
       <div class="sidebar-footer">
-        <div class="app-version">v2.8.0 · The Foreman AI</div>
+        <div class="app-version">v3.0.0 · The Foreman AI</div>
       </div>
     </div>
   </nav>
@@ -2433,6 +2441,180 @@
 
 
 
+    <!-- ═══════════════════════════════════════════════════════════════
+         CRM PAGE — Contacts · Pipeline · Deals · Activities · Analytics
+    ═══════════════════════════════════════════════════════════════ -->
+    <div id="page-crm" class="page">
+      <div class="page-header">
+        <h1 class="page-title">👥 CRM</h1>
+        <div class="page-actions">
+          <button class="btn-secondary" onclick="exportCRMData()">⬇ Export</button>
+          <button class="btn-primary" onclick="openAddContactModal()">+ Add Contact</button>
+        </div>
+      </div>
+
+      <!-- CRM KPI Strip -->
+      <div class="crm-kpi-grid" id="crm-kpi-grid">
+        <div class="crm-kpi">
+          <div class="crm-kpi-icon">👥</div>
+          <div class="crm-kpi-value" id="crm-kpi-contacts">0</div>
+          <div class="crm-kpi-label">Total Contacts</div>
+        </div>
+        <div class="crm-kpi">
+          <div class="crm-kpi-icon">🔥</div>
+          <div class="crm-kpi-value" id="crm-kpi-leads">0</div>
+          <div class="crm-kpi-label">Active Leads</div>
+        </div>
+        <div class="crm-kpi">
+          <div class="crm-kpi-icon">💰</div>
+          <div class="crm-kpi-value" id="crm-kpi-pipeline">$0</div>
+          <div class="crm-kpi-label">Pipeline Value</div>
+        </div>
+        <div class="crm-kpi">
+          <div class="crm-kpi-icon">✅</div>
+          <div class="crm-kpi-value" id="crm-kpi-won">$0</div>
+          <div class="crm-kpi-label">Won This Month</div>
+        </div>
+        <div class="crm-kpi">
+          <div class="crm-kpi-icon">📅</div>
+          <div class="crm-kpi-value" id="crm-kpi-followups">0</div>
+          <div class="crm-kpi-label">Follow-ups Due</div>
+        </div>
+        <div class="crm-kpi">
+          <div class="crm-kpi-icon">📈</div>
+          <div class="crm-kpi-value" id="crm-kpi-conversion">0%</div>
+          <div class="crm-kpi-label">Win Rate</div>
+        </div>
+      </div>
+
+      <!-- CRM Tab Bar -->
+      <div class="crm-tabs">
+        <button class="crm-tab active" id="crm-tab-pipeline" onclick="showCRMTab('pipeline')">🔥 Pipeline</button>
+        <button class="crm-tab" id="crm-tab-contacts" onclick="showCRMTab('contacts')">👥 Contacts</button>
+        <button class="crm-tab" id="crm-tab-deals" onclick="showCRMTab('deals')">💰 Deals</button>
+        <button class="crm-tab" id="crm-tab-activities" onclick="showCRMTab('activities')">📋 Activities</button>
+        <button class="crm-tab" id="crm-tab-analytics" onclick="showCRMTab('analytics')">📊 Analytics</button>
+      </div>
+
+      <!-- ── PIPELINE TAB ───────────────────────────────────────────────── -->
+      <div class="crm-panel active" id="crm-panel-pipeline">
+        <div class="crm-toolbar">
+          <div class="crm-search-wrap">
+            <input type="text" class="crm-search" id="pipeline-search" placeholder="Search leads..." oninput="filterPipeline()">
+          </div>
+          <select class="crm-filter-select" id="pipeline-filter-owner" onchange="filterPipeline()">
+            <option value="">All Owners</option>
+          </select>
+          <button class="btn-primary" onclick="openAddLeadModal()">+ New Lead</button>
+        </div>
+        <div class="pipeline-container" id="pipeline-board">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- ── CONTACTS TAB ──────────────────────────────────────────────── -->
+      <div class="crm-panel" id="crm-panel-contacts">
+        <div class="crm-toolbar">
+          <div class="crm-search-wrap">
+            <input type="text" class="crm-search" id="contacts-search" placeholder="Search contacts..." oninput="filterContacts()">
+          </div>
+          <select class="crm-filter-select" id="contacts-filter-type" onchange="filterContacts()">
+            <option value="">All Types</option>
+            <option value="customer">Customers</option>
+            <option value="lead">Leads</option>
+            <option value="vendor">Vendors</option>
+            <option value="subcontractor">Subcontractors</option>
+          </select>
+          <select class="crm-filter-select" id="contacts-filter-tag" onchange="filterContacts()">
+            <option value="">All Tags</option>
+            <option value="hot">Hot</option>
+            <option value="warm">Warm</option>
+            <option value="cold">Cold</option>
+          </select>
+          <button class="btn-primary" onclick="openAddContactModal()">+ Add Contact</button>
+        </div>
+        <div class="contact-grid" id="contacts-grid">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- ── DEALS TAB ─────────────────────────────────────────────────── -->
+      <div class="crm-panel" id="crm-panel-deals">
+        <div class="crm-toolbar">
+          <div class="crm-search-wrap">
+            <input type="text" class="crm-search" id="deals-search" placeholder="Search deals..." oninput="filterDeals()">
+          </div>
+          <select class="crm-filter-select" id="deals-filter-stage" onchange="filterDeals()">
+            <option value="">All Stages</option>
+            <option value="prospect">Prospect</option>
+            <option value="quote">Quote Sent</option>
+            <option value="negotiation">Negotiation</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
+          </select>
+          <button class="btn-primary" onclick="openAddDealModal()">+ New Deal</button>
+        </div>
+        <div id="deals-list">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- ── ACTIVITIES TAB ────────────────────────────────────────────── -->
+      <div class="crm-panel" id="crm-panel-activities">
+        <div class="crm-toolbar">
+          <div class="crm-search-wrap">
+            <input type="text" class="crm-search" id="activities-search" placeholder="Search activities..." oninput="filterActivities()">
+          </div>
+          <select class="crm-filter-select" id="activities-filter-type" onchange="filterActivities()">
+            <option value="">All Types</option>
+            <option value="call">Calls</option>
+            <option value="email">Emails</option>
+            <option value="meeting">Meetings</option>
+            <option value="note">Notes</option>
+            <option value="quote">Quotes</option>
+            <option value="followup">Follow-ups</option>
+          </select>
+          <button class="btn-primary" onclick="openLogActivityModal()">+ Log Activity</button>
+          <button class="btn-secondary" onclick="openScheduleFollowupModal()">📅 Schedule</button>
+        </div>
+        <div class="activity-feed" id="activities-feed">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- ── ANALYTICS TAB ──────────────────────────────────────────────── -->
+      <div class="crm-panel" id="crm-panel-analytics">
+        <div class="crm-chart-grid">
+          <div class="crm-chart-card">
+            <div class="crm-chart-title">📊 Pipeline by Stage</div>
+            <div class="crm-bar-chart" id="crm-chart-pipeline"></div>
+          </div>
+          <div class="crm-chart-card">
+            <div class="crm-chart-title">🏷️ Leads by Source</div>
+            <div class="crm-bar-chart" id="crm-chart-sources"></div>
+          </div>
+          <div class="crm-chart-card">
+            <div class="crm-chart-title">📅 Activity This Month</div>
+            <div class="crm-bar-chart" id="crm-chart-activity"></div>
+          </div>
+          <div class="crm-chart-card">
+            <div class="crm-chart-title">💰 Revenue Forecast</div>
+            <div id="crm-chart-forecast">
+              <div style="text-align:center;padding:20px">
+                <div style="font-size:32px;font-weight:800;color:var(--accent)" id="crm-forecast-value">$0</div>
+                <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Expected from active deals</div>
+                <div style="margin-top:16px" id="crm-forecast-breakdown"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section-card" style="margin-top:16px">
+          <h3 class="section-title">🏆 Top Contacts by Deal Value</h3>
+          <div id="crm-top-contacts"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ══════════════════════════════════════════════════════════
          DELAYS & DEFICIENCIES PAGE
     ══════════════════════════════════════════════════════════ -->
@@ -3988,6 +4170,10 @@
       <span class="bn-icon">🏗️</span>
       <span class="bn-label">Projects</span>
     </a>
+    <a class="bn-item" data-page="crm" onclick="navigateTo('crm')">
+      <span class="bn-icon">👥</span>
+      <span>CRM</span>
+    </a>
     <a class="bn-item" data-page="safety-forms" onclick="navigateTo('safety-forms')">
       <span class="bn-icon">🦺</span>
       <span class="bn-label">Safety</span>
@@ -4717,6 +4903,486 @@
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('edit-time-entry-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveEditedTimeEntry()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CRM MODALS
+═══════════════════════════════════════════════════════════════════════ -->
+
+<!-- Add/Edit Contact Modal -->
+<div id="crm-contact-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:600px;width:95vw">
+    <div class="modal-header">
+      <h3 id="crm-contact-modal-title">👤 Add Contact</h3>
+      <span class="close-modal" onclick="closeModal('crm-contact-modal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="crm-contact-id">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" id="crm-contact-firstname" placeholder="John">
+        </div>
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" id="crm-contact-lastname" placeholder="Smith">
+        </div>
+        <div class="form-group">
+          <label>Company / Business</label>
+          <input type="text" id="crm-contact-company" placeholder="ABC Construction Ltd.">
+        </div>
+        <div class="form-group">
+          <label>Contact Type</label>
+          <select id="crm-contact-type">
+            <option value="lead">Lead</option>
+            <option value="customer">Customer</option>
+            <option value="vendor">Vendor</option>
+            <option value="subcontractor">Subcontractor</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="crm-contact-email" placeholder="john@example.com">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="crm-contact-phone" placeholder="+1 (403) 555-0100">
+        </div>
+        <div class="form-group">
+          <label>City / Province</label>
+          <input type="text" id="crm-contact-location" placeholder="Calgary, AB">
+        </div>
+        <div class="form-group">
+          <label>Lead Temperature</label>
+          <select id="crm-contact-temp">
+            <option value="warm">Warm</option>
+            <option value="hot">Hot 🔥</option>
+            <option value="cold">Cold</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Source</label>
+          <select id="crm-contact-source">
+            <option value="referral">Referral</option>
+            <option value="website">Website</option>
+            <option value="social">Social Media</option>
+            <option value="kijiji">Kijiji</option>
+            <option value="facebook">Facebook</option>
+            <option value="google">Google</option>
+            <option value="cold_call">Cold Call</option>
+            <option value="repeat">Repeat Client</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Assigned To</label>
+          <input type="text" id="crm-contact-owner" placeholder="Your name">
+        </div>
+        <div class="form-group full-width">
+          <label>Address</label>
+          <input type="text" id="crm-contact-address" placeholder="123 Main St, Calgary, AB T2P 1J9">
+        </div>
+        <div class="form-group full-width">
+          <label>Notes</label>
+          <textarea id="crm-contact-notes" rows="3" placeholder="Any additional notes about this contact..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('crm-contact-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCRMContact()">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Lead Modal -->
+<div id="crm-lead-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:600px;width:95vw">
+    <div class="modal-header">
+      <h3 id="crm-lead-modal-title">🔥 Add Lead</h3>
+      <span class="close-modal" onclick="closeModal('crm-lead-modal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="crm-lead-id">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Lead Title *</label>
+          <input type="text" id="crm-lead-title" placeholder="e.g. Kitchen Renovation - Smith Residence">
+        </div>
+        <div class="form-group">
+          <label>Contact</label>
+          <select id="crm-lead-contact">
+            <option value="">— Select contact —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Stage</label>
+          <select id="crm-lead-stage">
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="qualified">Qualified</option>
+            <option value="quote_sent">Quote Sent</option>
+            <option value="negotiation">Negotiation</option>
+            <option value="won">Won ✅</option>
+            <option value="lost">Lost ❌</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estimated Value ($)</label>
+          <input type="number" id="crm-lead-value" placeholder="0" min="0" step="100">
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="crm-lead-priority">
+            <option value="medium">Medium</option>
+            <option value="high">High 🔥</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Expected Close Date</label>
+          <input type="date" id="crm-lead-close-date">
+        </div>
+        <div class="form-group">
+          <label>Project Type</label>
+          <select id="crm-lead-trade">
+            <option value="residential">Residential</option>
+            <option value="commercial">Commercial</option>
+            <option value="renovation">Renovation</option>
+            <option value="new_build">New Build</option>
+            <option value="framing">Framing</option>
+            <option value="electrical">Electrical</option>
+            <option value="plumbing">Plumbing</option>
+            <option value="roofing">Roofing</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Win Probability (%)</label>
+          <input type="number" id="crm-lead-probability" value="50" min="0" max="100">
+        </div>
+        <div class="form-group full-width">
+          <label>Address / Location</label>
+          <input type="text" id="crm-lead-address" placeholder="Job site address">
+        </div>
+        <div class="form-group full-width">
+          <label>Description</label>
+          <textarea id="crm-lead-description" rows="3" placeholder="Describe the scope of work..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('crm-lead-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCRMLead()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Deal Modal -->
+<div id="crm-deal-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:600px;width:95vw">
+    <div class="modal-header">
+      <h3 id="crm-deal-modal-title">💰 Add Deal</h3>
+      <span class="close-modal" onclick="closeModal('crm-deal-modal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="crm-deal-id">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Deal Name *</label>
+          <input type="text" id="crm-deal-name" placeholder="e.g. Office Renovation - Acme Corp">
+        </div>
+        <div class="form-group">
+          <label>Contact</label>
+          <select id="crm-deal-contact">
+            <option value="">— Select contact —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Deal Value ($) *</label>
+          <input type="number" id="crm-deal-value" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label>Stage</label>
+          <select id="crm-deal-stage">
+            <option value="prospect">Prospect</option>
+            <option value="quote">Quote Sent</option>
+            <option value="negotiation">Negotiation</option>
+            <option value="contract">Contract Signed</option>
+            <option value="won">Won ✅</option>
+            <option value="lost">Lost ❌</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Close Date</label>
+          <input type="date" id="crm-deal-close">
+        </div>
+        <div class="form-group">
+          <label>Win Probability (%)</label>
+          <input type="number" id="crm-deal-prob" value="50" min="0" max="100">
+        </div>
+        <div class="form-group">
+          <label>Related Project</label>
+          <select id="crm-deal-project">
+            <option value="">— None —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Deal Type</label>
+          <select id="crm-deal-type">
+            <option value="new_business">New Business</option>
+            <option value="renewal">Renewal</option>
+            <option value="upsell">Upsell</option>
+            <option value="referral">Referral</option>
+          </select>
+        </div>
+        <div class="form-group full-width">
+          <label>Notes</label>
+          <textarea id="crm-deal-notes" rows="3" placeholder="Deal notes, terms, conditions..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('crm-deal-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCRMDeal()">Save Deal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Log Activity Modal -->
+<div id="crm-activity-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:500px;width:95vw">
+    <div class="modal-header">
+      <h3>📋 Log Activity</h3>
+      <span class="close-modal" onclick="closeModal('crm-activity-modal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="activity-type-grid">
+        <button class="activity-type-btn selected" onclick="selectActivityType('call', this)">
+          <span class="at-icon">📞</span>Call
+        </button>
+        <button class="activity-type-btn" onclick="selectActivityType('email', this)">
+          <span class="at-icon">📧</span>Email
+        </button>
+        <button class="activity-type-btn" onclick="selectActivityType('meeting', this)">
+          <span class="at-icon">🤝</span>Meeting
+        </button>
+        <button class="activity-type-btn" onclick="selectActivityType('note', this)">
+          <span class="at-icon">📝</span>Note
+        </button>
+        <button class="activity-type-btn" onclick="selectActivityType('quote', this)">
+          <span class="at-icon">📄</span>Quote
+        </button>
+        <button class="activity-type-btn" onclick="selectActivityType('followup', this)">
+          <span class="at-icon">🔔</span>Follow-up
+        </button>
+      </div>
+      <input type="hidden" id="crm-activity-type" value="call">
+      <div class="form-group">
+        <label>Contact</label>
+        <select id="crm-activity-contact">
+          <option value="">— Select contact —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Related Lead / Deal</label>
+        <select id="crm-activity-lead">
+          <option value="">— None —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Subject / Title</label>
+        <input type="text" id="crm-activity-subject" placeholder="e.g. Called re: deck quote">
+      </div>
+      <div class="form-group">
+        <label>Notes / Details</label>
+        <textarea id="crm-activity-notes" rows="4" placeholder="What was discussed, next steps, outcomes..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="crm-activity-date">
+        </div>
+        <div class="form-group">
+          <label>Duration (minutes)</label>
+          <input type="number" id="crm-activity-duration" placeholder="30" min="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Outcome</label>
+        <select id="crm-activity-outcome">
+          <option value="">— Select outcome —</option>
+          <option value="positive">Positive - Moving forward</option>
+          <option value="neutral">Neutral - No change</option>
+          <option value="negative">Negative - Not interested</option>
+          <option value="callback">Callback requested</option>
+          <option value="quote_requested">Quote requested</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('crm-activity-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCRMActivity()">Save Activity</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Follow-up Modal -->
+<div id="crm-followup-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:440px;width:95vw">
+    <div class="modal-header">
+      <h3>🔔 Schedule Follow-up</h3>
+      <span class="close-modal" onclick="closeModal('crm-followup-modal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Contact *</label>
+        <select id="crm-followup-contact">
+          <option value="">— Select contact —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Follow-up Type</label>
+        <select id="crm-followup-type">
+          <option value="call">📞 Phone Call</option>
+          <option value="email">📧 Email</option>
+          <option value="visit">🚗 Site Visit</option>
+          <option value="quote">📄 Send Quote</option>
+          <option value="meeting">🤝 Meeting</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" id="crm-followup-date">
+        </div>
+        <div class="form-group">
+          <label>Time</label>
+          <input type="time" id="crm-followup-time" value="09:00">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Reminder Note</label>
+        <textarea id="crm-followup-note" rows="3" placeholder="What to discuss or bring up..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <select id="crm-followup-priority">
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('crm-followup-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCRMFollowup()">Schedule</button>
+    </div>
+  </div>
+</div>
+
+<!-- Contact Detail Modal -->
+<div id="crm-contact-detail-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:700px;width:95vw;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <h3 id="crm-detail-modal-title">Contact Details</h3>
+      <span class="close-modal" onclick="closeModal('crm-contact-detail-modal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div id="crm-contact-detail-content">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('crm-contact-detail-modal')">Close</button>
+      <button class="btn btn-secondary" onclick="logActivityForContact()">📋 Log Activity</button>
+      <button class="btn btn-primary" onclick="editCurrentContact()">✏️ Edit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pay Stub Modal -->
+<div id="paystub-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:700px;width:95vw;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <h3>💵 Pay Stub</h3>
+      <span class="close-modal" onclick="closeModal('paystub-modal')">&times;</span>
+    </div>
+    <div class="modal-body" id="paystub-content">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('paystub-modal')">Close</button>
+      <button class="btn btn-primary" onclick="printPaystub()">🖨 Print</button>
+    </div>
+  </div>
+</div>
+
+<!-- TD1 Form Modal -->
+<div id="td1-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:800px;width:95vw;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <h3>📋 TD1 Personal Tax Credits Return</h3>
+      <span class="close-modal" onclick="closeModal('td1-modal')">&times;</span>
+    </div>
+    <div class="modal-body" id="td1-content">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('td1-modal')">Close</button>
+      <button class="btn btn-primary" onclick="printTD1()">🖨 Print TD1</button>
+    </div>
+  </div>
+</div>
+
+<!-- T4 Slip Modal -->
+<div id="t4-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:800px;width:95vw;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <h3>📄 T4 Statement of Remuneration Paid</h3>
+      <span class="close-modal" onclick="closeModal('t4-modal')">&times;</span>
+    </div>
+    <div class="modal-body" id="t4-content">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('t4-modal')">Close</button>
+      <button class="btn btn-primary" onclick="printT4()">🖨 Print T4</button>
+    </div>
+  </div>
+</div>
+
+<!-- Invoice Preview / PDF Modal -->
+<div id="invoice-preview-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:860px;width:95vw;max-height:92vh;overflow-y:auto">
+    <div class="modal-header">
+      <h3>📄 Invoice Preview</h3>
+      <span class="close-modal" onclick="closeModal('invoice-preview-modal')">&times;</span>
+    </div>
+    <div class="modal-body" id="invoice-preview-content">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('invoice-preview-modal')">Close</button>
+      <button class="btn btn-secondary" onclick="printInvoicePreview()">🖨 Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Photo Viewer Modal -->
+<div id="photo-viewer-modal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:600px;width:95vw">
+    <div class="modal-header">
+      <h3>🖼 Photo</h3>
+      <span class="close-modal" onclick="closeModal('photo-viewer-modal')">&times;</span>
+    </div>
+    <div class="modal-body" style="text-align:center">
+      <img id="photo-viewer-img" src="" style="max-width:100%;border-radius:8px">
+      <p id="photo-viewer-caption" style="font-size:12px;color:var(--text-muted);margin-top:8px"></p>
     </div>
   </div>
 </div>
