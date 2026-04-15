@@ -632,12 +632,12 @@ function renderDynamicChatSuggestions() {
     });
   } else if (active.length > 0) {
     suggestions.push({
-      icon: '📋',
+      icon: '👷',
       label: `${active.length} Active Project${active.length > 1 ? 's' : ''}`,
       prompt: `Summarize my ${active.length} active project${active.length > 1 ? 's' : ''}`
     });
   } else {
-    suggestions.push({ icon: '📋', label: 'Active Projects', prompt: 'Summarize my active projects' });
+    suggestions.push({ icon: '👷', label: 'Active Projects', prompt: 'Summarize my active projects' });
   }
 
   // --- Trade-aware suggestions ---
@@ -1647,7 +1647,7 @@ function renderProjects(filter = 'all') {
         ${sowTotal > 0 ? `
           <div style="margin-top:12px;padding:10px;background:#f8f9fa;border-radius:6px">
             <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#666;margin-bottom:5px">
-              <span>📋 Scope Progress</span>
+              <span>📊 Scope Progress</span>
               <span>${sowProgress}% (${sowCompleted}/${sowTotal})</span>
             </div>
             <div style="height:6px;background:#e9ecef;border-radius:3px;overflow:hidden">
@@ -2028,7 +2028,7 @@ function renderEmployees() {
         '<button class="btn-secondary btn-sm" onclick="loadWorkerToPayroll(\'emp\',' + i + ')">💵 Pay</button>' +
         '<button class="btn-secondary btn-sm" onclick="generatePaystub(' + i + ')">📄 Stub</button>' +
         '<button class="btn-secondary btn-sm" onclick="generateTD1(' + i + ')">🍁 TD1</button>' +
-        '<button class="btn-secondary btn-sm" onclick="generateT4(' + i + ')">📋 T4</button>' +
+        '<button class="btn-secondary btn-sm" onclick="generateT4(' + i + ')">📄 T4</button>' +
         '<button class="btn-secondary btn-sm" style="color:#ef4444;border-color:#ef4444" onclick="removeEmployee(' + i + ')">Remove</button>' +
       '</div>' +
     '</div>';
@@ -2948,7 +2948,7 @@ function renderGSTReport(d) {
       </div>
     </div>
     <div style="background:rgba(33,150,243,0.08);border:1px solid rgba(33,150,243,0.2);border-radius:8px;padding:12px;font-size:13px;margin-top:12px">
-      <strong>📋 Filing Info:</strong> ${d.filing_due}<br>
+      <strong>📄 Filing Info:</strong> ${d.filing_due}<br>
       File online at <a href="https://www.canada.ca/en/revenue-agency.html" target="_blank" style="color:var(--primary)">CRA My Business Account</a>
     </div>
   `;
@@ -5538,7 +5538,7 @@ function appendMessage(text, role, actions) {
   const container = document.getElementById('chat-messages');
   const div = document.createElement('div');
   div.className = `chat-message ${role}`;
-  const avatar = role === 'ai' ? '📋' : (currentUser?.contact_name?.charAt(0)?.toUpperCase() || 'U');
+  const avatar = role === 'ai' ? '👷' : (currentUser?.contact_name?.charAt(0)?.toUpperCase() || 'U');
   
   let actionsHtml = '';
   if (actions && actions.length > 0) {
@@ -5726,7 +5726,7 @@ function renderDocuments(searchTerm) {
           <span>${formatDate(doc.created_at)}</span>
           ${fileSize ? `<span>• ${fileSize}</span>` : ''}
         </div>
-        ${project ? `<div class="doc-card-project">📋 ${escapeHtml(project.name)}</div>` : ''}
+        ${project ? `<div class="doc-card-project">📁 ${escapeHtml(project.name)}</div>` : ''}
         ${doc.description ? `<div class="doc-card-desc">${escapeHtml(doc.description)}</div>` : ''}
         <div class="doc-card-actions">
           <button onclick="event.stopPropagation();viewDocument('${doc.id}')" class="btn-secondary btn-sm">👁️ View</button>
@@ -6105,7 +6105,7 @@ function switchPMView(view) {
 function renderKanbanBoard() {
   const tasks = store.pmTasks || [];
   const statuses = ['todo', 'inprogress', 'review', 'done'];
-  const statusLabels = { todo: '📋 To Do', inprogress: '🔄 In Progress', review: '👀 Review', done: '✅ Done' };
+  const statusLabels = { todo: '📝 To Do', inprogress: '🔄 In Progress', review: '👀 Review', done: '✅ Done' };
   
   statuses.forEach(status => {
     const container = document.getElementById(`kanban-${status}`);
@@ -6465,7 +6465,7 @@ function getCategoryIcon(category) {
     'framing': '🪵',
     'foundation': '🏗️',
     'insulation': '🧱',
-    'inspection': '📋',
+    'inspection': '🔍',
     'siteprep': '🚜'
   };
   return icons[category] || '📝';
@@ -6918,7 +6918,7 @@ function renderReportsTab() {
             </div>
           </div>
           <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
-            <span style="color:var(--text-secondary);font-size:13px">📋 To Do: <strong>${todo}</strong></span>
+            <span style="color:var(--text-secondary);font-size:13px">📝 To Do: <strong>${todo}</strong></span>
             <span style="color:var(--info);font-size:13px">🔄 In Progress: <strong>${inProgress}</strong></span>
             <span style="color:var(--warning);font-size:13px">👀 Review: <strong>${inReview}</strong></span>
             <span style="color:var(--success);font-size:13px">✅ Done: <strong>${completed}</strong></span>
@@ -6946,7 +6946,7 @@ function renderAuditLog() {
   if (activities.length === 0) {
     container.innerHTML = `
       <div class="pm-empty-mini">
-        <span style="font-size:20px">📋</span>
+        <span style="font-size:20px">📝</span>
         <p>No activity yet. Actions on tasks, risks, and issues will appear here.</p>
       </div>`;
     return;
@@ -8105,7 +8105,7 @@ function buildContextSummary() {
   return `${projects.length} projects, ${tasks.length} tasks (${overdue} overdue), ${outstanding.length} outstanding invoices.`;
 }
 
-console.log('📋 Foreman AI Mini Chat loaded');
+console.log('👷 Foreman AI Mini Chat loaded');
 
 // ═══════════════════════════════════════════════════════════
 //  DELAYS & DEFICIENCIES SYSTEM
@@ -8243,7 +8243,7 @@ function renderDelaysPage() {
     return;
   }
 
-  const typeIcons = { delay:'⏱', deficiency:'🔴', safety:'🦺', material:'📦', weather:'🌧', labour:'👷', equipment:'🔧', design:'📐', inspection:'🔍', other:'📋' };
+  const typeIcons = { delay:'⏱', deficiency:'🔴', safety:'🦺', material:'📦', weather:'🌧', labour:'👷', equipment:'🔧', design:'📐', inspection:'🔍', other:'📄' };
   const sevClass = { low:'severity-low', medium:'severity-medium', high:'severity-high', critical:'severity-critical' };
   const sevLabel = { low:'Low', medium:'Medium', high:'High', critical:'Critical' };
 
@@ -8253,7 +8253,7 @@ function renderDelaysPage() {
     return `
     <div class="delay-card ${sevClass[d.severity] || ''}">
       <div class="delay-card-header">
-        <div class="delay-type-icon">${typeIcons[d.type] || '📋'}</div>
+        <div class="delay-type-icon">${typeIcons[d.type] || '📄'}</div>
         <div class="delay-card-info">
           <div class="delay-title">${d.title}</div>
           <div class="delay-meta">${projName} · ${d.date} · Logged by ${d.logged_by || 'Foreman'}</div>
@@ -8286,7 +8286,7 @@ function filterDelays(filter, btn) {
   else if (['open','inprogress','resolved'].includes(filter)) filtered = delays.filter(d => d.status === filter);
   else filtered = delays.filter(d => d.type === filter);
 
-  const typeIcons = { delay:'⏱', deficiency:'🔴', safety:'🦺', material:'📦', weather:'🌧', labour:'👷', equipment:'🔧', design:'📐', inspection:'🔍', other:'📋' };
+  const typeIcons = { delay:'⏱', deficiency:'🔴', safety:'🦺', material:'📦', weather:'🌧', labour:'👷', equipment:'🔧', design:'📐', inspection:'🔍', other:'📄' };
   const sevClass = { low:'severity-low', medium:'severity-medium', high:'severity-high', critical:'severity-critical' };
   const sevLabel = { low:'Low', medium:'Medium', high:'High', critical:'Critical' };
 
@@ -8304,7 +8304,7 @@ function filterDelays(filter, btn) {
     return `
     <div class="delay-card ${sevClass[d.severity] || ''}">
       <div class="delay-card-header">
-        <div class="delay-type-icon">${typeIcons[d.type] || '📋'}</div>
+        <div class="delay-type-icon">${typeIcons[d.type] || '📄'}</div>
         <div class="delay-card-info">
           <div class="delay-title">${d.title}</div>
           <div class="delay-meta">${projName} · ${d.date}</div>
@@ -8517,7 +8517,7 @@ function renderSafetyRecords() {
     return;
   }
 
-  const formIcons = { flha:'📋', fall_arrest:'🪝', toolbox_talk:'🔧', incident_report:'🚨', site_inspection:'🔍' };
+  const formIcons = { flha:'🦺', fall_arrest:'🪝', toolbox_talk:'🔧', incident_report:'🚨', site_inspection:'🔍' };
   container.innerHTML = records.slice().reverse().map(r => `
     <div class="sf-record-card">
       <div class="sf-record-header">
@@ -8799,7 +8799,7 @@ function renderContactCard(c) {
     ${c.phone ? `<div class="contact-detail-row">📞 <a href="tel:${c.phone}" onclick="event.stopPropagation()">${escHtml(c.phone)}</a></div>` : ''}
     ${c.location ? `<div class="contact-detail-row">📍 ${escHtml(c.location)}</div>` : ''}
     <div class="contact-card-footer">
-      <span>📋 ${leads} lead${leads!==1?'s':''}</span>
+      <span>📝 ${leads} lead${leads!==1?'s':''}</span>
       <span>🎯 ${activities} activit${activities!==1?'ies':'y'}</span>
       <span class="contact-date">${c.created_at ? new Date(c.created_at).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}) : ''}</span>
     </div>
@@ -10311,7 +10311,7 @@ function printT4() {
   setTimeout(() => win.print(), 400);
 }
 
-console.log('📋 HR Module (Pay Stubs, TD1, T4) loaded');
+console.log('📄 HR Module (Pay Stubs, TD1, T4) loaded');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONVERT ESTIMATE/QUOTE TO INVOICE

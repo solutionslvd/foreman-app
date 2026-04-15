@@ -109,7 +109,7 @@
       <h2>🔐 Admin Login</h2>
       <div class="form-group">
         <label>Admin Username</label>
-        <input type="text" id="admin-username" placeholder="admin" value="admin">
+        <input type="text" id="admin-username" placeholder="Admin username">
       </div>
       <div class="form-group">
         <label>Admin Password</label>
@@ -339,7 +339,7 @@
           </div>
         </div>
         <div class="kpi-card ar">
-          <div class="kpi-icon">📋</div>
+          <div class="kpi-icon">📄</div>
           <div class="kpi-content">
             <div class="kpi-value" id="kpi-ar">$0</div>
             <div class="kpi-label">Outstanding AR</div>
@@ -492,7 +492,7 @@
           <div class="ai-qc-desc">Tax remittance guidance</div>
         </div>
         <div class="ai-quick-card" onclick="sendQuickPrompt('What permits do I need for this construction project?')">
-          <div class="ai-qc-icon">📋</div>
+          <div class="ai-qc-icon">📝</div>
           <div class="ai-qc-label">Permits & Regs</div>
           <div class="ai-qc-desc">Permit requirements</div>
         </div>
@@ -604,7 +604,7 @@
         </div>
         <div class="kanban-board" id="pm-kanban-board">
           <div class="kanban-column" data-status="todo">
-            <div class="kanban-header"><h4>📋 To Do</h4><span class="kanban-count">4</span></div>
+            <div class="kanban-header"><h4>📝 To Do</h4><span class="kanban-count">4</span></div>
             <div class="kanban-cards" id="kanban-todo"></div>
           </div>
           <div class="kanban-column" data-status="inprogress">
@@ -663,7 +663,7 @@
           <div class="risk-matrix" id="pm-risk-matrix"></div>
         </div>
         <div class="risk-register">
-          <h3>📋 Risk Register</h3>
+          <h3>⚠️ Risk Register</h3>
           <table class="risk-table" id="pm-risk-table">
             <thead><tr><th>ID</th><th>Description</th><th>Category</th><th>Impact</th><th>Likelihood</th><th>Score</th><th>Owner</th><th>Status</th></tr></thead>
             <tbody id="risk-register-body"></tbody>
@@ -728,14 +728,14 @@
       <div class="page-header">
         <h1 class="page-title">Invoices &amp; Estimates</h1>
         <div class="page-actions">
-          <button class="btn-secondary btn-sm" onclick="openEstimateModal()">📋 New Estimate</button>
+          <button class="btn-secondary btn-sm" onclick="openEstimateModal()">📄 New Estimate</button>
           <button class="btn-secondary btn-sm" onclick="previewInvoice()">👁 Preview</button>
           <button class="btn-primary btn-sm" onclick="openInvoiceModal()">+ New Invoice</button>
         </div>
       </div>
       <div class="inv-tabs">
         <button class="inv-tab active" onclick="showInvTab('invoices', this)">📄 Invoices</button>
-        <button class="inv-tab" onclick="showInvTab('estimates', this)">📋 Estimates</button>
+        <button class="inv-tab" onclick="showInvTab('estimates', this)">📄 Estimates</button>
       </div>
       <div id="inv-tab-invoices">
         <div class="invoice-summary-bar">
@@ -768,10 +768,10 @@
       <div id="inv-tab-estimates" style="display:none">
         <div id="estimates-list" class="data-table-container">
           <div class="empty-state">
-            <div class="empty-icon">📋</div>
+            <div class="empty-icon">📄</div>
             <h3>No Estimates Yet</h3>
             <p>Create quotes and estimates for clients</p>
-            <button class="btn-primary" onclick="openEstimateModal()">📋 New Estimate</button>
+            <button class="btn-primary" onclick="openEstimateModal()">📄 New Estimate</button>
           </div>
         </div>
       </div>
@@ -789,7 +789,7 @@
 
       <!-- Expense Sub-tabs -->
       <div style="display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap;border-bottom:1px solid var(--border-light);padding-bottom:.75rem">
-        <button class="filter-btn active" id="etab-list" onclick="showExpenseTab('list',this)">📋 All Expenses</button>
+        <button class="filter-btn active" id="etab-list" onclick="showExpenseTab('list',this)">💵 All Expenses</button>
         <button class="filter-btn" id="etab-receipts" onclick="showExpenseTab('receipts',this)">📷 Receipt Snapshots</button>
         <button class="filter-btn" id="etab-summary" onclick="showExpenseTab('summary',this)">📊 Summary</button>
       </div>
@@ -919,7 +919,7 @@
         <button class="filter-btn active" id="ptab-employees" onclick="showPayrollTab('employees',this)">👷 Employees</button>
         <button class="filter-btn" id="ptab-contractors" onclick="showPayrollTab('contractors',this)">🔨 Contractors</button>
         <button class="filter-btn" id="ptab-run" onclick="showPayrollTab('run',this)">💰 Run Payroll</button>
-        <button class="filter-btn" id="ptab-history" onclick="showPayrollTab('history',this)">📋 History</button>
+        <button class="filter-btn" id="ptab-history" onclick="showPayrollTab('history',this)">📜 History</button>
         <button class="filter-btn" id="ptab-chart" onclick="showPayrollTab('chart',this)">📊 Chart of Accounts</button>
         <button class="filter-btn" id="ptab-bank" onclick="showPayrollTab('bank',this)">🏦 Bank Feed</button>
         <button class="filter-btn" id="ptab-tax" onclick="showPayrollTab('tax',this)">🇨🇦 CRA Tax</button>
@@ -1282,7 +1282,7 @@
 
           <!-- GST/HST Summary -->
           <div style="background:rgba(46,125,50,.08);border:1px solid rgba(46,125,50,.3);border-radius:10px;padding:1.2rem;margin-bottom:1rem">
-            <h4 style="font-size:.9rem;margin-bottom:.75rem;color:#66bb6a">📋 GST/HST Return Summary</h4>
+            <h4 style="font-size:.9rem;margin-bottom:.75rem;color:#66bb6a">💰 GST/HST Return Summary</h4>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem">
               <div style="text-align:center"><div style="font-size:1.4rem;font-weight:700" id="tax-gst-collected">$0.00</div><div style="font-size:.75rem;color:var(--text-muted)">GST Collected (Line 103)</div></div>
               <div style="text-align:center"><div style="font-size:1.4rem;font-weight:700" id="tax-itc">$0.00</div><div style="font-size:.75rem;color:var(--text-muted)">Input Tax Credits (Line 106)</div></div>
@@ -2480,7 +2480,7 @@
               <div><strong>GST Filing</strong><p>GST filing guide for contractors</p></div>
             </div>
             <div class="help-item" onclick="sendQuickPrompt('What permits do I need for construction?'); navigateTo('ai-chat')">
-              <span class="hi-icon">📋</span>
+              <span class="hi-icon">❓</span>
               <div><strong>Building Permits</strong><p>Construction permit requirements</p></div>
             </div>
           </div>
@@ -2555,7 +2555,7 @@
         <button class="crm-tab active" id="crm-tab-pipeline" onclick="showCRMTab('pipeline')">🔥 Pipeline</button>
         <button class="crm-tab" id="crm-tab-contacts" onclick="showCRMTab('contacts')">👥 Contacts</button>
         <button class="crm-tab" id="crm-tab-deals" onclick="showCRMTab('deals')">💰 Deals</button>
-        <button class="crm-tab" id="crm-tab-activities" onclick="showCRMTab('activities')">📋 Activities</button>
+        <button class="crm-tab" id="crm-tab-activities" onclick="showCRMTab('activities')">📝 Activities</button>
         <button class="crm-tab" id="crm-tab-analytics" onclick="showCRMTab('analytics')">📊 Analytics</button>
       </div>
 
@@ -2691,7 +2691,7 @@
 
       <!-- Summary KPIs -->
       <div class="delays-kpi-row" id="delays-kpi-row">
-        <div class="delays-kpi"><span class="dkpi-icon">📋</span><span class="dkpi-val" id="dkpi-total">0</span><span class="dkpi-label">Total Logged</span></div>
+        <div class="delays-kpi"><span class="dkpi-icon">📝</span><span class="dkpi-val" id="dkpi-total">0</span><span class="dkpi-label">Total Logged</span></div>
         <div class="delays-kpi"><span class="dkpi-icon">🚨</span><span class="dkpi-val" id="dkpi-open">0</span><span class="dkpi-label">Open</span></div>
         <div class="delays-kpi"><span class="dkpi-icon">🔧</span><span class="dkpi-val" id="dkpi-inprogress">0</span><span class="dkpi-label">In Progress</span></div>
         <div class="delays-kpi"><span class="dkpi-icon">✅</span><span class="dkpi-val" id="dkpi-resolved">0</span><span class="dkpi-label">Resolved</span></div>
@@ -2733,7 +2733,7 @@
       <!-- Form Card Grid -->
       <div id="sf-card-grid" class="sf-card-grid">
         <div class="sf-form-card" onclick="openSafetyFormModal('sf-flha')">
-          <div class="sf-card-icon">📋</div>
+          <div class="sf-card-icon">🦺</div>
           <div class="sf-card-body">
             <h3>Field Level Hazard Assessment</h3>
             <p>FLHA — Complete before starting work each day</p>
@@ -2806,7 +2806,7 @@
       <div id="sf-modal-sf-flha" class="modal-overlay hidden" onclick="closeSafetyFormModal('sf-flha', event)">
         <div class="modal-box sf-modal-box" onclick="event.stopPropagation()">
           <div class="modal-header">
-            <h2>📋 Field Level Hazard Assessment (FLHA)</h2>
+            <h2>🦺 Field Level Hazard Assessment (FLHA)</h2>
             <button class="modal-close" onclick="closeSafetyFormModal('sf-flha')">✕</button>
           </div>
           <div class="modal-body sf-modal-body">
@@ -3168,7 +3168,7 @@
               <option value="equipment">🔧 Equipment Breakdown</option>
               <option value="design">📐 Design / Drawing Issue</option>
               <option value="inspection">🔍 Inspection Hold</option>
-              <option value="other">📋 Other</option>
+              <option value="other">📄 Other</option>
             </select>
           </div>
           <div class="form-group">
@@ -3323,7 +3323,7 @@
     
       <!-- Scope of Work Checklist Section -->
       <div class="form-section" style="margin-top:20px;border-top:1px solid #e0e0e0;padding-top:15px">
-        <h4 style="margin:0 0 10px 0;font-size:1rem;font-weight:600">📋 Scope of Work Checklist</h4>
+        <h4 style="margin:0 0 10px 0;font-size:1rem;font-weight:600">✅ Scope of Work Checklist</h4>
         <p style="font-size:0.85rem;color:#666;margin-bottom:10px">Add checklist items to track project progress.</p>
         <div id="proj-sow-container" style="max-height:200px;overflow-y:auto">
           <p style="color:#999;font-style:italic">No scope items added yet</p>
@@ -3526,7 +3526,7 @@
 <div id="new-estimate-modal" class="modal-overlay hidden">
   <div class="modal" style="max-width:780px;width:95vw">
     <div class="modal-header">
-      <h3>📋 New Estimate / Quote</h3>
+      <h3>📄 New Estimate / Quote</h3>
       <button class="modal-close" onclick="closeModal('new-estimate-modal')">✕</button>
     </div>
     <div class="modal-body">
@@ -3642,7 +3642,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('new-estimate-modal')">Cancel</button>
-      <button class="btn-primary" onclick="createEstimate()">📋 Create Estimate</button>
+      <button class="btn-primary" onclick="createEstimate()">✅ Create Estimate</button>
     </div>
   </div>
 </div>
@@ -4294,13 +4294,13 @@
   </nav>
 
   <!-- Floating AI Chat Button + Mini Popup -->
-  <button class="fab-ai" onclick="toggleMiniChat()" title="Ask Foreman AI" id="fab-ai-btn">📋</button>
+  <button class="fab-ai" onclick="toggleMiniChat()" title="Ask Foreman AI" id="fab-ai-btn">👷</button>
 
   <!-- Mini Floating Chat Popup -->
   <div id="mini-chat-popup" class="mini-chat-popup hidden">
     <div class="mini-chat-header">
       <div class="mini-chat-title">
-        <span class="mini-chat-avatar">📋</span>
+        <span class="mini-chat-avatar">👷</span>
         <div>
           <div class="mini-chat-name">Foreman AI</div>
           <div class="mini-chat-status">● Online — Ask me anything</div>
@@ -4319,7 +4319,7 @@
       </div>
     </div>
     <div class="mini-chat-quick-prompts" id="mini-quick-prompts">
-      <button onclick="sendMiniPrompt('Summarize my active projects')">📋 Projects</button>
+      <button onclick="sendMiniPrompt('Summarize my active projects')">📁 Projects</button>
       <button onclick="sendMiniPrompt('What tasks are overdue?')">⏰ Overdue</button>
       <button onclick="sendMiniPrompt('What safety forms do I need today?')">🦺 Safety</button>
       <button onclick="sendMiniPrompt('Help me write a quick site note')">📝 Site Note</button>
@@ -5320,7 +5320,7 @@
 <div id="crm-activity-modal" class="modal-overlay hidden">
   <div class="modal" style="max-width:500px;width:95vw">
     <div class="modal-header">
-      <h3>📋 Log Activity</h3>
+      <h3>📝 Log Activity</h3>
       <span class="close-modal" onclick="closeModal('crm-activity-modal')">&times;</span>
     </div>
     <div class="modal-body">
@@ -5462,7 +5462,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('crm-contact-detail-modal')">Close</button>
-      <button class="btn btn-secondary" onclick="logActivityForContact()">📋 Log Activity</button>
+      <button class="btn btn-secondary" onclick="logActivityForContact()">📝 Log Activity</button>
       <button class="btn btn-primary" onclick="editCurrentContact()">✏️ Edit</button>
     </div>
   </div>
@@ -5489,7 +5489,7 @@
 <div id="td1-modal" class="modal-overlay hidden">
   <div class="modal" style="max-width:800px;width:95vw;max-height:90vh;overflow-y:auto">
     <div class="modal-header">
-      <h3>📋 TD1 Personal Tax Credits Return</h3>
+      <h3>📄 TD1 Personal Tax Credits Return</h3>
       <span class="close-modal" onclick="closeModal('td1-modal')">&times;</span>
     </div>
     <div class="modal-body" id="td1-content">

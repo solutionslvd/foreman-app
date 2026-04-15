@@ -240,7 +240,7 @@ function renderContactCard(c) {
     ${c.phone ? `<div class="contact-detail-row">📞 <a href="tel:${c.phone}" onclick="event.stopPropagation()">${escHtml(c.phone)}</a></div>` : ''}
     ${c.location ? `<div class="contact-detail-row">📍 ${escHtml(c.location)}</div>` : ''}
     <div class="contact-card-footer">
-      <span>📋 ${leads} lead${leads!==1?'s':''}</span>
+      <span>📝 ${leads} lead${leads!==1?'s':''}</span>
       <span>🎯 ${activities} activit${activities!==1?'ies':'y'}</span>
       <span class="contact-date">${c.created_at ? new Date(c.created_at).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}) : ''}</span>
     </div>
@@ -1695,7 +1695,7 @@ function printT4() {
   setTimeout(() => win.print(), 400);
 }
 
-console.log('📋 HR Module (Pay Stubs, TD1, T4) loaded');
+console.log('📄 HR Module (Pay Stubs, TD1, T4) loaded');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONVERT ESTIMATE/QUOTE TO INVOICE
