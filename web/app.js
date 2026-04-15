@@ -4039,6 +4039,8 @@ function openEstimateModal() {
   document.getElementById('est-lines-body').innerHTML = '';
   document.getElementById('est-customer').value = '';
   document.getElementById('est-project-desc').value = '';
+  if (document.getElementById('est-project-size')) document.getElementById('est-project-size').value = '';
+  if (document.getElementById('est-project-type')) document.getElementById('est-project-type').value = '';
   document.getElementById('est-notes').value = '';
   document.getElementById('est-subtotal').textContent = '$0.00';
   document.getElementById('est-gst-total').textContent = '$0.00';
@@ -4049,6 +4051,236 @@ function openEstimateModal() {
   document.getElementById('est-valid-until').value = valid.toISOString().split('T')[0];
   addEstimateLine();
   openModal('new-estimate-modal');
+}
+
+function updateEstimateDesc() {
+  const type = document.getElementById('est-project-type')?.value;
+  const descMap = {
+    new_home_framing: 'New home framing - labour and materials',
+    garage_build: 'Detached garage construction',
+    basement_development: 'Basement development and finishing',
+    kitchen_renovation: 'Kitchen renovation - demo, framing, finishing',
+    bathroom_renovation: 'Bathroom renovation - full gut and rebuild',
+    deck_build: 'Deck/patio construction',
+    addition: 'Home addition construction',
+    roofing_residential: 'Residential roofing - tear off and replace',
+    commercial_office: 'Commercial office tenant improvement',
+    retail_renovation: 'Retail space renovation',
+    warehouse_build: 'Warehouse/industrial building construction',
+    commercial_roofing: 'Commercial flat roof replacement',
+    electrical_rough_in: 'Electrical rough-in - wiring and panel',
+    plumbing_rough_in: 'Plumbing rough-in - supply and drain',
+    hvac_install: 'HVAC system installation',
+    insulation: 'Insulation installation - blown and batt',
+    drywall_taping: 'Drywall supply and install with taping',
+    flooring: 'Flooring installation',
+    painting: 'Interior/exterior painting',
+    concrete_work: 'Concrete foundation and flatwork',
+    excavation: 'Excavation and site preparation'
+  };
+  const desc = document.getElementById('est-project-desc');
+  if (desc && descMap[type]) desc.value = descMap[type];
+}
+
+// Alberta construction project templates (labour + materials + compliance items)
+const ALBERTA_PROJECT_TEMPLATES = {
+  new_home_framing: {
+    notes: 'All work to comply with Alberta Building Code (ABC) 2019. Framing inspections required per AHJ. Workers Compensation Board (WCB) coverage included. GST applies.',
+    lines: [
+      { desc: 'Labour - Lead Framer (Journeyman)', qty: 80, unit: 'hrs', rate: 95 },
+      { desc: 'Labour - Apprentice Framer (2nd year)', qty: 80, unit: 'hrs', rate: 45 },
+      { desc: 'Labour - General Labour / Clean-up', qty: 20, unit: 'hrs', rate: 35 },
+      { desc: 'Lumber - Dimensional (2x6, 2x4, 2x8 package)', qty: 1, unit: 'lot', rate: 18500 },
+      { desc: 'LVL Beams & Engineered Wood', qty: 1, unit: 'lot', rate: 4200 },
+      { desc: 'Nails, Hardware, Connectors (Simpson Strong-Tie)', qty: 1, unit: 'lot', rate: 1800 },
+      { desc: 'Sheathing - OSB 7/16 (walls & roof)', qty: 1, unit: 'lot', rate: 3200 },
+      { desc: 'House Wrap - Tyvek or equivalent', qty: 1, unit: 'lot', rate: 850 },
+      { desc: 'Temporary Bracing & Scaffolding', qty: 1, unit: 'wk', rate: 1200 },
+      { desc: 'Framing Inspection Fee (City of Edmonton/Calgary)', qty: 1, unit: 'ea', rate: 350 },
+      { desc: 'WCB Premium (included in rate)', qty: 1, unit: 'allowance', rate: 0 },
+      { desc: 'Site Safety - FLHA, fall protection', qty: 1, unit: 'allowance', rate: 250 }
+    ]
+  },
+  garage_build: {
+    notes: 'Detached garage permit required from municipality. Alberta Safety Codes Officer inspection required. Foundation, framing, and electrical permit separate.',
+    lines: [
+      { desc: 'Labour - Foreman / Lead Carpenter', qty: 40, unit: 'hrs', rate: 90 },
+      { desc: 'Labour - Carpenter / Framer', qty: 60, unit: 'hrs', rate: 65 },
+      { desc: 'Labour - General Labour', qty: 20, unit: 'hrs', rate: 35 },
+      { desc: 'Concrete - Slab on Grade (4" with wire mesh)', qty: 1, unit: 'lot', rate: 6500 },
+      { desc: 'Lumber Package - Walls & Roof', qty: 1, unit: 'lot', rate: 7800 },
+      { desc: 'Sheathing - OSB 7/16', qty: 1, unit: 'lot', rate: 1400 },
+      { desc: 'Roofing - Asphalt shingles (30yr)', qty: 1, unit: 'lot', rate: 2200 },
+      { desc: 'Overhead Door & Opener', qty: 1, unit: 'ea', rate: 1800 },
+      { desc: 'Man Door - Steel Exterior', qty: 1, unit: 'ea', rate: 450 },
+      { desc: 'Window (optional)', qty: 1, unit: 'ea', rate: 380 },
+      { desc: 'Siding - LP SmartSide or Vinyl', qty: 1, unit: 'lot', rate: 2600 },
+      { desc: 'Building Permit (municipality)', qty: 1, unit: 'ea', rate: 800 },
+      { desc: 'Safety Codes Officer Inspections', qty: 2, unit: 'ea', rate: 200 }
+    ]
+  },
+  basement_development: {
+    notes: 'Development permit may be required. Egress window required per ABC Section 9.7.4. All electrical to CSA C22.1 Canadian Electrical Code. Smoke/CO detector compliance per ABC.',
+    lines: [
+      { desc: 'Labour - Framing', qty: 24, unit: 'hrs', rate: 75 },
+      { desc: 'Labour - Drywall Install & Tape', qty: 32, unit: 'hrs', rate: 65 },
+      { desc: 'Labour - Electrical Rough-In (Licensed)', qty: 16, unit: 'hrs', rate: 110 },
+      { desc: 'Labour - Plumbing Rough-In (Licensed)', qty: 12, unit: 'hrs', rate: 115 },
+      { desc: 'Labour - Insulation', qty: 8, unit: 'hrs', rate: 55 },
+      { desc: 'Labour - Flooring Installation', qty: 12, unit: 'hrs', rate: 60 },
+      { desc: 'Labour - Paint & Trim', qty: 16, unit: 'hrs', rate: 55 },
+      { desc: 'Lumber - 2x4 steel stud or wood framing', qty: 1, unit: 'lot', rate: 1800 },
+      { desc: 'Drywall - 1/2" (supply and install)', qty: 1, unit: 'lot', rate: 2400 },
+      { desc: 'Insulation - Batt R-20 walls', qty: 1, unit: 'lot', rate: 900 },
+      { desc: 'Flooring - LVP (supply)', qty: 1, unit: 'lot', rate: 2200 },
+      { desc: 'Electrical - Wire, boxes, panel circuits', qty: 1, unit: 'lot', rate: 1600 },
+      { desc: 'Plumbing - Bathroom rough-in', qty: 1, unit: 'lot', rate: 2800 },
+      { desc: 'Egress Window & Well', qty: 1, unit: 'ea', rate: 1400 },
+      { desc: 'Smoke / CO Detectors (ABC compliant)', qty: 3, unit: 'ea', rate: 85 },
+      { desc: 'Development Permit', qty: 1, unit: 'ea', rate: 450 }
+    ]
+  },
+  kitchen_renovation: {
+    notes: 'Electrical permit required for new circuits. Plumbing permit required if moving supply/drain. All work per ABC and CSA standards.',
+    lines: [
+      { desc: 'Labour - Demo & Disposal', qty: 12, unit: 'hrs', rate: 65 },
+      { desc: 'Labour - Carpentry / Cabinet Install', qty: 24, unit: 'hrs', rate: 80 },
+      { desc: 'Labour - Electrical (Licensed)', qty: 12, unit: 'hrs', rate: 110 },
+      { desc: 'Labour - Plumbing (Licensed)', qty: 8, unit: 'hrs', rate: 115 },
+      { desc: 'Labour - Tile Backsplash', qty: 10, unit: 'hrs', rate: 70 },
+      { desc: 'Labour - Paint & Trim', qty: 8, unit: 'hrs', rate: 55 },
+      { desc: 'Cabinets (supply - mid range)', qty: 1, unit: 'lot', rate: 8500 },
+      { desc: 'Countertop - Quartz (supply & install)', qty: 1, unit: 'lot', rate: 3200 },
+      { desc: 'Tile Backsplash (supply)', qty: 1, unit: 'lot', rate: 650 },
+      { desc: 'Sink & Faucet (supply)', qty: 1, unit: 'set', rate: 850 },
+      { desc: 'Under-cabinet Lighting', qty: 1, unit: 'lot', rate: 480 },
+      { desc: 'Drywall Patching', qty: 1, unit: 'allowance', rate: 350 },
+      { desc: 'Permits (electrical + plumbing)', qty: 1, unit: 'lot', rate: 400 }
+    ]
+  },
+  roofing_residential: {
+    notes: 'Building permit may be required for structural changes. Wind warranty requires ice & water shield in valley per ABC. Alberta climate zone ice barrier requirement at eaves.',
+    lines: [
+      { desc: 'Labour - Tear Off & Disposal (per sq)', qty: 1, unit: 'lot', rate: 1800 },
+      { desc: 'Labour - Installation (Journeyman Roofer)', qty: 32, unit: 'hrs', rate: 75 },
+      { desc: 'Labour - Apprentice', qty: 16, unit: 'hrs', rate: 40 },
+      { desc: 'Asphalt Shingles - 30yr Architectural', qty: 1, unit: 'lot', rate: 4200 },
+      { desc: 'Ice & Water Shield (2m from eave per ABC)', qty: 1, unit: 'lot', rate: 850 },
+      { desc: 'Synthetic Felt Underlayment', qty: 1, unit: 'lot', rate: 480 },
+      { desc: 'Drip Edge - Aluminum', qty: 1, unit: 'lot', rate: 320 },
+      { desc: 'Ridge Cap & Hip Shingles', qty: 1, unit: 'lot', rate: 280 },
+      { desc: 'Flashings - Step, counter, chimney', qty: 1, unit: 'lot', rate: 650 },
+      { desc: 'Venting - Soffit, ridge vent', qty: 1, unit: 'lot', rate: 420 },
+      { desc: 'Waste Disposal / Bin', qty: 1, unit: 'ea', rate: 650 },
+      { desc: 'Fall Protection Equipment', qty: 1, unit: 'allowance', rate: 150 }
+    ]
+  },
+  drywall_taping: {
+    notes: 'Fire separation requirements per ABC. Type X drywall required for garage/house separation (5/8"). Moisture resistant board in wet areas.',
+    lines: [
+      { desc: 'Labour - Drywall Hanging', qty: 24, unit: 'hrs', rate: 65 },
+      { desc: 'Labour - Taping & Mudding (3 coats)', qty: 20, unit: 'hrs', rate: 70 },
+      { desc: 'Labour - Sanding & Prime Coat', qty: 8, unit: 'hrs', rate: 55 },
+      { desc: 'Drywall 1/2" - Regular (supply)', qty: 1, unit: 'lot', rate: 2800 },
+      { desc: 'Drywall 5/8" Type X - Fire rated (supply)', qty: 1, unit: 'lot', rate: 850 },
+      { desc: 'Moisture Resistant - Bathroom/kitchen', qty: 1, unit: 'lot', rate: 420 },
+      { desc: 'Joint Compound (mud)', qty: 1, unit: 'lot', rate: 380 },
+      { desc: 'Tape, screws, corner bead', qty: 1, unit: 'lot', rate: 280 }
+    ]
+  },
+  concrete_work: {
+    notes: 'Footing design per site-specific soils report. All concrete per CSA A23.1/A23.2. Frost depth minimum 1.2m in Alberta. Inspections by Safety Codes Officer.',
+    lines: [
+      { desc: 'Labour - Excavation & Forming', qty: 24, unit: 'hrs', rate: 75 },
+      { desc: 'Labour - Pour & Finish', qty: 16, unit: 'hrs', rate: 80 },
+      { desc: 'Labour - Stripping & Backfill', qty: 8, unit: 'hrs', rate: 65 },
+      { desc: 'Concrete - 32 MPa (per m3)', qty: 15, unit: 'm3', rate: 220 },
+      { desc: 'Rebar - 15M deformed (supply)', qty: 1, unit: 'lot', rate: 1800 },
+      { desc: 'Wire Mesh - 6x6 W2.9 slab', qty: 1, unit: 'lot', rate: 650 },
+      { desc: 'Forming Lumber & Ties', qty: 1, unit: 'lot', rate: 1200 },
+      { desc: 'Poly Vapour Barrier - 10 mil', qty: 1, unit: 'lot', rate: 280 },
+      { desc: 'Granular Sub-base (crushed limestone)', qty: 1, unit: 'lot', rate: 1400 },
+      { desc: 'Safety Codes Officer Inspection', qty: 2, unit: 'ea', rate: 200 }
+    ]
+  }
+};
+
+async function aiGenerateEstimate() {
+  const projectType = document.getElementById('est-project-type')?.value;
+  const projectSize = document.getElementById('est-project-size')?.value || '';
+  const btn = document.getElementById('ai-fill-btn');
+
+  if (!projectType) {
+    showToast('Please select a Project Type first', 'error');
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Generating...'; }
+
+  const template = ALBERTA_PROJECT_TEMPLATES[projectType];
+
+  if (template) {
+    setTimeout(() => {
+      document.getElementById('est-lines-body').innerHTML = '';
+      estLineCount = 0;
+
+      template.lines.forEach(line => {
+        addEstimateLine();
+        const rows = document.querySelectorAll('#est-lines-body tr');
+        if (rows.length > 0) {
+          const row = rows[rows.length - 1];
+          const inputs = row.querySelectorAll('input, select');
+          if (inputs[0]) inputs[0].value = line.desc;
+          if (inputs[1]) inputs[1].value = line.qty;
+          if (inputs[2]) inputs[2].value = line.unit;
+          if (inputs[3]) { inputs[3].value = line.rate; inputs[3].dispatchEvent(new Event('input')); }
+        }
+      });
+
+      document.getElementById('est-notes').value = template.notes;
+      recalcEstimate();
+
+      if (btn) { btn.disabled = false; btn.textContent = '✨ AI Fill'; }
+      showToast('✅ AI filled ' + template.lines.length + ' line items based on Alberta standards', 'success');
+    }, 800);
+  } else {
+    const projectDesc = document.getElementById('est-project-desc')?.value || projectType.replace(/_/g,' ');
+    try {
+      const res = await apiPost('/api/ai/chat', {
+        messages: [{
+          role: 'user',
+          content: 'Generate a detailed construction estimate for Alberta Canada for: "' + projectDesc + '" ' + (projectSize ? '(Size: ' + projectSize + ')' : '') + '. Return JSON only: {"lines": [{"desc": "...", "qty": 1, "unit": "hrs|ea|lot|m2|lf", "rate": 0}], "notes": "Alberta code compliance notes"}. Include labour, materials, permits. Follow Alberta Building Code and WCB requirements.'
+        }]
+      });
+      if (res?.content) {
+        try {
+          const data = JSON.parse(res.content.replace(/```json|```/g,'').trim());
+          if (data.lines) {
+            document.getElementById('est-lines-body').innerHTML = '';
+            estLineCount = 0;
+            data.lines.forEach(line => {
+              addEstimateLine();
+              const rows = document.querySelectorAll('#est-lines-body tr');
+              if (rows.length > 0) {
+                const row = rows[rows.length - 1];
+                const inputs = row.querySelectorAll('input, select');
+                if (inputs[0]) inputs[0].value = line.desc;
+                if (inputs[1]) inputs[1].value = line.qty;
+                if (inputs[2]) inputs[2].value = line.unit;
+                if (inputs[3]) { inputs[3].value = line.rate; inputs[3].dispatchEvent(new Event('input')); }
+              }
+            });
+            if (data.notes) document.getElementById('est-notes').value = data.notes;
+            recalcEstimate();
+            showToast('✅ AI generated estimate from your description', 'success');
+          }
+        } catch(e) { showToast('AI response received - please review and edit', 'info'); }
+      }
+    } catch(e) {
+      showToast('AI fill requires backend connection. Using manual mode.', 'info');
+    }
+    if (btn) { btn.disabled = false; btn.textContent = '✨ AI Fill'; }
+  }
 }
 
 
@@ -8783,6 +9015,8 @@ function editCRMLead(leadId) {
   setField('crm-lead-probability', l.probability);
   setField('crm-lead-address', l.address);
   setField('crm-lead-description', l.description);
+  setField('crm-lead-email', l.email || '');
+  setField('crm-lead-phone', l.phone || '');
   populateCRMContactDropdowns();
   openModal('crm-lead-modal');
 }
@@ -8808,6 +9042,8 @@ function saveCRMLead() {
     probability: parseInt(getField('crm-lead-probability')) || 50,
     address: getField('crm-lead-address'),
     description: getField('crm-lead-description'),
+    email: getField('crm-lead-email'),
+    phone: getField('crm-lead-phone'),
     updated_at: new Date().toISOString()
   };
 
@@ -8855,7 +9091,24 @@ function openLeadDetail(leadId) {
     ['Address', l.address || '—'],
     ['Contact', c ? `${c.first_name} ${c.last_name}` : '—'],
     ['Company', l.company || '—'],
+    ['Email', (l.email || c?.email) ? `<a href="mailto:${l.email||c?.email}" style="color:var(--primary)">${l.email||c?.email}</a>` : '—'],
+    ['Phone', (l.phone || c?.phone) ? `<a href="tel:${l.phone||c?.phone}" style="color:var(--primary)">${l.phone||c?.phone}</a>` : '—'],
   ].map(([k,v]) => `<div class="contact-info-row"><span>${k}</span><span>${v}</span></div>`).join('');
+
+  // Build contact quick-reach buttons (email/phone/SMS)
+  const contactPhone = c?.phone || l.phone || '';
+  const contactEmail = c?.email || l.email || '';
+  const leadSubject = encodeURIComponent(`Re: ${l.title}`);
+  const leadBody = encodeURIComponent(`Hi ${c ? c.first_name : 'there'},\n\nFollowing up on ${l.title}.\n\nBest regards`);
+  const smsBody = encodeURIComponent(`Hi ${c ? c.first_name : 'there'}, following up on ${l.title}. Please let us know if you have any questions.`);
+
+  const contactBtns = [
+    contactEmail ? `<a class="btn btn-msg btn-email" href="mailto:${contactEmail}?subject=${leadSubject}&body=${leadBody}" title="Send Email">📧 Email</a>` : '',
+    contactEmail ? `<a class="btn btn-msg btn-gmail" href="https://mail.google.com/mail/?view=cm&to=${contactEmail}&su=${leadSubject}&body=${leadBody}" target="_blank" title="Open in Gmail">✉️ Gmail</a>` : '',
+    contactPhone ? `<a class="btn btn-msg btn-sms" href="sms:${contactPhone}?body=${smsBody}" title="Send SMS">💬 SMS</a>` : '',
+    contactPhone ? `<a class="btn btn-msg btn-phone" href="tel:${contactPhone}" title="Call">📞 Call</a>` : '',
+    contactPhone ? `<a class="btn btn-msg btn-whatsapp" href="https://wa.me/${contactPhone.replace(/\D/g,'')}?text=${smsBody}" target="_blank" title="WhatsApp">🟢 WhatsApp</a>` : '',
+  ].filter(Boolean).join('');
 
   const content = `
     <div class="lead-detail-header">
@@ -8868,6 +9121,7 @@ function openLeadDetail(leadId) {
         ${l.stage !== 'Lost' && l.stage !== 'Won' ? `<button class="btn btn-danger" onclick="markLeadLost('${l.id}')">❌ Mark Lost</button>` : ''}
       </div>
     </div>
+    ${contactBtns ? `<div class="lead-contact-quick-reach">${contactBtns}</div>` : ''}
     <div class="contact-info-rows">${details}</div>
     ${l.description ? `<div class="contact-notes-box"><h5>Description</h5><p>${escHtml(l.description)}</p></div>` : ''}
     ${activities.length > 0 ? `<h4 style="margin-top:1.5rem">Activity History</h4>

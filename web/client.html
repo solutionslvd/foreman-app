@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Client Portal – The Foreman AI</title>
+  <link rel="stylesheet" href="/static/app.css?v=3.1">
+  <style>
+    /* ─── Client Portal Styles ─────────────────────────────────── */
+    .cp-body { min-height: 100vh; background: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', -apple-system, sans-serif; }
+    .cp-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cp-brand { display: flex; align-items: center; gap: 12px; }
+    .cp-brand-icon { font-size: 28px; }
+    .cp-brand-text { }
+    .cp-brand-name { font-size: 17px; font-weight: 700; color: var(--primary); display: block; }
+    .cp-brand-sub { font-size: 11px; color: var(--text-secondary); }
+    .cp-content { max-width: 960px; margin: 0 auto; padding: 28px 16px 80px; }
+    /* Status banner */
+    .cp-status-banner {
+      background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,107,53,0.05));
+      border: 1px solid rgba(255,107,53,0.3);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 20px;
+    }
+    .cp-status-icon { font-size: 40px; }
+    .cp-status-info { flex: 1; }
+    .cp-status-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+    .cp-status-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+    .cp-status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .cp-status-badge.active { background: rgba(16,185,129,0.2); color: #10b981; }
+    .cp-status-badge.pending { background: rgba(245,158,11,0.2); color: #f59e0b; }
+    .cp-status-badge.completed { background: rgba(99,102,241,0.2); color: #818cf8; }
+    /* Progress bar */
+    .cp-progress-section { margin-bottom: 24px; }
+    .cp-progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .cp-progress-label { font-size: 13px; font-weight: 600; }
+    .cp-progress-pct { font-size: 13px; color: var(--primary); font-weight: 700; }
+    .cp-progress-bar { height: 12px; background: var(--bg-input); border-radius: 6px; overflow: hidden; }
+    .cp-progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #ff9a72); border-radius: 6px; transition: width 1s ease; }
+    /* Cards grid */
+    .cp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .cp-card { background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; }
+    .cp-card-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .cp-card-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .cp-card-body { padding: 16px 18px; }
+    /* Milestones */
+    .cp-milestone { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+    .cp-milestone:last-child { border-bottom: none; }
+    .cp-ms-dot { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+    .cp-ms-dot.done { background: rgba(16,185,129,0.2); color: #10b981; }
+    .cp-ms-dot.active { background: rgba(255,107,53,0.2); color: var(--primary); }
+    .cp-ms-dot.upcoming { background: var(--bg-input); color: var(--text-muted); }
+    .cp-ms-info { flex: 1; }
+    .cp-ms-name { font-size: 13px; font-weight: 600; }
+    .cp-ms-date { font-size: 11px; color: var(--text-secondary); }
+    /* Invoice rows */
+    .cp-inv-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+    .cp-inv-row:last-child { border-bottom: none; }
+    .cp-inv-info { flex: 1; }
+    .cp-inv-num { font-size: 13px; font-weight: 600; }
+    .cp-inv-date { font-size: 11px; color: var(--text-secondary); }
+    .cp-inv-amount { font-weight: 700; color: var(--text-primary); }
+    .cp-inv-status { font-size: 11px; padding: 3px 8px; border-radius: 20px; margin-left: 8px; }
+    .cp-inv-status.paid { background: rgba(16,185,129,0.15); color: #10b981; }
+    .cp-inv-status.outstanding { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .cp-inv-status.overdue { background: rgba(239,68,68,0.15); color: #ef4444; }
+    /* Updates feed */
+    .cp-update { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-light); }
+    .cp-update:last-child { border-bottom: none; }
+    .cp-update-icon { font-size: 20px; width: 36px; text-align: center; flex-shrink: 0; }
+    .cp-update-body { flex: 1; }
+    .cp-update-text { font-size: 13px; margin-bottom: 2px; }
+    .cp-update-time { font-size: 11px; color: var(--text-secondary); }
+    /* Documents */
+    .cp-doc-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: 0.15s; }
+    .cp-doc-row:hover { opacity: 0.8; }
+    .cp-doc-row:last-child { border-bottom: none; }
+    /* Message form */
+    .cp-message-form { display: flex; gap: 8px; margin-top: 12px; }
+    .cp-message-form textarea { flex: 1; background: var(--bg-input); border: 1px solid var(--border-light); border-radius: var(--radius-sm); color: var(--text-primary); padding: 10px 12px; font-size: 13px; resize: none; height: 60px; }
+    /* Auth */
+    .cp-auth { position: fixed; inset: 0; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; z-index: 999; }
+    .cp-auth-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 40px; width: 380px; max-width: 95vw; border: 1px solid var(--border); text-align: center; }
+    .cp-auth-icon { font-size: 56px; margin-bottom: 12px; }
+    .cp-auth-card h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+    .cp-auth-card p { color: var(--text-secondary); font-size: 13px; margin-bottom: 24px; }
+    .cp-auth-field { margin-bottom: 14px; text-align: left; }
+    .cp-auth-field label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 500; }
+    .cp-auth-field input { width: 100%; background: var(--bg-input); border: 1px solid var(--border-light); border-radius: var(--radius-sm); color: var(--text-primary); padding: 12px 14px; font-size: 14px; box-sizing: border-box; }
+    .cp-back-link { display: block; margin-top: 16px; font-size: 12px; color: var(--text-secondary); cursor: pointer; }
+    .cp-back-link:hover { color: var(--primary); }
+    /* Bottom nav */
+    .cp-bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+    .cp-bn-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--text-muted); cursor: pointer; flex: 1; text-align: center; transition: color 0.2s; }
+    .cp-bn-item.active { color: var(--primary); }
+    .cp-bn-icon { font-size: 22px; }
+    .cp-bn-label { font-size: 10px; font-weight: 500; }
+    @media (max-width: 600px) { .cp-grid { grid-template-columns: 1fr; } }
+  </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body class="cp-body">
+
+<!-- Auth Screen -->
+<div class="cp-auth" id="cp-auth">
+  <div class="cp-auth-card">
+    <div class="cp-auth-icon">🏗️</div>
+    <h2>Client Portal</h2>
+    <p>The Foreman AI · View your project status, invoices & documents</p>
+    <div class="cp-auth-field">
+      <label>Your Email Address</label>
+      <input type="email" id="cp-login-email" placeholder="client@email.com" autocomplete="email">
+    </div>
+    <div class="cp-auth-field">
+      <label>Access Code</label>
+      <input type="text" id="cp-login-code" placeholder="Provided by your contractor" maxlength="20">
+    </div>
+    <div id="cp-login-error" style="color:#ef4444;font-size:12px;margin-bottom:10px;display:none;"></div>
+    <button class="btn-primary" style="width:100%;" onclick="cpLogin()">Access My Project</button>
+    <a class="cp-back-link" href="/app.html">← Contractor Login</a>
+  </div>
+</div>
+
+<!-- Main Portal -->
+<div id="cp-portal" style="display:none;">
+  <!-- Header -->
+  <header class="cp-header">
+    <div class="cp-brand">
+      <div class="cp-brand-icon">🏗️</div>
+      <div class="cp-brand-text">
+        <span class="cp-brand-name">Client Portal</span>
+        <span class="cp-brand-sub" id="cp-company-name">The Foreman AI</span>
+      </div>
+    </div>
+    <button class="btn-secondary btn-sm" onclick="cpSignOut()">Sign Out</button>
+  </header>
+
+  <!-- Content -->
+  <main class="cp-content">
+    <!-- Project Overview Tab -->
+    <div id="cp-tab-overview" class="cp-tab-content">
+      <div class="cp-status-banner">
+        <div class="cp-status-icon">🏗️</div>
+        <div class="cp-status-info">
+          <div class="cp-status-label">YOUR PROJECT</div>
+          <div class="cp-status-name" id="cp-project-name">Loading...</div>
+          <span class="cp-status-badge active" id="cp-project-status">Active</span>
+        </div>
+      </div>
+
+      <div class="cp-progress-section">
+        <div class="cp-progress-header">
+          <span class="cp-progress-label">Overall Progress</span>
+          <span class="cp-progress-pct" id="cp-progress-pct">0%</span>
+        </div>
+        <div class="cp-progress-bar">
+          <div class="cp-progress-fill" id="cp-progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="cp-grid">
+        <!-- Milestones -->
+        <div class="cp-card">
+          <div class="cp-card-header">
+            <div class="cp-card-title">📅 Milestones</div>
+          </div>
+          <div class="cp-card-body" id="cp-milestones">
+            <div class="cp-milestone">
+              <div class="cp-ms-dot done">✓</div>
+              <div class="cp-ms-info">
+                <div class="cp-ms-name">Contract Signed</div>
+                <div class="cp-ms-date">Completed</div>
+              </div>
+            </div>
+            <div class="cp-milestone">
+              <div class="cp-ms-dot active">●</div>
+              <div class="cp-ms-info">
+                <div class="cp-ms-name">Construction In Progress</div>
+                <div class="cp-ms-date">In progress</div>
+              </div>
+            </div>
+            <div class="cp-milestone">
+              <div class="cp-ms-dot upcoming">○</div>
+              <div class="cp-ms-info">
+                <div class="cp-ms-name">Final Inspection</div>
+                <div class="cp-ms-date">Upcoming</div>
+              </div>
+            </div>
+            <div class="cp-milestone">
+              <div class="cp-ms-dot upcoming">○</div>
+              <div class="cp-ms-info">
+                <div class="cp-ms-name">Project Handover</div>
+                <div class="cp-ms-date">Upcoming</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Info -->
+        <div class="cp-card">
+          <div class="cp-card-header">
+            <div class="cp-card-title">📋 Project Info</div>
+          </div>
+          <div class="cp-card-body" id="cp-project-info">
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div><div style="font-size:11px;color:var(--text-secondary);">CONTRACTOR</div><div style="font-size:13px;font-weight:600;" id="cp-contractor-name">—</div></div>
+              <div><div style="font-size:11px;color:var(--text-secondary);">START DATE</div><div style="font-size:13px;font-weight:600;" id="cp-start-date">—</div></div>
+              <div><div style="font-size:11px;color:var(--text-secondary);">EST. COMPLETION</div><div style="font-size:13px;font-weight:600;" id="cp-end-date">—</div></div>
+              <div><div style="font-size:11px;color:var(--text-secondary);">CONTRACT VALUE</div><div style="font-size:13px;font-weight:600;color:var(--primary);" id="cp-contract-value">—</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoices Tab -->
+    <div id="cp-tab-invoices" class="cp-tab-content" style="display:none;">
+      <div class="cp-card" style="margin-bottom:16px;">
+        <div class="cp-card-header">
+          <div class="cp-card-title">💳 Invoice Summary</div>
+        </div>
+        <div class="cp-card-body">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+            <div style="text-align:center;"><div style="font-size:11px;color:var(--text-secondary);">TOTAL</div><div style="font-size:1.2rem;font-weight:700;" id="cp-inv-total">$0</div></div>
+            <div style="text-align:center;"><div style="font-size:11px;color:#10b981;">PAID</div><div style="font-size:1.2rem;font-weight:700;color:#10b981;" id="cp-inv-paid">$0</div></div>
+            <div style="text-align:center;"><div style="font-size:11px;color:#f59e0b;">OWING</div><div style="font-size:1.2rem;font-weight:700;color:#f59e0b;" id="cp-inv-owing">$0</div></div>
+          </div>
+          <div id="cp-invoices-list">
+            <div style="text-align:center;color:var(--text-secondary);padding:20px;">No invoices yet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Updates Tab -->
+    <div id="cp-tab-updates" class="cp-tab-content" style="display:none;">
+      <div class="cp-card" style="margin-bottom:16px;">
+        <div class="cp-card-header">
+          <div class="cp-card-title">📢 Project Updates</div>
+        </div>
+        <div class="cp-card-body" id="cp-updates-list">
+          <div class="cp-update">
+            <div class="cp-update-icon">🏗️</div>
+            <div class="cp-update-body">
+              <div class="cp-update-text">Project portal activated. Your contractor will post updates here.</div>
+              <div class="cp-update-time">Today</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message contractor -->
+      <div class="cp-card">
+        <div class="cp-card-header">
+          <div class="cp-card-title">💬 Message Contractor</div>
+        </div>
+        <div class="cp-card-body">
+          <div class="cp-message-form">
+            <textarea id="cp-message-text" placeholder="Type your message or question..."></textarea>
+            <button class="btn-primary btn-sm" onclick="cpSendMessage()" style="height:60px;align-self:flex-end;">Send</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:8px;">Messages are recorded and forwarded to your contractor.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documents Tab -->
+    <div id="cp-tab-docs" class="cp-tab-content" style="display:none;">
+      <div class="cp-card">
+        <div class="cp-card-header">
+          <div class="cp-card-title">📁 Project Documents</div>
+        </div>
+        <div class="cp-card-body" id="cp-docs-list">
+          <div class="cp-doc-row" onclick="cpViewDoc('contract')">
+            <span style="font-size:24px;">📄</span>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:600;">Contract Agreement</div><div style="font-size:11px;color:var(--text-secondary);">Project contract and scope</div></div>
+            <span style="color:var(--text-secondary);">›</span>
+          </div>
+          <div class="cp-doc-row" onclick="cpViewDoc('estimate')">
+            <span style="font-size:24px;">📋</span>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:600;">Approved Estimate / Quote</div><div style="font-size:11px;color:var(--text-secondary);">Itemized cost breakdown</div></div>
+            <span style="color:var(--text-secondary);">›</span>
+          </div>
+          <div class="cp-doc-row" onclick="cpViewDoc('permit')">
+            <span style="font-size:24px;">🏛️</span>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:600;">Building Permit</div><div style="font-size:11px;color:var(--text-secondary);">Municipal permit documents</div></div>
+            <span style="color:var(--text-secondary);">›</span>
+          </div>
+          <div class="cp-doc-row" onclick="cpViewDoc('warranty')">
+            <span style="font-size:24px;">🛡️</span>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:600;">Warranty Information</div><div style="font-size:11px;color:var(--text-secondary);">Materials and labour warranty</div></div>
+            <span style="color:var(--text-secondary);">›</span>
+          </div>
+          <div class="cp-doc-row" onclick="cpViewDoc('insurance')">
+            <span style="font-size:24px;">🦺</span>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:600;">Insurance Certificate (WCB)</div><div style="font-size:11px;color:var(--text-secondary);">Workers compensation coverage</div></div>
+            <span style="color:var(--text-secondary);">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Nav -->
+  <nav class="cp-bottom-nav">
+    <div class="cp-bn-item active" id="cpnav-overview" onclick="cpShowTab('overview')">
+      <span class="cp-bn-icon">🏗️</span>
+      <span class="cp-bn-label">Project</span>
+    </div>
+    <div class="cp-bn-item" id="cpnav-invoices" onclick="cpShowTab('invoices')">
+      <span class="cp-bn-icon">💳</span>
+      <span class="cp-bn-label">Invoices</span>
+    </div>
+    <div class="cp-bn-item" id="cpnav-updates" onclick="cpShowTab('updates')">
+      <span class="cp-bn-icon">📢</span>
+      <span class="cp-bn-label">Updates</span>
+    </div>
+    <div class="cp-bn-item" id="cpnav-docs" onclick="cpShowTab('docs')">
+      <span class="cp-bn-icon">📁</span>
+      <span class="cp-bn-label">Documents</span>
+    </div>
+  </nav>
+</div>
+
+<script>
+const CP_KEY = 'cp_session';
+let cpCurrentProject = null;
+let cpCurrentClient = null;
+
+function cpGetStore() {
+  try { return JSON.parse(localStorage.getItem('foreman_store') || '{}'); } catch(e) { return {}; }
+}
+
+function cpLogin() {
+  const email = document.getElementById('cp-login-email').value.trim();
+  const code  = document.getElementById('cp-login-code').value.trim();
+  const errEl = document.getElementById('cp-login-error');
+  errEl.style.display = 'none';
+
+  if (!email || !code) { errEl.textContent = 'Please enter your email and access code.'; errEl.style.display='block'; return; }
+
+  const store = cpGetStore();
+  // Find project by access code or client email
+  const projects = store.projects || [];
+  const contacts = store.crmContacts || [];
+
+  // Match by access code stored in project, or by client email
+  let project = projects.find(p => (p.client_portal_code||'').toLowerCase() === code.toLowerCase())
+    || projects.find(p => (p.client_email||'').toLowerCase() === email.toLowerCase());
+
+  // Fallback: any project if demo mode
+  if (!project && projects.length > 0 && code.toUpperCase() === 'DEMO') {
+    project = projects[0];
+  }
+
+  if (project) {
+    sessionStorage.setItem(CP_KEY, JSON.stringify({ email, project_id: project.id, project_name: project.name || project.title }));
+    cpCurrentProject = project;
+    cpCurrentClient = { email };
+    cpInitPortal();
+  } else {
+    // Demo mode fallback even with no projects
+    if (code.toUpperCase() === 'DEMO') {
+      cpCurrentProject = { id: 'demo', name: 'Demo Project', status: 'active', progress: 45, contract_value: 85000, start_date: '2025-01-15', end_date: '2025-06-30' };
+      sessionStorage.setItem(CP_KEY, JSON.stringify({ email, project_id: 'demo', project_name: 'Demo Project' }));
+      cpInitPortal();
+    } else {
+      errEl.textContent = 'Access code not found. Please check with your contractor.';
+      errEl.style.display = 'block';
+    }
+  }
+}
+
+function cpInitPortal() {
+  document.getElementById('cp-auth').style.display = 'none';
+  document.getElementById('cp-portal').style.display = 'block';
+
+  const store = cpGetStore();
+  const settings = store.settings || {};
+  document.getElementById('cp-company-name').textContent = settings.business_name || 'The Foreman AI';
+
+  const project = cpCurrentProject;
+  document.getElementById('cp-project-name').textContent = project.name || project.title || 'Your Project';
+
+  const status = project.status || 'active';
+  const statusEl = document.getElementById('cp-project-status');
+  statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+  statusEl.className = 'cp-status-badge ' + (status === 'completed' ? 'completed' : status === 'pending' ? 'pending' : 'active');
+
+  const pct = project.progress || 0;
+  document.getElementById('cp-progress-pct').textContent = pct + '%';
+  setTimeout(() => { document.getElementById('cp-progress-fill').style.width = pct + '%'; }, 100);
+
+  document.getElementById('cp-contractor-name').textContent = settings.business_name || 'Your Contractor';
+  document.getElementById('cp-start-date').textContent = project.start_date ? new Date(project.start_date).toLocaleDateString('en-CA', {year:'numeric',month:'long',day:'numeric'}) : '—';
+  document.getElementById('cp-end-date').textContent = project.end_date || project.due_date ? new Date(project.end_date||project.due_date).toLocaleDateString('en-CA', {year:'numeric',month:'long',day:'numeric'}) : '—';
+  document.getElementById('cp-contract-value').textContent = project.contract_value ? '$' + parseFloat(project.contract_value).toLocaleString('en-CA') : '—';
+
+  cpLoadInvoices();
+  cpLoadUpdates();
+}
+
+function cpLoadInvoices() {
+  const store = cpGetStore();
+  const invoices = (store.invoices || []).filter(inv => {
+    if (!cpCurrentProject) return false;
+    return inv.project_id === cpCurrentProject.id || (inv.customer||'').toLowerCase().includes(cpCurrentClient?.email?.split('@')[0]||'');
+  });
+  const total = invoices.reduce((s,i) => s + (parseFloat(i.total)||0), 0);
+  const paid = invoices.filter(i => i.status==='paid').reduce((s,i) => s + (parseFloat(i.total)||0), 0);
+  const owing = total - paid;
+  document.getElementById('cp-inv-total').textContent = '$' + total.toLocaleString('en-CA');
+  document.getElementById('cp-inv-paid').textContent = '$' + paid.toLocaleString('en-CA');
+  document.getElementById('cp-inv-owing').textContent = '$' + owing.toLocaleString('en-CA');
+  const list = document.getElementById('cp-invoices-list');
+  if (!invoices.length) { list.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:20px;">No invoices for your project yet.</div>'; return; }
+  list.innerHTML = invoices.map(inv => `
+    <div class="cp-inv-row">
+      <div class="cp-inv-info">
+        <div class="cp-inv-num">Invoice #${inv.number || inv.id}</div>
+        <div class="cp-inv-date">${new Date(inv.date||inv.created_at).toLocaleDateString('en-CA')}</div>
+      </div>
+      <div class="cp-inv-amount">$${parseFloat(inv.total||0).toLocaleString('en-CA')}</div>
+      <span class="cp-inv-status ${inv.status==='paid'?'paid':inv.overdue?'overdue':'outstanding'}">${inv.status==='paid'?'Paid':inv.overdue?'Overdue':'Outstanding'}</span>
+    </div>
+  `).join('');
+}
+
+function cpLoadUpdates() {
+  const store = cpGetStore();
+  const updates = (store.projectUpdates || []).filter(u => u.project_id === cpCurrentProject?.id);
+  if (!updates.length) return;
+  const list = document.getElementById('cp-updates-list');
+  list.innerHTML = updates.map(u => `
+    <div class="cp-update">
+      <div class="cp-update-icon">📢</div>
+      <div class="cp-update-body">
+        <div class="cp-update-text">${u.message || u.text}</div>
+        <div class="cp-update-time">${new Date(u.created_at||Date.now()).toLocaleDateString('en-CA')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function cpSendMessage() {
+  const text = document.getElementById('cp-message-text').value.trim();
+  if (!text) return;
+  const store = cpGetStore();
+  if (!store.clientMessages) store.clientMessages = [];
+  store.clientMessages.push({ project_id: cpCurrentProject?.id, email: cpCurrentClient?.email, message: text, created_at: new Date().toISOString() });
+  localStorage.setItem('foreman_store', JSON.stringify(store));
+  document.getElementById('cp-message-text').value = '';
+  alert('✅ Message sent to your contractor!');
+}
+
+function cpViewDoc(type) {
+  const msgs = {
+    contract: 'Contract Agreement\n\nThis document is stored with your contractor.\nContact them directly to request a copy.\n\nFor questions about scope of work or contract terms, message your contractor through the Updates tab.',
+    estimate: 'Approved Estimate\n\nYour approved project estimate is on file with your contractor.\nAll items and pricing were agreed upon before project start.\n\nContact your contractor for a detailed copy.',
+    permit: 'Building Permit\n\nYour project permit is filed with the municipality.\nPermit inspections are scheduled and coordinated by your contractor.\n\nAlberta Safety Codes inspections are conducted by a licensed Safety Codes Officer.',
+    warranty: 'Warranty Information\n\nLabour Warranty: 1 year from project completion date\nMaterials Warranty: Per manufacturer specifications\n\nAll work complies with Alberta Building Code (ABC) 2019.\nFor warranty claims, contact your contractor immediately.',
+    insurance: 'WCB Insurance Certificate\n\nYour contractor carries active Workers Compensation Board (WCB) Alberta coverage.\n\nWCB Alberta ensures all workers on your site are covered in case of workplace injury.\n\nRequest a copy of the WCB clearance letter from your contractor.'
+  };
+  alert(msgs[type] || 'Document not available.');
+}
+
+function cpShowTab(tab) {
+  document.querySelectorAll('.cp-tab-content').forEach(t => t.style.display='none');
+  document.querySelectorAll('.cp-bn-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('cp-tab-' + tab).style.display = 'block';
+  document.getElementById('cpnav-' + tab)?.classList.add('active');
+}
+
+function cpSignOut() {
+  sessionStorage.removeItem(CP_KEY);
+  document.getElementById('cp-auth').style.display = 'flex';
+  document.getElementById('cp-portal').style.display = 'none';
+}
+
+// Auto-login if session exists
+window.addEventListener('DOMContentLoaded', () => {
+  const sess = sessionStorage.getItem(CP_KEY);
+  if (sess) {
+    try {
+      const s = JSON.parse(sess);
+      cpCurrentClient = { email: s.email };
+      const store = cpGetStore();
+      cpCurrentProject = (store.projects||[]).find(p=>p.id===s.project_id) || { id: s.project_id, name: s.project_name, status: 'active', progress: 0 };
+      cpInitPortal();
+    } catch(e) {}
+  }
+});
+</script>
+</body>
+</html>

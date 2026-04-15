@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Employee Portal – The Foreman AI</title>
+  <link rel="stylesheet" href="/static/app.css?v=3.1">
+  <style>
+    /* ─── Employee Portal Overrides ─────────────────────────────── */
+    :root { --ep-accent: #ff6b35; }
+    .ep-body { min-height: 100vh; background: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', -apple-system, sans-serif; }
+    .ep-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ep-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--primary); }
+    .ep-brand-sub { font-size: 11px; color: var(--text-secondary); font-weight: 400; display: block; }
+    .ep-user-chip { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .ep-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: white; }
+    .ep-content { max-width: 900px; margin: 0 auto; padding: 24px 16px 80px; }
+    .ep-welcome { margin-bottom: 24px; }
+    .ep-welcome h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+    .ep-welcome p { color: var(--text-secondary); font-size: 0.9rem; }
+    .ep-cards { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-bottom: 28px; }
+    .ep-stat-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--border); }
+    .ep-stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+    .ep-stat-val { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); }
+    .ep-stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .ep-section { background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+    .ep-section-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .ep-section-title { font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .ep-section-body { padding: 16px 20px; }
+    /* Timer */
+    .ep-timer-display { font-size: 3rem; font-weight: 700; text-align: center; padding: 20px; font-variant-numeric: tabular-nums; color: var(--primary); }
+    .ep-timer-controls { display: flex; gap: 12px; justify-content: center; margin-bottom: 20px; }
+    .ep-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ep-form-group { display: flex; flex-direction: column; gap: 4px; }
+    .ep-form-group label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+    .ep-form-group select, .ep-form-group input, .ep-form-group textarea {
+      background: var(--bg-input); border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+      color: var(--text-primary); padding: 10px 12px; font-size: 14px;
+    }
+    .ep-form-group.full { grid-column: 1/-1; }
+    /* Time entries list */
+    .ep-time-entry { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-light); }
+    .ep-time-entry:last-child { border-bottom: none; }
+    .ep-te-date { width: 80px; font-size: 12px; color: var(--text-secondary); text-align: center; background: var(--bg-input); border-radius: 6px; padding: 4px 8px; }
+    .ep-te-info { flex: 1; }
+    .ep-te-project { font-size: 13px; font-weight: 600; }
+    .ep-te-type { font-size: 11px; color: var(--text-secondary); }
+    .ep-te-hours { font-weight: 700; font-size: 1rem; color: var(--primary); width: 60px; text-align: right; }
+    /* Paystub list */
+    .ep-pay-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: 0.15s; }
+    .ep-pay-row:last-child { border-bottom: none; }
+    .ep-pay-row:hover { opacity: 0.85; }
+    .ep-pay-period { flex: 1; }
+    .ep-pay-period strong { display: block; font-size: 13px; }
+    .ep-pay-period span { font-size: 11px; color: var(--text-secondary); }
+    .ep-pay-amount { font-weight: 700; font-size: 1rem; color: var(--primary); }
+    .ep-pay-status { font-size: 11px; padding: 3px 8px; border-radius: 20px; }
+    .ep-pay-status.paid { background: rgba(16,185,129,0.15); color: #10b981; }
+    .ep-pay-status.pending { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    /* Docs list */
+    .ep-doc-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-light); cursor: pointer; }
+    .ep-doc-row:last-child { border-bottom: none; }
+    .ep-doc-icon { font-size: 24px; width: 40px; text-align: center; }
+    .ep-doc-info { flex: 1; }
+    .ep-doc-name { font-size: 13px; font-weight: 600; }
+    .ep-doc-date { font-size: 11px; color: var(--text-secondary); }
+    /* Bottom nav mobile */
+    .ep-bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+    .ep-bn-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--text-muted); cursor: pointer; flex: 1; text-align: center; transition: color 0.2s; }
+    .ep-bn-item.active { color: var(--primary); }
+    .ep-bn-icon { font-size: 22px; }
+    .ep-bn-label { font-size: 10px; font-weight: 500; }
+    /* Auth overlay */
+    .ep-auth { position: fixed; inset: 0; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; z-index: 999; }
+    .ep-auth-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 40px; width: 360px; max-width: 95vw; border: 1px solid var(--border); text-align: center; }
+    .ep-auth-icon { font-size: 56px; margin-bottom: 12px; }
+    .ep-auth-card h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+    .ep-auth-card p { color: var(--text-secondary); font-size: 13px; margin-bottom: 24px; }
+    .ep-auth-field { margin-bottom: 14px; text-align: left; }
+    .ep-auth-field label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 500; }
+    .ep-auth-field input { width: 100%; background: var(--bg-input); border: 1px solid var(--border-light); border-radius: var(--radius-sm); color: var(--text-primary); padding: 12px 14px; font-size: 14px; box-sizing: border-box; }
+    .ep-back-link { display: block; margin-top: 16px; font-size: 12px; color: var(--text-secondary); cursor: pointer; }
+    .ep-back-link:hover { color: var(--primary); }
+    @media (max-width: 600px) { .ep-cards { grid-template-columns: 1fr 1fr; } .ep-form-grid { grid-template-columns: 1fr; } }
+  </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body class="ep-body">
+
+<!-- Auth Screen -->
+<div class="ep-auth" id="ep-auth">
+  <div class="ep-auth-card">
+    <div class="ep-auth-icon">👷</div>
+    <h2>Employee Portal</h2>
+    <p>The Foreman AI · Log time, view pay stubs & tax documents</p>
+    <div class="ep-auth-field">
+      <label>Employee Email</label>
+      <input type="email" id="ep-login-email" placeholder="you@email.com" autocomplete="email">
+    </div>
+    <div class="ep-auth-field">
+      <label>Password / PIN</label>
+      <input type="password" id="ep-login-password" placeholder="••••••••">
+    </div>
+    <div id="ep-login-error" style="color:#ef4444;font-size:12px;margin-bottom:10px;display:none;"></div>
+    <button class="btn-primary" style="width:100%;" onclick="epLogin()">Sign In</button>
+    <a class="ep-back-link" href="/app.html">← Back to Main App</a>
+  </div>
+</div>
+
+<!-- Main Portal -->
+<div id="ep-portal" style="display:none;">
+  <!-- Header -->
+  <header class="ep-header">
+    <div class="ep-brand">
+      👷 Employee Portal
+      <span class="ep-brand-sub">The Foreman AI</span>
+    </div>
+    <div class="ep-user-chip" onclick="epSignOut()">
+      <div class="ep-avatar" id="ep-avatar-initial">E</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;" id="ep-user-name">Employee</div>
+        <div style="font-size:11px;color:var(--text-secondary);">Tap to sign out</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="ep-content" id="ep-main-content">
+    <!-- Dashboard Tab -->
+    <div id="ep-tab-home" class="ep-tab-content">
+      <div class="ep-welcome">
+        <h2>Welcome back! 👋</h2>
+        <p id="ep-welcome-sub">Here's your work summary</p>
+      </div>
+      <div class="ep-cards">
+        <div class="ep-stat-card">
+          <div class="ep-stat-label">⏱️ This Week</div>
+          <div class="ep-stat-val" id="ep-hours-week">0h</div>
+          <div class="ep-stat-sub">hours logged</div>
+        </div>
+        <div class="ep-stat-card">
+          <div class="ep-stat-label">📅 This Month</div>
+          <div class="ep-stat-val" id="ep-hours-month">0h</div>
+          <div class="ep-stat-sub">hours logged</div>
+        </div>
+        <div class="ep-stat-card">
+          <div class="ep-stat-label">💰 Last Pay</div>
+          <div class="ep-stat-val" id="ep-last-pay">$0</div>
+          <div class="ep-stat-sub">net pay</div>
+        </div>
+        <div class="ep-stat-card">
+          <div class="ep-stat-label">📄 Documents</div>
+          <div class="ep-stat-val" id="ep-doc-count">0</div>
+          <div class="ep-stat-sub">available</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Tracking Tab -->
+    <div id="ep-tab-time" class="ep-tab-content" style="display:none;">
+      <div class="ep-section">
+        <div class="ep-section-header">
+          <div class="ep-section-title">⏱️ Log Time</div>
+        </div>
+        <div class="ep-section-body">
+          <div class="ep-timer-display" id="ep-timer-display">00:00:00</div>
+          <div class="ep-timer-controls">
+            <button class="btn-primary" id="ep-timer-btn" onclick="epToggleTimer()">▶ Start Timer</button>
+            <button class="btn-secondary" onclick="epManualEntry()">+ Manual Entry</button>
+          </div>
+          <div class="ep-form-grid">
+            <div class="ep-form-group">
+              <label>Project</label>
+              <select id="ep-time-project">
+                <option value="">Select project...</option>
+              </select>
+            </div>
+            <div class="ep-form-group">
+              <label>Work Type</label>
+              <select id="ep-time-type">
+                <optgroup label="General">
+                  <option value="general_labour">General Labour</option>
+                  <option value="site_supervision">Site Supervision</option>
+                  <option value="cleanup">Cleanup</option>
+                  <option value="travel">Travel</option>
+                </optgroup>
+                <optgroup label="Structural">
+                  <option value="framing">Framing</option>
+                  <option value="foundation">Foundation / Concrete</option>
+                  <option value="carpentry">Carpentry / Millwork</option>
+                </optgroup>
+                <optgroup label="Mechanical">
+                  <option value="plumbing">Plumbing</option>
+                  <option value="hvac">HVAC / Mechanical</option>
+                  <option value="electrical">Electrical</option>
+                </optgroup>
+                <optgroup label="Exterior">
+                  <option value="roofing">Roofing</option>
+                  <option value="siding">Siding / Cladding</option>
+                  <option value="insulation">Insulation</option>
+                </optgroup>
+                <optgroup label="Interior">
+                  <option value="drywall">Drywall / Taping</option>
+                  <option value="flooring">Flooring</option>
+                  <option value="painting">Painting</option>
+                </optgroup>
+                <optgroup label="Other">
+                  <option value="demolition">Demolition</option>
+                  <option value="other">Other</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="ep-form-group full">
+              <label>Notes</label>
+              <input type="text" id="ep-time-notes" placeholder="What did you work on?">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ep-section">
+        <div class="ep-section-header">
+          <div class="ep-section-title">📋 Recent Entries</div>
+        </div>
+        <div class="ep-section-body" id="ep-time-list">
+          <div style="text-align:center;color:var(--text-secondary);padding:20px;">No time entries yet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pay Stubs Tab -->
+    <div id="ep-tab-pay" class="ep-tab-content" style="display:none;">
+      <div class="ep-section">
+        <div class="ep-section-header">
+          <div class="ep-section-title">💰 Pay Stubs</div>
+        </div>
+        <div class="ep-section-body" id="ep-pay-list">
+          <div style="text-align:center;color:var(--text-secondary);padding:20px;">No pay stubs available yet.<br>Contact your employer if this is incorrect.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documents Tab -->
+    <div id="ep-tab-docs" class="ep-tab-content" style="display:none;">
+      <div class="ep-section">
+        <div class="ep-section-header">
+          <div class="ep-section-title">📄 Tax & HR Documents</div>
+        </div>
+        <div class="ep-section-body" id="ep-docs-list">
+          <div class="ep-doc-row" onclick="epViewDoc('td1')">
+            <div class="ep-doc-icon">📋</div>
+            <div class="ep-doc-info">
+              <div class="ep-doc-name">TD1 – Personal Tax Credits Return</div>
+              <div class="ep-doc-date">Federal & Alberta Provincial</div>
+            </div>
+            <span style="color:var(--text-secondary);">›</span>
+          </div>
+          <div class="ep-doc-row" onclick="epViewDoc('t4')">
+            <div class="ep-doc-icon">🧾</div>
+            <div class="ep-doc-info">
+              <div class="ep-doc-name">T4 – Statement of Remuneration Paid</div>
+              <div class="ep-doc-date" id="ep-t4-year">Tax year document</div>
+            </div>
+            <span style="color:var(--text-secondary);">›</span>
+          </div>
+          <div class="ep-doc-row" onclick="epViewDoc('direct_deposit')">
+            <div class="ep-doc-icon">🏦</div>
+            <div class="ep-doc-info">
+              <div class="ep-doc-name">Direct Deposit Authorization</div>
+              <div class="ep-doc-date">Banking information form</div>
+            </div>
+            <span style="color:var(--text-secondary);">›</span>
+          </div>
+          <div class="ep-doc-row" onclick="epViewDoc('wcb')">
+            <div class="ep-doc-icon">🦺</div>
+            <div class="ep-doc-info">
+              <div class="ep-doc-name">WCB Worker Information</div>
+              <div class="ep-doc-date">Workers' Compensation Board Alberta</div>
+            </div>
+            <span style="color:var(--text-secondary);">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Nav -->
+  <nav class="ep-bottom-nav">
+    <div class="ep-bn-item active" id="epnav-home" onclick="epShowTab('home')">
+      <span class="ep-bn-icon">🏠</span>
+      <span class="ep-bn-label">Home</span>
+    </div>
+    <div class="ep-bn-item" id="epnav-time" onclick="epShowTab('time')">
+      <span class="ep-bn-icon">⏱️</span>
+      <span class="ep-bn-label">Log Time</span>
+    </div>
+    <div class="ep-bn-item" id="epnav-pay" onclick="epShowTab('pay')">
+      <span class="ep-bn-icon">💰</span>
+      <span class="ep-bn-label">Pay Stubs</span>
+    </div>
+    <div class="ep-bn-item" id="epnav-docs" onclick="epShowTab('docs')">
+      <span class="ep-bn-icon">📄</span>
+      <span class="ep-bn-label">Documents</span>
+    </div>
+  </nav>
+</div>
+
+<script>
+// ── Employee Portal Logic ─────────────────────────────────────────────────
+const EP_KEY = 'ep_session';
+let epTimerInterval = null;
+let epTimerStart = null;
+let epTimerSeconds = 0;
+let epCurrentUser = null;
+
+function epGetStore() {
+  try { return JSON.parse(localStorage.getItem('foreman_store') || '{}'); } catch(e) { return {}; }
+}
+
+function epLogin() {
+  const email = document.getElementById('ep-login-email').value.trim();
+  const pass  = document.getElementById('ep-login-password').value;
+  const errEl = document.getElementById('ep-login-error');
+  errEl.style.display = 'none';
+
+  if (!email || !pass) { errEl.textContent = 'Please enter email and password.'; errEl.style.display='block'; return; }
+
+  // Check against foreman store employees
+  const store = epGetStore();
+  const employees = store.employees || [];
+  const emp = employees.find(e => (e.email||'').toLowerCase() === email.toLowerCase());
+
+  if (emp) {
+    // Store session
+    sessionStorage.setItem(EP_KEY, JSON.stringify({ id: emp.id, name: emp.name || emp.full_name, email: emp.email }));
+    epCurrentUser = { id: emp.id, name: emp.name || emp.full_name, email };
+    epInitPortal();
+  } else {
+    // Fallback: accept any email if token exists (demo mode)
+    const token = localStorage.getItem('foreman_token');
+    if (token) {
+      const name = email.split('@')[0].replace(/\./g,' ').replace(/\b\w/g, c => c.toUpperCase());
+      sessionStorage.setItem(EP_KEY, JSON.stringify({ name, email }));
+      epCurrentUser = { name, email };
+      epInitPortal();
+    } else {
+      errEl.textContent = 'Employee not found. Please contact your employer.';
+      errEl.style.display = 'block';
+    }
+  }
+}
+
+function epInitPortal() {
+  document.getElementById('ep-auth').style.display = 'none';
+  document.getElementById('ep-portal').style.display = 'block';
+  const name = epCurrentUser.name || 'Employee';
+  document.getElementById('ep-user-name').textContent = name;
+  document.getElementById('ep-avatar-initial').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('ep-welcome-sub').textContent = 'Good ' + epTimeOfDay() + ', ' + name.split(' ')[0] + '!';
+  document.getElementById('ep-t4-year').textContent = 'Tax year ' + (new Date().getFullYear() - 1);
+  epLoadStats();
+  epLoadProjects();
+  epLoadTimeEntries();
+}
+
+function epTimeOfDay() {
+  const h = new Date().getHours();
+  return h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+}
+
+function epLoadStats() {
+  const store = epGetStore();
+  const entries = (store.timeEntries || []).filter(e => e.employee_id === epCurrentUser?.id || !epCurrentUser?.id);
+  const now = new Date();
+  const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay());
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const weekHours = entries.filter(e => new Date(e.date) >= weekStart).reduce((s,e) => s + (parseFloat(e.hours)||0), 0);
+  const monthHours = entries.filter(e => new Date(e.date) >= monthStart).reduce((s,e) => s + (parseFloat(e.hours)||0), 0);
+  document.getElementById('ep-hours-week').textContent = weekHours.toFixed(1) + 'h';
+  document.getElementById('ep-hours-month').textContent = monthHours.toFixed(1) + 'h';
+  document.getElementById('ep-doc-count').textContent = '4';
+}
+
+function epLoadProjects() {
+  const store = epGetStore();
+  const sel = document.getElementById('ep-time-project');
+  sel.innerHTML = '<option value="">Select project...</option>';
+  (store.projects || []).forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.id; o.textContent = p.name || p.title;
+    sel.appendChild(o);
+  });
+}
+
+function epLoadTimeEntries() {
+  const store = epGetStore();
+  const entries = (store.timeEntries || []).slice(-10).reverse();
+  const container = document.getElementById('ep-time-list');
+  if (!entries.length) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:20px;">No time entries yet</div>';
+    return;
+  }
+  container.innerHTML = entries.map(e => `
+    <div class="ep-time-entry">
+      <div class="ep-te-date">${new Date(e.date||e.start_time||Date.now()).toLocaleDateString('en-CA',{month:'short',day:'numeric'})}</div>
+      <div class="ep-te-info">
+        <div class="ep-te-project">${e.project_name || e.project || 'No Project'}</div>
+        <div class="ep-te-type">${(e.type||e.work_type||'General').replace(/_/g,' ')}</div>
+      </div>
+      <div class="ep-te-hours">${parseFloat(e.hours||0).toFixed(1)}h</div>
+    </div>
+  `).join('');
+}
+
+// Timer
+function epToggleTimer() {
+  const btn = document.getElementById('ep-timer-btn');
+  if (!epTimerStart) {
+    epTimerStart = Date.now() - (epTimerSeconds * 1000);
+    epTimerInterval = setInterval(epUpdateTimer, 1000);
+    btn.textContent = '⏹ Stop Timer';
+    btn.style.background = 'linear-gradient(135deg,#ef4444,#dc2626)';
+  } else {
+    clearInterval(epTimerInterval);
+    const hours = epTimerSeconds / 3600;
+    epSaveTimeEntry(hours);
+    epTimerStart = null; epTimerSeconds = 0;
+    document.getElementById('ep-timer-display').textContent = '00:00:00';
+    btn.textContent = '▶ Start Timer';
+    btn.style.background = '';
+  }
+}
+
+function epUpdateTimer() {
+  epTimerSeconds = Math.floor((Date.now() - epTimerStart) / 1000);
+  const h = String(Math.floor(epTimerSeconds/3600)).padStart(2,'0');
+  const m = String(Math.floor((epTimerSeconds%3600)/60)).padStart(2,'0');
+  const s = String(epTimerSeconds%60).padStart(2,'0');
+  document.getElementById('ep-timer-display').textContent = h+':'+m+':'+s;
+}
+
+function epManualEntry() {
+  const hrs = parseFloat(prompt('Enter hours worked (e.g. 7.5):'));
+  if (!hrs || isNaN(hrs)) return;
+  epSaveTimeEntry(hrs);
+}
+
+function epSaveTimeEntry(hours) {
+  const store = epGetStore();
+  if (!store.timeEntries) store.timeEntries = [];
+  const project_id = document.getElementById('ep-time-project')?.value;
+  const project = (store.projects||[]).find(p=>p.id===project_id);
+  const entry = {
+    id: 'te_' + Date.now(),
+    employee_id: epCurrentUser?.id || 'emp_portal',
+    employee_name: epCurrentUser?.name || '',
+    project_id, project_name: project?.name || project?.title || '',
+    work_type: document.getElementById('ep-time-type')?.value || 'general_labour',
+    hours: parseFloat(hours.toFixed(2)),
+    date: new Date().toISOString().split('T')[0],
+    notes: document.getElementById('ep-time-notes')?.value || '',
+    source: 'employee_portal'
+  };
+  store.timeEntries.push(entry);
+  localStorage.setItem('foreman_store', JSON.stringify(store));
+  epLoadTimeEntries(); epLoadStats();
+  alert('✅ ' + hours.toFixed(2) + ' hours logged successfully!');
+}
+
+function epShowTab(tab) {
+  document.querySelectorAll('.ep-tab-content').forEach(t => t.style.display='none');
+  document.querySelectorAll('.ep-bn-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('ep-tab-' + tab).style.display = 'block';
+  document.getElementById('epnav-' + tab)?.classList.add('active');
+}
+
+function epViewDoc(type) {
+  const docInfo = {
+    td1: 'TD1 Personal Tax Credits Return\n\nClaim Codes:\n• Code 0 – No exemption (multiple employers)\n• Code 1 – Basic personal amount ~$15,705\n• Code 2 – Eligible dependant + basic ~$29,000\n• Code 3 – Caregiver + dependants + basic ~$42,000\n\nFill out and return to your employer.\nDownload at: canada.ca/td1',
+    t4: 'T4 Statement of Remuneration Paid\n\nYour T4 for the previous tax year will be issued by February 28.\n\nContact your employer if you have not received your T4.',
+    direct_deposit: 'Direct Deposit Authorization\n\nProvide a void cheque or bank letter to your employer to set up direct deposit.\n\nInformation needed:\n• Institution number (3 digits)\n• Transit number (5 digits)\n• Account number',
+    wcb: 'WCB Alberta – Workers Compensation\n\nAs an employee, you are covered by WCB Alberta.\nIf you are injured on the job:\n1. Report immediately to your supervisor\n2. Seek medical attention\n3. File a WCB claim at wcb.ab.ca\n4. Keep records of all medical visits\n\nWCB Alberta: 1-866-922-9221'
+  };
+  alert(docInfo[type] || 'Document not available.');
+}
+
+function epSignOut() {
+  if (confirm('Sign out of Employee Portal?')) {
+    sessionStorage.removeItem(EP_KEY);
+    document.getElementById('ep-auth').style.display = 'flex';
+    document.getElementById('ep-portal').style.display = 'none';
+    epCurrentUser = null;
+    clearInterval(epTimerInterval);
+  }
+}
+
+// Auto-login if session exists
+window.addEventListener('DOMContentLoaded', () => {
+  const sess = sessionStorage.getItem(EP_KEY);
+  if (sess) {
+    try { epCurrentUser = JSON.parse(sess); epInitPortal(); } catch(e) {}
+  }
+});
+</script>
+</body>
+</html>

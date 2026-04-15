@@ -25,8 +25,8 @@
 <div id="auth-screen" class="auth-screen">
   <div class="auth-container">
     <div class="auth-logo">
-      <div class="logo-icon">📋</div>
-      <h1 class="auth-title">📋 The Foreman AI</h1>
+      <div class="logo-icon">👷</div>
+      <h1 class="auth-title">👷 The Foreman AI</h1>
       <p class="auth-subtitle">Your Construction Command Centre</p>
     </div>
 
@@ -50,9 +50,7 @@
       </button>
       <p class="auth-switch">Don't have an account? <a href="#" onclick="showForm('register-form'); return false;">Sign Up</a></p>
       <p class="auth-switch"><a href="#" onclick="showForm('admin-login-form')">Admin Login →</a></p>
-      <div style="margin-top:16px;padding:12px;background:#dbeafe;border-radius:8px;font-size:0.8rem;color:#1e40af;text-align:center">
-        <strong>Demo Account:</strong><br>test@foreman.ca &bull; Test1234!
-      </div>
+      
     </div>
 
     <!-- Register Form -->
@@ -136,7 +134,7 @@
         <span></span><span></span><span></span>
       </button>
       <div class="header-brand">
-        <span class="brand-icon">📋</span>
+        <span class="brand-icon">👷</span>
         <span class="brand-name" id="header-app-name">The Foreman AI</span>
       </div>
     </div>
@@ -203,7 +201,7 @@
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <div class="sidebar-content">
       <div class="sidebar-header">
-        <span class="sidebar-logo">📋</span>
+        <span class="sidebar-logo">👷</span>
         <span class="sidebar-title" id="sidebar-app-name">The Foreman AI</span>
         <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
       </div>
@@ -228,7 +226,7 @@
           <span class="nav-icon">🏗️</span><span>Projects</span>
         </a>
         <a class="nav-item" data-page="pm-dashboard" onclick="navigateTo('pm-dashboard')">
-          <span class="nav-icon">📊</span><span>Project Management</span>
+          <span class="nav-icon">🗂️</span><span>Project Management</span>
         </a>
       </div>
 
@@ -291,8 +289,21 @@
         </a>
       </div>
 
+      <!-- External Portals -->
+      <div class="sidebar-section-label">Portals</div>
+      <div class="sidebar-nav">
+        <a class="nav-item nav-item-portal" href="employee.html" target="_blank">
+          <span class="nav-icon">👷</span><span>Employee Portal</span>
+          <span class="nav-badge-ext">↗</span>
+        </a>
+        <a class="nav-item nav-item-portal" href="client.html" target="_blank">
+          <span class="nav-icon">🏗️</span><span>Client Portal</span>
+          <span class="nav-badge-ext">↗</span>
+        </a>
+      </div>
+
       <div class="sidebar-footer">
-        <div class="app-version">v3.0.0 · The Foreman AI</div>
+        <div class="app-version">v3.1.0 · The Foreman AI</div>
       </div>
     </div>
   </nav>
@@ -373,6 +384,14 @@
             <span class="qa-icon">⏱️</span>
             <span>Log Time</span>
           </button>
+          <a class="quick-btn quick-btn-portal" href="employee.html" target="_blank">
+            <span class="qa-icon">👷</span>
+            <span>Employee Portal</span>
+          </a>
+          <a class="quick-btn quick-btn-portal" href="client.html" target="_blank">
+            <span class="qa-icon">🏗️</span>
+            <span>Client Portal</span>
+          </a>
         </div>
       </div>
 
@@ -417,7 +436,7 @@
       <!-- AI Hero Banner -->
       <div class="ai-page-hero">
         <div class="ai-hero-left">
-          <div class="ai-hero-avatar">📋</div>
+          <div class="ai-hero-avatar">👷</div>
           <div class="ai-hero-info">
             <h1>Foreman AI Assistant</h1>
             <p>Your on-site construction co-pilot. Ask about projects, invoices, safety, scheduling, regulations — anything on your plate.</p>
@@ -487,7 +506,7 @@
       <div class="chat-container">
         <div class="chat-messages" id="chat-messages">
           <div class="chat-message ai">
-            <div class="msg-avatar">📋</div>
+            <div class="msg-avatar">👷</div>
             <div class="msg-bubble">
               <div class="msg-content">
                 <p>Hi! I'm <strong>Foreman AI</strong> — your construction command assistant. I have full access to your live data including projects, tasks, invoices, expenses, payroll, and documents.</p>
@@ -542,9 +561,9 @@
     ═══════════════════════════════════════════════════════════════════════════ -->
     <div id="page-pm-dashboard" class="page">
       <div class="page-header">
-        <h1 class="page-title">📋 Project Management</h1>
+        <h1 class="page-title">🏗️ Project Management</h1>
         <div class="page-actions">
-          <button class="btn-secondary btn-sm" onclick="switchPMView('board')">📋 Board</button>
+          <button class="btn-secondary btn-sm" onclick="switchPMView('board')">🗂️ Board</button>
           <button class="btn-secondary btn-sm" onclick="switchPMView('gantt')">📅 Gantt</button>
           <button class="btn-secondary btn-sm" onclick="switchPMView('list')">📑 List</button>
           <button class="btn-primary btn-sm" onclick="openModal('pm-new-task-modal')">+ New Task</button>
@@ -690,6 +709,7 @@
         <div class="pm-toolbar">
           <button class="btn-secondary btn-sm" onclick="shareClientPortal()">Share Portal Link</button>
           <button class="btn-primary btn-sm" onclick="openModal('pm-client-update-modal')">+ Post Update</button>
+          <a class="btn-secondary btn-sm" href="client.html" target="_blank" style="text-decoration:none;">🏗️ Open Client Portal ↗</a>
         </div>
         <div class="client-portal-container" id="pm-client-portal">
           <div class="client-portal-header">
@@ -1640,11 +1660,53 @@
             <div class="form-group">
               <label>Work Type</label>
               <select id="time-type">
-                <option value="framing">Framing</option>
-                <option value="carpentry">Carpentry</option>
-                <option value="cleanup">Cleanup</option>
-                <option value="travel">Travel</option>
-                <option value="other">Other</option>
+                <optgroup label="General">
+                  <option value="general_labour">General Labour</option>
+                  <option value="site_supervision">Site Supervision</option>
+                  <option value="cleanup">Cleanup</option>
+                  <option value="travel">Travel</option>
+                  <option value="meeting">Meeting / Admin</option>
+                </optgroup>
+                <optgroup label="Structural">
+                  <option value="framing">Framing</option>
+                  <option value="foundation">Foundation / Concrete</option>
+                  <option value="steel_erection">Steel Erection</option>
+                  <option value="masonry">Masonry / Brickwork</option>
+                  <option value="carpentry">Carpentry / Millwork</option>
+                </optgroup>
+                <optgroup label="Mechanical">
+                  <option value="plumbing">Plumbing</option>
+                  <option value="hvac">HVAC / Mechanical</option>
+                  <option value="electrical">Electrical</option>
+                  <option value="gas_fitting">Gas Fitting</option>
+                  <option value="fire_suppression">Fire Suppression</option>
+                </optgroup>
+                <optgroup label="Exterior">
+                  <option value="roofing">Roofing</option>
+                  <option value="siding">Siding / Cladding</option>
+                  <option value="windows_doors">Windows & Doors</option>
+                  <option value="insulation">Insulation</option>
+                  <option value="waterproofing">Waterproofing</option>
+                  <option value="excavation">Excavation / Grading</option>
+                </optgroup>
+                <optgroup label="Interior">
+                  <option value="drywall">Drywall / Taping</option>
+                  <option value="flooring">Flooring</option>
+                  <option value="painting">Painting</option>
+                  <option value="tiling">Tiling</option>
+                  <option value="cabinets">Cabinets / Countertops</option>
+                  <option value="trim">Trim / Finishing</option>
+                </optgroup>
+                <optgroup label="Safety & Inspections">
+                  <option value="safety_inspection">Safety Inspection</option>
+                  <option value="flha">FLHA / Hazard Assessment</option>
+                  <option value="toolbox_talk">Toolbox Talk</option>
+                </optgroup>
+                <optgroup label="Other">
+                  <option value="landscaping">Landscaping</option>
+                  <option value="demolition">Demolition</option>
+                  <option value="other">Other</option>
+                </optgroup>
               </select>
             </div>
           </div>
@@ -3468,14 +3530,63 @@
       <button class="modal-close" onclick="closeModal('new-estimate-modal')">✕</button>
     </div>
     <div class="modal-body">
+      <!-- AI Quick Fill Banner -->
+      <div class="ai-fill-banner" id="ai-fill-banner">
+        <div class="ai-fill-icon">🤖</div>
+        <div class="ai-fill-text">
+          <strong>AI Estimate Generator</strong>
+          <span>Enter project type below and let AI fill standard Alberta labour, materials & tasks</span>
+        </div>
+        <button class="btn-primary btn-sm" onclick="aiGenerateEstimate()" id="ai-fill-btn">✨ AI Fill</button>
+      </div>
       <div class="form-row">
         <div class="form-group">
           <label>Client Name *</label>
           <input type="text" id="est-customer" placeholder="Customer or company name">
         </div>
         <div class="form-group">
+          <label>Project Type *</label>
+          <select id="est-project-type" onchange="updateEstimateDesc()">
+            <option value="">— Select project type —</option>
+            <optgroup label="Residential">
+              <option value="new_home_framing">New Home Framing</option>
+              <option value="garage_build">Garage Build</option>
+              <option value="basement_development">Basement Development</option>
+              <option value="kitchen_renovation">Kitchen Renovation</option>
+              <option value="bathroom_renovation">Bathroom Renovation</option>
+              <option value="deck_build">Deck / Patio Build</option>
+              <option value="addition">Home Addition</option>
+              <option value="roofing_residential">Residential Roofing</option>
+            </optgroup>
+            <optgroup label="Commercial">
+              <option value="commercial_office">Commercial Office Fit-Out</option>
+              <option value="retail_renovation">Retail Renovation</option>
+              <option value="warehouse_build">Warehouse / Industrial Build</option>
+              <option value="commercial_roofing">Commercial Roofing</option>
+            </optgroup>
+            <optgroup label="Trades">
+              <option value="electrical_rough_in">Electrical Rough-In</option>
+              <option value="plumbing_rough_in">Plumbing Rough-In</option>
+              <option value="hvac_install">HVAC Installation</option>
+              <option value="insulation">Insulation</option>
+              <option value="drywall_taping">Drywall & Taping</option>
+              <option value="flooring">Flooring Installation</option>
+              <option value="painting">Interior/Exterior Painting</option>
+              <option value="concrete_work">Concrete / Foundation Work</option>
+              <option value="excavation">Excavation & Site Prep</option>
+            </optgroup>
+            <option value="custom">Custom / Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
           <label>Project / Job Description</label>
           <input type="text" id="est-project-desc" placeholder="Brief description of work">
+        </div>
+        <div class="form-group">
+          <label>Project Size / Scope</label>
+          <input type="text" id="est-project-size" placeholder="e.g. 1200 sq ft, 3 bedrooms, 40x60 garage">
         </div>
       </div>
       <div class="form-row">
@@ -3635,12 +3746,12 @@
           <input type="date" id="emp-start-date">
         </div>
         <div class="form-group">
-          <label>TD1 Claim Code</label>
+          <label>TD1 Claim Code <span class="info-tooltip" data-tip="TD1 Claim Codes determine federal payroll deductions:&#10;Code 0 – More than one employer (no basic exemption)&#10;Code 1 – Basic personal amount only (~$15,705)&#10;Code 2 – Eligible dependant + basic (~$29,000)&#10;Code 3 – Multiple dependants + caregiver + basic (~$42,000)&#10;Higher codes = fewer taxes withheld. Employee fills out TD1 form annually.">ℹ️</span></label>
           <select id="emp-td1">
-            <option value="1">Code 1 – Basic personal amount</option>
-            <option value="2">Code 2</option>
-            <option value="3">Code 3</option>
-            <option value="0">Code 0 – No claim</option>
+            <option value="1">Code 1 – Basic personal amount (~$15,705)</option>
+            <option value="2">Code 2 – Eligible dependant + basic (~$29,000)</option>
+            <option value="3">Code 3 – Caregiver + dependants + basic (~$42,000)</option>
+            <option value="0">Code 0 – No claim (multiple employers)</option>
           </select>
         </div>
       </div>
@@ -4890,11 +5001,53 @@
       <div class="form-group">
         <label>Work Type</label>
         <select id="edit-time-type">
-          <option value="framing">Framing</option>
-          <option value="carpentry">Carpentry</option>
-          <option value="cleanup">Cleanup</option>
-          <option value="travel">Travel</option>
-          <option value="other">Other</option>
+          <optgroup label="General">
+            <option value="general_labour">General Labour</option>
+            <option value="site_supervision">Site Supervision</option>
+            <option value="cleanup">Cleanup</option>
+            <option value="travel">Travel</option>
+            <option value="meeting">Meeting / Admin</option>
+          </optgroup>
+          <optgroup label="Structural">
+            <option value="framing">Framing</option>
+            <option value="foundation">Foundation / Concrete</option>
+            <option value="steel_erection">Steel Erection</option>
+            <option value="masonry">Masonry / Brickwork</option>
+            <option value="carpentry">Carpentry / Millwork</option>
+          </optgroup>
+          <optgroup label="Mechanical">
+            <option value="plumbing">Plumbing</option>
+            <option value="hvac">HVAC / Mechanical</option>
+            <option value="electrical">Electrical</option>
+            <option value="gas_fitting">Gas Fitting</option>
+            <option value="fire_suppression">Fire Suppression</option>
+          </optgroup>
+          <optgroup label="Exterior">
+            <option value="roofing">Roofing</option>
+            <option value="siding">Siding / Cladding</option>
+            <option value="windows_doors">Windows & Doors</option>
+            <option value="insulation">Insulation</option>
+            <option value="waterproofing">Waterproofing</option>
+            <option value="excavation">Excavation / Grading</option>
+          </optgroup>
+          <optgroup label="Interior">
+            <option value="drywall">Drywall / Taping</option>
+            <option value="flooring">Flooring</option>
+            <option value="painting">Painting</option>
+            <option value="tiling">Tiling</option>
+            <option value="cabinets">Cabinets / Countertops</option>
+            <option value="trim">Trim / Finishing</option>
+          </optgroup>
+          <optgroup label="Safety & Inspections">
+            <option value="safety_inspection">Safety Inspection</option>
+            <option value="flha">FLHA / Hazard Assessment</option>
+            <option value="toolbox_talk">Toolbox Talk</option>
+          </optgroup>
+          <optgroup label="Other">
+            <option value="landscaping">Landscaping</option>
+            <option value="demolition">Demolition</option>
+            <option value="other">Other</option>
+          </optgroup>
         </select>
       </div>
       <div class="form-group">
@@ -5024,13 +5177,13 @@
         <div class="form-group">
           <label>Stage</label>
           <select id="crm-lead-stage">
-            <option value="new">New</option>
-            <option value="contacted">Contacted</option>
-            <option value="qualified">Qualified</option>
-            <option value="quote_sent">Quote Sent</option>
-            <option value="negotiation">Negotiation</option>
-            <option value="won">Won ✅</option>
-            <option value="lost">Lost ❌</option>
+            <option value="New">New</option>
+            <option value="Contacted">Contacted</option>
+            <option value="Qualified">Qualified</option>
+            <option value="Quote Sent">Quote Sent</option>
+            <option value="Negotiation">Negotiation</option>
+            <option value="Won">Won ✅</option>
+            <option value="Lost">Lost ❌</option>
           </select>
         </div>
         <div class="form-group">
@@ -5066,6 +5219,14 @@
         <div class="form-group">
           <label>Win Probability (%)</label>
           <input type="number" id="crm-lead-probability" value="50" min="0" max="100">
+        </div>
+        <div class="form-group">
+          <label>Contact Email</label>
+          <input type="email" id="crm-lead-email" placeholder="client@email.com">
+        </div>
+        <div class="form-group">
+          <label>Contact Phone</label>
+          <input type="tel" id="crm-lead-phone" placeholder="+1 (780) 555-0100">
         </div>
         <div class="form-group full-width">
           <label>Address / Location</label>
