@@ -2,10 +2,12 @@
 User Registration, Login, NDA, and Permissions API
 """
 
-from fastapi import APIRouter, HTTPException, Header
+from fastapi import APIRouter, HTTPException, Header, Request
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 import logging
+import time
+from collections import defaultdict
 
 from app.user_system import (
     create_user, authenticate_user, verify_user_token,
@@ -23,6 +25,21 @@ from app.persistence import save_users
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+# ─── Simple in-memory rate limiter ───────────────────────────────────────────
+_login_attempts: dict = defaultdict(list)  # ip -> [timestamps]
+RATE_LIMIT_MAX   = 10   # max attempts
+RATE_LIMIT_WINDOW = 300  # per 5 minutes
+
+def _check_rate_limit(ip: str):
+    now = time.time()
+    attempts = [t for t in _login_attempts[ip] if now - t < RATE_LIMIT_WINDOW]
+    _login_attempts[ip] = attempts
+    if len(attempts) >= RATE_LIMIT_MAX:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Too many login attempts. Please wait {RATE_LIMIT_WINDOW // 60} minutes."
+        )
+    _login_attempts[ip].append(now)
 
 # ─── Models ───────────────────────────────────────────────────────────────────
 
@@ -76,8 +93,10 @@ def get_business_config():
 # ─── Registration & Auth ──────────────────────────────────────────────────────
 
 @router.post("/register")
-async def register(request: RegisterRequest):
+async def register(request: RegisterRequest, req: Request):
     """Register a new user account"""
+    client_ip = req.client.host if req.client else "unknown"
+    _check_rate_limit(client_ip)
     if len(request.password) < 8:
         raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
     try:
@@ -90,6 +109,17 @@ async def register(request: RegisterRequest):
             phone=request.phone,
             plan=request.plan
         )
+        # Send welcome email (non-blocking — don't fail if email fails)
+        try:
+            from app.email_sender import send_welcome_email
+            send_welcome_email(
+                request.email,
+                request.contact_name,
+                request.business_name,
+                request.plan or "starter"
+            )
+        except Exception as e:
+            logger.warning(f"Welcome email failed: {e}")
         return {
             "success": True,
             "message": "Account created successfully",
@@ -101,8 +131,10 @@ async def register(request: RegisterRequest):
 
 
 @router.post("/login")
-async def login(request: LoginRequest):
+async def login(request: LoginRequest, req: Request):
     """User login"""
+    client_ip = req.client.host if req.client else "unknown"
+    _check_rate_limit(client_ip)
     result = authenticate_user(request.email, request.password)
     if not result:
         raise HTTPException(status_code=401, detail="Invalid email or password")
@@ -379,3 +411,87 @@ async def get_user_store(authorization: Optional[str] = Header(None)):
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     return {"store": db_user.get("store", {}), "success": True}
+
+
+# ─── Password Reset Endpoints ─────────────────────────────────────────────────
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str
+
+@router.post("/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest, req: Request):
+    """Send password reset email. Always returns success to prevent email enumeration."""
+    from app.user_system import create_reset_token
+    from app.email_sender import send_password_reset
+    from app.user_system import users_db
+    client_ip = req.client.host if req.client else "unknown"
+    _check_rate_limit(client_ip)
+    token = create_reset_token(request.email)
+    if token:
+        user = users_db.get(request.email, {})
+        send_password_reset(request.email, token, user.get("contact_name", ""))
+    # Always return success (don't reveal if email exists)
+    return {"success": True, "message": "If that email exists, a reset link has been sent."}
+
+@router.post("/reset-password")
+async def reset_password_endpoint(request: ResetPasswordRequest):
+    """Reset password using a token from the reset email."""
+    from app.user_system import reset_password
+    if len(request.new_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+    success = reset_password(request.token, request.new_password)
+    if not success:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+    return {"success": True, "message": "Password reset successfully. You can now log in."}
+
+@router.post("/change-password")
+async def change_password(request: ChangePasswordRequest, authorization: Optional[str] = Header(None)):
+    """Change password while logged in."""
+    user = get_current_user(authorization)
+    from app.user_system import update_password
+    success = update_password(user["email"], request.old_password, request.new_password)
+    if not success:
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    return {"success": True, "message": "Password changed successfully"}
+
+
+# ─── Invoice Email Endpoint ───────────────────────────────────────────────────
+
+class SendInvoiceEmailRequest(BaseModel):
+    to_email: str
+    client_name: str
+    invoice_number: str
+    invoice_total: str
+    due_date: str
+    business_name: Optional[str] = "The Foreman AI"
+
+@router.post("/send-invoice-email")
+async def send_invoice_email_endpoint(
+    request: SendInvoiceEmailRequest,
+    authorization: Optional[str] = Header(None)
+):
+    """Send an invoice email to a client."""
+    get_current_user(authorization)  # auth check
+    from app.email_sender import send_invoice_email
+    success = send_invoice_email(
+        to_email=request.to_email,
+        client_name=request.client_name,
+        invoice_number=request.invoice_number,
+        invoice_total=request.invoice_total,
+        due_date=request.due_date,
+        business_name=request.business_name or "The Foreman AI"
+    )
+    if not success:
+        raise HTTPException(
+            status_code=503,
+            detail="Email could not be sent. Check SMTP settings in Render environment variables."
+        )
+    return {"success": True, "message": f"Invoice emailed to {request.to_email}"}

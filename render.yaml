@@ -7,21 +7,92 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /health
     envVars:
+      # ── Python Runtime ───────────────────────────────────────────────────────
       - key: PYTHON_VERSION
-        value: 3.11.0
+        value: "3.11.0"
+
+      # ── Security (REQUIRED - generate strong random values) ──────────────────
+      - key: SECRET_KEY
+        generateValue: true          # JWT signing key for user sessions
+
+      - key: ADMIN_SECRET_KEY
+        generateValue: true          # JWT signing key for admin sessions
+
+      - key: ADMIN_USERNAME
+        value: admin                 # Change to your desired admin username
+
+      - key: ADMIN_PASSWORD_HASH
+        # Generate with: python3 -c "import bcrypt; print(bcrypt.hashpw(b'YourPassword',bcrypt.gensalt(12)).decode())"
+        value: ""                    # REQUIRED: bcrypt hash of your admin password
+
+      # ── App Identity ─────────────────────────────────────────────────────────
       - key: BUSINESS_NAME
-        value: Foreman
+        value: "Foreman AI"
+
       - key: BUSINESS_TYPE
-        value: General Contractor
+        value: "General Contractor"
+
       - key: AI_NAME
-        value: Foreman AI
+        value: "Foreman AI"
+
       - key: GST_RATE
-        value: "0.05"
+        value: "0.05"                # Canadian GST rate (5%)
+
+      - key: APP_BASE_URL
+        value: "https://your-app.onrender.com"  # Change to your Render URL
+
+      # ── CORS ─────────────────────────────────────────────────────────────────
+      - key: ALLOWED_ORIGINS
+        value: "https://your-app.onrender.com"  # Comma-separated; add custom domain if any
+
+      # ── AI / LLM ─────────────────────────────────────────────────────────────
+      - key: OPENAI_API_KEY
+        value: ""                    # sk-... from platform.openai.com
+
+      - key: ANTHROPIC_API_KEY
+        value: ""                    # Optional: sk-ant-... from console.anthropic.com
+
+      # ── Email / SMTP ─────────────────────────────────────────────────────────
+      - key: SMTP_HOST
+        value: "smtp.gmail.com"      # Or: smtp.sendgrid.net / smtp.mailgun.org
+
+      - key: SMTP_PORT
+        value: "587"                 # 587 = STARTTLS (recommended), 465 = SSL
+
+      - key: SMTP_USER
+        value: ""                    # Your Gmail address or SendGrid username
+
+      - key: SMTP_PASS
+        value: ""                    # Gmail App Password (not your Google password)
+
+      - key: SMTP_FROM
+        value: ""                    # From address (often same as SMTP_USER)
+
+      - key: SMTP_FROM_NAME
+        value: "Foreman AI"          # Display name shown in emails
+
+      # ── Stripe (Optional – for billing/payments) ─────────────────────────────
+      - key: STRIPE_SECRET_KEY
+        value: ""                    # sk_live_... from dashboard.stripe.com
+
+      - key: STRIPE_PUBLISHABLE_KEY
+        value: ""                    # pk_live_... (used in frontend)
+
+      # ── Runtime / Storage ────────────────────────────────────────────────────
       - key: DEBUG
         value: "false"
-      - key: SECRET_KEY
-        generateValue: true
-      - key: ADMIN_USERNAME
-        value: admin
-      - key: ADMIN_PASSWORD_HASH
-        value: 400136f398d0be8f9e12dd5878c076787470b0a978f2d146852631bd2c477cfb
+
+      - key: DEBUG_MODE
+        value: "false"
+
+      - key: PORT
+        value: "10000"               # Render sets this automatically; leave as-is
+
+      - key: DATA_DIR
+        value: "/opt/render/project/src/data"   # Persistent data directory on Render
+
+      - key: SETTINGS_FILE
+        value: "/opt/render/project/src/data/settings.json"
+
+      - key: ADMIN_TOKEN_EXPIRE_HOURS
+        value: "24"                  # How long admin JWT tokens stay valid

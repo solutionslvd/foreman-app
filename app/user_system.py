@@ -7,6 +7,18 @@ import hashlib
 import hmac
 import secrets
 import os
+
+# ─── bcrypt with graceful fallback ───────────────────────────────────────────
+try:
+    import bcrypt as _bcrypt
+    _BCRYPT_AVAILABLE = True
+except ImportError:
+    _BCRYPT_AVAILABLE = False
+    import logging as _log
+    _log.getLogger(__name__).warning(
+        "bcrypt not installed — falling back to SHA-256. "
+        "Add 'bcrypt' to requirements.txt for production."
+    )
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 import logging
@@ -22,11 +34,24 @@ user_sessions: Dict[str, Dict] = {}
 
 
 def hash_password(password: str) -> str:
+    """Hash a password using bcrypt (preferred) or SHA-256 fallback."""
+    if _BCRYPT_AVAILABLE:
+        salt = _bcrypt.gensalt(rounds=12)
+        return _bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
     return hashlib.sha256(password.encode()).hexdigest()
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return hmac.compare_digest(hash_password(plain), hashed)
+    """Verify a password — supports bcrypt ($2b$) and legacy SHA-256."""
+    try:
+        if hashed.startswith("$2b$") or hashed.startswith("$2a$"):
+            if _BCRYPT_AVAILABLE:
+                return _bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+            return False  # bcrypt hash but library missing — deny safely
+        # Legacy SHA-256 path
+        return hmac.compare_digest(hashlib.sha256(plain.encode()).hexdigest(), hashed)
+    except Exception:
+        return False
 
 
 def create_user(
@@ -210,3 +235,44 @@ def get_platform_stats() -> Dict:
             plans["business"] * 299
         )
     }
+
+# ─── Password Reset ───────────────────────────────────────────────────────────
+_reset_tokens: Dict[str, Dict] = {}  # token -> {email, expires_at}
+
+def create_reset_token(email: str) -> Optional[str]:
+    """Create a password-reset token for the given email. Returns None if email not found."""
+    if email not in users_db:
+        return None  # silently return None (don't reveal whether email exists)
+    token = secrets.token_urlsafe(32)
+    expires = datetime.now() + timedelta(hours=1)
+    _reset_tokens[token] = {"email": email, "expires_at": expires.isoformat()}
+    return token
+
+def reset_password(token: str, new_password: str) -> bool:
+    """Reset password using a valid token. Returns True on success."""
+    entry = _reset_tokens.get(token)
+    if not entry:
+        return False
+    if datetime.now() > datetime.fromisoformat(entry["expires_at"]):
+        del _reset_tokens[token]
+        return False
+    email = entry["email"]
+    user = users_db.get(email)
+    if not user:
+        return False
+    user["password_hash"] = hash_password(new_password)
+    save_users(users_db)
+    del _reset_tokens[token]
+    logger.info(f"Password reset for: {email}")
+    return True
+
+def update_password(email: str, old_password: str, new_password: str) -> bool:
+    """Change password after verifying the old one."""
+    user = users_db.get(email)
+    if not user:
+        return False
+    if not verify_password(old_password, user["password_hash"]):
+        return False
+    user["password_hash"] = hash_password(new_password)
+    save_users(users_db)
+    return True

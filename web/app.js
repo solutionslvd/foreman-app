@@ -382,6 +382,93 @@ async function handleRegister() {
   }
 }
 
+async function handleForgotPassword() {
+  const email    = document.getElementById('forgot-email').value.trim();
+  const errEl    = document.getElementById('forgot-error');
+  const successEl= document.getElementById('forgot-success');
+
+  errEl.classList.add('hidden');
+  successEl.classList.add('hidden');
+
+  if (!email) { showError(errEl, 'Please enter your email address'); return; }
+
+  const btn = document.querySelector('#forgot-form .btn-primary');
+  btn.disabled = true;
+  btn.textContent = 'Sending\u2026';
+
+  try {
+    await fetch(`${API}/api/users/forgot-password`, {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ email })
+    });
+    // Always show success to avoid email enumeration
+    successEl.textContent = 'If that email exists, a reset link has been sent. Check your inbox.';
+    successEl.classList.remove('hidden');
+    document.getElementById('forgot-email').value = '';
+  } catch(e) {
+    showError(errEl, 'Connection error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send Reset Link';
+  }
+}
+
+async function handleResetPassword() {
+  const token    = document.getElementById('reset-token').value.trim();
+  const password = document.getElementById('reset-password').value;
+  const confirm  = document.getElementById('reset-password-confirm').value;
+  const errEl    = document.getElementById('reset-error');
+  const successEl= document.getElementById('reset-success');
+
+  errEl.classList.add('hidden');
+  successEl.classList.add('hidden');
+
+  if (!token)             { showError(errEl, 'Reset token is missing. Use the link from your email.'); return; }
+  if (password.length < 8){ showError(errEl, 'Password must be at least 8 characters'); return; }
+  if (password !== confirm){ showError(errEl, 'Passwords do not match'); return; }
+
+  const btn = document.querySelector('#reset-form .btn-primary');
+  btn.disabled = true;
+  btn.textContent = 'Saving\u2026';
+
+  try {
+    const res  = await fetch(`${API}/api/users/reset-password`, {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ token, new_password: password })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      successEl.textContent = '\u2705 Password updated! Redirecting to login\u2026';
+      successEl.classList.remove('hidden');
+      setTimeout(() => showForm('login-form'), 2000);
+    } else {
+      showError(errEl, data.detail || 'Reset failed. The link may have expired.');
+    }
+  } catch(e) {
+    showError(errEl, 'Connection error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Set New Password';
+  }
+}
+
+// Check for ?reset_token=xxx in URL on page load and pre-fill reset form
+(function checkResetTokenInURL() {
+  const params = new URLSearchParams(window.location.search);
+  const token  = params.get('reset_token') || params.get('token');
+  if (token) {
+    document.getElementById('reset-token').value = token;
+    if (document.readyState !== 'loading') {
+      showForm('reset-form');
+    } else {
+      document.addEventListener('DOMContentLoaded', () => showForm('reset-form'));
+    }
+    history.replaceState({}, document.title, window.location.pathname);
+  }
+})();
+
 function handleLogout() {
   authToken = null;
   isAdmin = false;
@@ -944,6 +1031,24 @@ function getEstLines() {
   return lines;
 }
 
+function generateInvoiceNumber() {
+  const invoices = store.invoices || [];
+  const year = new Date().getFullYear();
+  // Find highest existing number for this year
+  let maxNum = 0;
+  invoices.forEach(inv => {
+    const ref = inv.reference || inv.invoice_number || '';
+    // Match patterns like INV-2025-0042 or INV-0042
+    const m = ref.match(/INV[-_](?:\d{4}[-_])?(\d+)/i);
+    if (m) {
+      const n = parseInt(m[1], 10);
+      if (!isNaN(n) && n > maxNum) maxNum = n;
+    }
+  });
+  const next = String(maxNum + 1).padStart(4, '0');
+  return `INV-${year}-${next}`;
+}
+
 function openInvoiceModal() {
   invLineCount = 0;
   document.getElementById('inv-lines-body').innerHTML = '';
@@ -952,6 +1057,12 @@ function openInvoiceModal() {
   document.getElementById('inv-subtotal').textContent = '$0.00';
   document.getElementById('inv-gst-total').textContent = '$0.00';
   document.getElementById('inv-grand-total').textContent = '$0.00';
+  // Auto-generate invoice number
+  const invNumEl = document.getElementById('inv-number');
+  if (invNumEl) invNumEl.value = generateInvoiceNumber();
+  // Default status to 'sent'
+  const invStatusEl = document.getElementById('inv-status');
+  if (invStatusEl) invStatusEl.value = 'sent';
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('inv-date').value = today;
   const due = new Date(); due.setDate(due.getDate() + 30);
@@ -994,6 +1105,9 @@ async function createInvoice() {
   });
   const total = subtotal + gstTotal;
 
+  const invoiceNumber = document.getElementById('inv-number')?.value || generateInvoiceNumber();
+  const invoiceStatus = document.getElementById('inv-status')?.value || 'sent';
+
   try {
     const payload = {
       client_name: customer,
@@ -1002,7 +1116,10 @@ async function createInvoice() {
       date: date || new Date().toISOString().split('T')[0],
       due_date: dueDate,
       notes: notes,
-      payment_terms: document.getElementById('inv-terms').value
+      payment_terms: document.getElementById('inv-terms').value,
+      invoice_number: invoiceNumber,
+      reference: invoiceNumber,
+      status: invoiceStatus
     };
     let res;
     try {
@@ -1070,11 +1187,37 @@ async function createEstimate() {
   }
 }
 
+function invoiceStatusBadge(status) {
+  const s = (status || 'sent').toLowerCase();
+  const map = {
+    draft:   { bg: 'rgba(150,150,150,0.2)', color: '#aaa',      label: 'Draft'   },
+    sent:    { bg: 'rgba(33,150,243,0.15)', color: '#64b5f6',   label: 'Sent'    },
+    viewed:  { bg: 'rgba(156,39,176,0.15)', color: '#ce93d8',   label: 'Viewed'  },
+    paid:    { bg: 'rgba(76,175,80,0.15)',  color: '#81c784',   label: 'Paid'    },
+    overdue: { bg: 'rgba(244,67,54,0.15)',  color: '#e57373',   label: 'Overdue' },
+  };
+  const cfg = map[s] || map.sent;
+  return `<span style="padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;background:${cfg.bg};color:${cfg.color}">${cfg.label}</span>`;
+}
+
+function invoiceStatusMenu(invoiceId, currentStatus) {
+  const s = (currentStatus || 'sent').toLowerCase();
+  const options = ['draft','sent','viewed','paid','overdue'];
+  return `<select onchange="updateInvoiceStatus('${invoiceId}', this.value)" style="font-size:11px;padding:2px 4px;background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:4px;cursor:pointer">
+    ${options.map(o => `<option value="${o}"${o===s?' selected':''}>${o.charAt(0).toUpperCase()+o.slice(1)}</option>`).join('')}
+  </select>`;
+}
+
 async function loadInvoices() {
   try {
     const data = await apiGet('/api/ledger/transactions?transaction_type=invoice');
     const container = document.getElementById('invoices-list');
-    if (!data?.transactions?.length) {
+    // Merge API + local store invoices
+    const apiTxns  = data?.transactions || [];
+    const localInv = (store.invoices || []).filter(i => !apiTxns.find(t => t.id === i.id));
+    const allInv   = [...apiTxns, ...localInv];
+
+    if (!allInv.length) {
       container.innerHTML = `<div class="empty-state">
         <div class="empty-icon">📄</div>
         <h3>No Invoices Yet</h3>
@@ -1084,44 +1227,79 @@ async function loadInvoices() {
       return;
     }
 
-    let total = 0, paid = 0;
-    data.transactions.forEach(t => { total += t.total_amount; });
+    let total = 0, outstanding = 0, overdueTotal = 0;
+    allInv.forEach(t => {
+      const amt = t.total_amount || t.total || 0;
+      total += amt;
+      const s = (t.status || 'sent').toLowerCase();
+      if (!['paid','draft'].includes(s)) outstanding += amt;
+      if (s === 'overdue') overdueTotal += amt;
+    });
 
-    container.innerHTML = `
+    // Summary bar
+    const summary = `
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="flex:1;min-width:120px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px 16px">
+          <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Total Invoiced</div>
+          <div style="font-size:1.2rem;font-weight:700;color:var(--text)">${formatCurrency(total)}</div>
+        </div>
+        <div style="flex:1;min-width:120px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px 16px">
+          <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Outstanding</div>
+          <div style="font-size:1.2rem;font-weight:700;color:#64b5f6">${formatCurrency(outstanding)}</div>
+        </div>
+        <div style="flex:1;min-width:120px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px 16px">
+          <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Overdue</div>
+          <div style="font-size:1.2rem;font-weight:700;color:#e57373">${formatCurrency(overdueTotal)}</div>
+        </div>
+        <div style="flex:1;min-width:120px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px 16px">
+          <div style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Invoices</div>
+          <div style="font-size:1.2rem;font-weight:700;color:var(--text)">${allInv.length}</div>
+        </div>
+      </div>`;
+
+    container.innerHTML = summary + `
+      <div style="overflow-x:auto">
       <table class="data-table">
         <thead>
           <tr>
             <th>Invoice #</th>
             <th>Customer</th>
             <th>Date</th>
+            <th>Due</th>
             <th>Amount</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          ${data.transactions.map(t => `
+          ${allInv.map(t => {
+            const amt = t.total_amount || t.total || 0;
+            const customer = t.client_name || (t.description ? t.description.replace('Invoice ','').split(' - ')[1] || t.description : 'Unknown');
+            const invNum = t.invoice_number || t.reference || t.id || 'N/A';
+            const dueDate = t.due_date || '-';
+            return `
             <tr>
-              <td><strong>${t.reference || t.id || 'N/A'}</strong></td>
-              <td>${t.description ? t.description.replace('Invoice ', '').split(' - ')[1] || t.description : t.client_name || 'Unknown'}</td>
-              <td>${t.date}</td>
-              <td><strong>${formatCurrency(t.total_amount)}</strong></td>
-              <td>
-                <span class="status-active" style="padding:3px 8px;border-radius:10px;font-size:11px;background:rgba(76,175,80,0.15);color:var(--accent)">${t.status || 'Sent'}</span>
-              </td>
+              <td><strong style="color:var(--primary)">${invNum}</strong></td>
+              <td>${customer}</td>
+              <td>${t.date || '-'}</td>
+              <td>${dueDate}</td>
+              <td><strong>${formatCurrency(amt)}</strong></td>
+              <td>${invoiceStatusMenu(t.id, t.status)}</td>
               <td style="white-space:nowrap">
-                <button onclick="updateInvoiceStatus('${t.id}', 'paid')" style="padding:4px 8px;font-size:11px;background:var(--accent);color:white;border:none;border-radius:4px;cursor:pointer;margin-right:4px" title="Mark Paid">✓ Paid</button>
                 <button onclick="deleteInvoice('${t.id}')" style="padding:4px 8px;font-size:11px;background:var(--danger);color:white;border:none;border-radius:4px;cursor:pointer" title="Delete">🗑</button>
               </td>
-            </tr>
-          `).join('')}
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>
+      </div>
     `;
 
-    document.getElementById('inv-total').textContent = formatCurrency(total);
-    document.getElementById('inv-outstanding').textContent = formatCurrency(total * 0.4);
-  } catch(e) {}
+    const invTotalEl = document.getElementById('inv-total');
+    const invOutEl   = document.getElementById('inv-outstanding');
+    if (invTotalEl) invTotalEl.textContent = formatCurrency(total);
+    if (invOutEl)   invOutEl.textContent   = formatCurrency(outstanding);
+  } catch(e) { console.error('loadInvoices error:', e); }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2999,20 +3177,51 @@ function initTimeTracking() {
   renderTimeEntries();
 }
 
+function exportTimeCSV() {
+  const entries = store.time_entries || [];
+  if (!entries.length) { showToast('No time entries to export', 'warning'); return; }
+  const rows = [['Date','Project','Work Type','Hours','Minutes','Notes']];
+  entries.forEach(e => {
+    rows.push([
+      e.date || '',
+      e.project_name || '',
+      e.work_type || '',
+      Math.floor((e.minutes || 0) / 60),
+      (e.minutes || 0) % 60,
+      (e.notes || '').replace(/,/g, ';')
+    ]);
+  });
+  downloadCSV(rows, 'time_entries.csv');
+  showToast('Time entries exported!', 'success');
+}
+
 function renderTimeEntries() {
   const container = document.getElementById('time-entries');
   if (!container) return;
-  
+
   const entries = store.time_entries || [];
   const now = new Date();
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() - now.getDay());
-  weekStart.setHours(0, 0, 0, 0);
+  const viewFilter = document.getElementById('time-view-filter')?.value || 'week';
+
+  let filteredEntries;
+  if (viewFilter === 'week') {
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+    filteredEntries = entries.filter(e => new Date(e.date) >= weekStart);
+  } else if (viewFilter === 'month') {
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    filteredEntries = entries.filter(e => new Date(e.date) >= monthStart);
+  } else {
+    filteredEntries = [...entries];
+  }
+
+  const weekEntries = filteredEntries;
   
-  const weekEntries = entries.filter(e => new Date(e.date) >= weekStart);
-  
+  const filterLabel = { week: 'this week', month: 'this month', all: 'yet' };
+  const viewFilter2 = document.getElementById('time-view-filter')?.value || 'week';
   if (weekEntries.length === 0) {
-    container.innerHTML = '<div class="empty-state-sm">No time entries this week</div>';
+    container.innerHTML = `<div class="empty-state-sm">No time entries ${filterLabel[viewFilter2] || 'this week'}</div>`;
     return;
   }
   
@@ -3026,7 +3235,7 @@ function renderTimeEntries() {
   let html = `
     <div style="padding:12px;background:linear-gradient(135deg,var(--primary-light),rgba(255,107,53,0.1));border-radius:8px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <span style="font-weight:600;color:var(--primary)">Weekly Total</span>
+        <span style="font-weight:600;color:var(--primary)">${{week:'Weekly',month:'Monthly',all:'All-Time'}[document.getElementById('time-view-filter')?.value||'week']||'Weekly'} Total</span>
         <span style="font-size:1.2em;font-weight:700">${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m</span>
       </div>
     </div>
@@ -3060,20 +3269,72 @@ function renderTimeEntries() {
   container.innerHTML = html;
 }
 
+// ── Timer persistence helpers ─────────────────────────────────────────────
+function saveTimerState() {
+  if (timerRunning) {
+    localStorage.setItem('foreman_timer', JSON.stringify({
+      running: true,
+      startedAt: Date.now() - (timerSeconds * 1000),
+      projectId: document.getElementById('time-project')?.value || '',
+      workType: document.getElementById('time-type')?.value || 'other',
+      notes: document.getElementById('time-notes')?.value || ''
+    }));
+  } else {
+    localStorage.removeItem('foreman_timer');
+  }
+}
+
+function restoreTimerState() {
+  const saved = localStorage.getItem('foreman_timer');
+  if (!saved) return;
+  try {
+    const state = JSON.parse(saved);
+    if (state.running) {
+      timerSeconds = Math.floor((Date.now() - state.startedAt) / 1000);
+      if (document.getElementById('time-project') && state.projectId)
+        document.getElementById('time-project').value = state.projectId;
+      if (document.getElementById('time-type') && state.workType)
+        document.getElementById('time-type').value = state.workType;
+      if (document.getElementById('time-notes') && state.notes)
+        document.getElementById('time-notes').value = state.notes;
+      timerRunning = true;
+      document.getElementById('timer-btn').textContent = '⏹ Stop Timer';
+      document.getElementById('timer-btn').className = 'btn-danger';
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        const display = document.getElementById('timer-display');
+        if (display) display.textContent = formatTime(timerSeconds);
+        saveTimerState();
+      }, 1000);
+      const display = document.getElementById('timer-display');
+      if (display) display.textContent = formatTime(timerSeconds);
+      showToast('⏱️ Timer restored — still running!', 'info');
+    }
+  } catch(e) { localStorage.removeItem('foreman_timer'); }
+}
+
 function toggleTimer() {
   if (timerRunning) {
     clearInterval(timerInterval);
     timerRunning = false;
+    localStorage.removeItem('foreman_timer');
     document.getElementById('timer-btn').textContent = '▶ Start Timer';
     document.getElementById('timer-btn').className = 'btn-primary';
-    
-    // BUG-001 FIX: Actually save the time entry when timer stops
+
     if (timerSeconds > 0) {
       const projectId = document.getElementById('time-project')?.value || null;
       const project = projectId ? (store.projects || []).find(p => p.id === projectId) : null;
       const workType = document.getElementById('time-type')?.value || 'other';
       const notes = document.getElementById('time-notes')?.value || '';
-      
+      // Overtime flag: check weekly hours
+      const weekMs = 7 * 24 * 3600 * 1000;
+      const weekStart = Date.now() - weekMs;
+      const weeklySeconds = (store.time_entries || [])
+        .filter(e => new Date(e.date).getTime() > weekStart)
+        .reduce((s, e) => s + (e.seconds || (e.minutes * 60) || 0), 0);
+      const totalWeeklyHours = (weeklySeconds + timerSeconds) / 3600;
+      const isOvertime = totalWeeklyHours > 40;
+
       const entry = {
         id: 'time_' + Date.now(),
         date: new Date().toISOString(),
@@ -3085,17 +3346,22 @@ function toggleTimer() {
         notes: notes,
         user: currentUser?.contact_name || 'Unknown',
         manual: false,
-        timer: true
+        timer: true,
+        overtime: isOvertime
       };
-      
+
       store.time_entries = store.time_entries || [];
       store.time_entries.push(entry);
       saveStore();
-      
-      showToast(`Time entry saved: ${formatTime(timerSeconds)}`, 'success');
+
+      if (isOvertime) {
+        showToast(`⚠️ Overtime! ${totalWeeklyHours.toFixed(1)}h this week (>40h). Entry saved.`, 'warning');
+      } else {
+        showToast(`Time entry saved: ${formatTime(timerSeconds)}`, 'success');
+      }
       renderTimeEntries();
     }
-    
+
     timerSeconds = 0;
     document.getElementById('timer-display').textContent = '00:00:00';
   } else {
@@ -3104,8 +3370,11 @@ function toggleTimer() {
     document.getElementById('timer-btn').className = 'btn-danger';
     timerInterval = setInterval(() => {
       timerSeconds++;
-      document.getElementById('timer-display').textContent = formatTime(timerSeconds);
+      const display = document.getElementById('timer-display');
+      if (display) display.textContent = formatTime(timerSeconds);
+      saveTimerState();
     }, 1000);
+    saveTimerState();
   }
 }
 
@@ -8645,13 +8914,17 @@ function renderPipelineBoard() {
   if (!board) return;
 
   const leads = store.crmLeads || [];
-  const filterStage = document.getElementById('pipeline-filter-owner')?.value || '';
-  const filterSearch = (document.getElementById('pipeline-search')?.value || '').toLowerCase();
+  const filterStage    = document.getElementById('pipeline-filter-owner')?.value || '';
+  const filterPriority = document.getElementById('pipeline-filter-priority')?.value || '';
+  const filterTrade    = document.getElementById('pipeline-filter-trade')?.value || '';
+  const filterSearch   = (document.getElementById('pipeline-search')?.value || '').toLowerCase();
 
   const filtered = leads.filter(l => {
-    if (filterStage && l.stage !== filterStage) return false;
+    if (filterStage    && l.stage    !== filterStage)    return false;
+    if (filterPriority && l.priority !== filterPriority) return false;
+    if (filterTrade    && l.trade    !== filterTrade)    return false;
     if (filterSearch) {
-      const hay = (l.title + ' ' + (l.contact_name||'') + ' ' + (l.company||'')).toLowerCase();
+      const hay = (l.title + ' ' + (l.contact_name||'') + ' ' + (l.company||'') + ' ' + (l.address||'')).toLowerCase();
       if (!hay.includes(filterSearch)) return false;
     }
     return true;

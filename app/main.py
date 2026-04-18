@@ -33,13 +33,17 @@ app = FastAPI(
     redoc_url="/api/redoc"
 )
 
+# ── CORS: read from env (comma-separated), fallback to same-origin only ──────
+_raw_origins = os.environ.get("ALLOWED_ORIGINS", "")
+_allowed_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()] or ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
+)</pre>
 
 # ── Keep-Alive Background Task ────────────────────────────────────────────────
 _keep_alive_task = None
@@ -73,23 +77,6 @@ async def lifespan(app: FastAPI):
     ai_engine.config = config
     compliance_engine.config = config
     
-    # Create default test user on startup (for in-memory storage)
-    from app.user_system import users_db, create_user
-    if "test@foreman.ca" not in users_db:
-        try:
-            create_user(
-                email="test@foreman.ca",
-                password="Test1234!",
-                business_name="Test Construction Ltd.",
-                trade="Framing",
-                contact_name="Test User",
-                phone="780-555-1234",
-                plan="pro"
-            )
-            logger.info("Default test user created: test@foreman.ca / Test1234!")
-        except Exception as e:
-            logger.warning(f"Could not create default test user: {e}")
-
     # Start keep-alive background task
     _keep_alive_task = asyncio.create_task(keep_alive_ping())
     logger.info("✅ Application started successfully! Keep-alive task running.")
