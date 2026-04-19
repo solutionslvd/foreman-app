@@ -31,7 +31,7 @@ ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
 
 # Support both bcrypt hashes ($2b$...) and legacy SHA-256 hashes
 # Default is the bcrypt hash of "ChangeMe2024!" — MUST change in .env
-_DEFAULT_BCRYPT_HASH = "$2b$12$KFH96eyMZYtkIAAVhV/hcelD34dxn1XR4wG7hX8yACAIsndbIlS2y"
+_DEFAULT_BCRYPT_HASH = "$2b$12$QVsO4BasJ7b5lUZCVZq.0.47Au62YPTxLQmSBuVeFHCw6stZ7wYw."
 _DEFAULT_SHA256_HASH = "400136f398d0be8f9e12dd5878c076787470b0a978f2d146852631bd2c477cfb"
 
 ADMIN_PASSWORD_HASH = os.environ.get(
